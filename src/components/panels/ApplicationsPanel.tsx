@@ -1,6 +1,6 @@
 import { useKeyboard } from "@opentui/react";
 import { useShallow } from "zustand/shallow";
-import { useStateStore } from "~/stores/state";
+import { useStateStore } from "#/stores/state";
 
 export type ApplicationsPanelProps = {
   active: boolean;

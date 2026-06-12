@@ -1,9 +1,9 @@
-import resolveAbsolutePath from "~/lib/resolveAbsolutePath";
+import resolveAbsolutePath from "#/lib/resolveAbsolutePath";
 
 import { z } from "zod/mini";
-import keys from "~/util/object/keys";
-import getProtocol from "~/lib/getProtocol";
-import readTextFile from "~/lib/io/readTextFile";
+import keys from "#/util/object/keys";
+import getProtocol from "#/lib/getProtocol";
+import readTextFile from "#/lib/io/readTextFile";
 
 const getParser = {
   ".json": () => JSON.parse,

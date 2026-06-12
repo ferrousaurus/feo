@@ -1,8 +1,8 @@
 import { deepMerge } from "@std/collections";
 import { queryOptions, useQueries } from "@tanstack/react-query";
-import readConfigFile from "~/lib/readConfigFile";
-import { useStateStore } from "~/stores/state";
-import CodePanel, { type CodePanelProps } from "~/components/panels/CodePanel";
+import readConfigFile from "#/lib/readConfigFile";
+import { useStateStore } from "#/stores/state";
+import CodePanel, { type CodePanelProps } from "#/components/panels/CodePanel";
 import { useShallow } from "zustand/shallow";
 
 export type PreviewPanelProps = Omit<CodePanelProps, "config" | "path"> & {

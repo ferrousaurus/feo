@@ -1,7 +1,7 @@
 import { queryOptions } from "@tanstack/react-query";
-import readConfigFile from "~/lib/readConfigFile";
-import resolveAbsolutePath from "~/lib/resolveAbsolutePath";
-import feoConfigValidator from "~/data/feoConfig";
+import readConfigFile from "#/lib/readConfigFile";
+import resolveAbsolutePath from "#/lib/resolveAbsolutePath";
+import feoConfigValidator from "#/data/feoConfig";
 
 const configQueryOptions = queryOptions({
   queryKey: ["~/.config/feo/config.toml"],

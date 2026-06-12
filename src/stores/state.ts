@@ -1,9 +1,9 @@
 import { createContext, use } from "react";
 import { create, useStore, type StoreApi } from "zustand";
 import type { UseBoundStore } from "zustand/react";
-import feoConfigValidator from "~/data/feoConfig";
-import keys from "~/util/object/keys";
-import queryClient from "~/stores/queryClient";
+import feoConfigValidator from "#/data/feoConfig";
+import keys from "#/util/object/keys";
+import queryClient from "#/stores/queryClient";
 
 const formats = [".json", ".yaml", ".toml"] as const;
 

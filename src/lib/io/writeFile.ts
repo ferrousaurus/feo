@@ -1,4 +1,4 @@
-import getRuntime from "~/lib/getRuntime";
+import getRuntime from "#/lib/getRuntime";
 
 const writeFileNode = async (path: string, contents: string) => {
   const writeFile = await import("node:fs/promises").then((m) => m.writeFile);

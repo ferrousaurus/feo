@@ -1,11 +1,11 @@
 import { useKeyboard } from "@opentui/react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useShallow } from "zustand/shallow";
-import readConfigFile from "~/lib/readConfigFile";
-import { useStateStore } from "~/stores/state";
-import configMutationOptions from "~/data/configMutationOptions";
-import moveSourceDownMutationOptions from "~/data/moveSourceDownMutationOptions";
-import moveSourceUpMutationOptions from "~/data/moveSourceUpMutationOptions";
+import readConfigFile from "#/lib/readConfigFile";
+import { useStateStore } from "#/stores/state";
+import configMutationOptions from "#/data/configMutationOptions";
+import moveSourceDownMutationOptions from "#/data/moveSourceDownMutationOptions";
+import moveSourceUpMutationOptions from "#/data/moveSourceUpMutationOptions";
 
 export type SourcesPanelProps = {
   active: boolean;

@@ -1,21 +1,21 @@
 import { useKeyboard } from "@opentui/react";
 import nodePath from "node:path";
 import { useMemo, useState } from "react";
-import type { FeoConfig } from "~/data/feoConfig";
-import feoConfigValidator from "~/data/feoConfig";
-import resolveAbsolutePath from "~/lib/resolveAbsolutePath";
-import { useStateStore } from "~/stores/state";
-import keys from "~/util/object/keys";
-import ApplicationsPanel from "~/components/panels/ApplicationsPanel";
-import Legend from "~/components/panels/LegendPanel";
-import PreviewPanel from "~/components/panels/PreviewPanel";
-import SourcePanel from "~/components/panels/SourcePanel";
-import SourcesPanel from "~/components/panels/SourcesPanel";
-import TargetsPanel from "~/components/panels/TargetsPanel";
+import type { FeoConfig } from "#/data/feoConfig";
+import feoConfigValidator from "#/data/feoConfig";
+import resolveAbsolutePath from "#/lib/resolveAbsolutePath";
+import { useStateStore } from "#/stores/state";
+import keys from "#/util/object/keys";
+import ApplicationsPanel from "#/components/panels/ApplicationsPanel";
+import Legend from "#/components/panels/LegendPanel";
+import PreviewPanel from "#/components/panels/PreviewPanel";
+import SourcePanel from "#/components/panels/SourcePanel";
+import SourcesPanel from "#/components/panels/SourcesPanel";
+import TargetsPanel from "#/components/panels/TargetsPanel";
 import { useShallow } from "zustand/react/shallow";
-import readTextFile from "~/lib/io/readTextFile";
-import writeFile from "~/lib/io/writeFile";
-import sha from "~/lib/crypto/hash";
+import readTextFile from "#/lib/io/readTextFile";
+import writeFile from "#/lib/io/writeFile";
+import sha from "#/lib/crypto/hash";
 
 const COLOR = "cyan";
 
