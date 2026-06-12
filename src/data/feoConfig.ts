@@ -1,6 +1,9 @@
 import { z } from "zod/mini";
 
 const feoConfigValidator = z.object({
+  settings: z.object({
+    previewFormat: z.enum([".json", ".yaml", ".toml"]),
+  }),
   configs: z.record(
     z.string(),
     z.object({

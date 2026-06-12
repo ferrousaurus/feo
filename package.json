@@ -19,6 +19,7 @@
     "typescript": "^5"
   },
   "dependencies": {
+    "@cliffy/command": "npm:@jsr/cliffy__command",
     "@opentui/core": "^0.3.4",
     "@opentui/react": "^0.3.4",
     "@std/collections": "npm:@jsr/std__collections",
@@ -28,6 +29,7 @@
     "@std/yaml": "npm:@jsr/std__yaml",
     "@tanstack/react-query": "^5.101.0",
     "react": "^19.2.6",
-    "zod": "^4.4.3"
+    "zod": "^4.4.3",
+    "zustand": "^5.0.14"
   }
 }

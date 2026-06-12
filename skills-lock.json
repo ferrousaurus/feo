@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "skills": {
+    "ferrousaurus-react-best-practices": {
+      "source": "ferrousaurus/skills",
+      "sourceType": "github",
+      "skillPath": "ferrousaurus-react-best-practices/SKILL.md",
+      "computedHash": "aaf6f2400d9562b40b577dc7114e74dc651be6402faecc04154a8231c11e30c0"
+    },
+    "ferrousaurus-typescript-best-practices": {
+      "source": "ferrousaurus/skills",
+      "sourceType": "github",
+      "skillPath": "ferrousaurus-typescript-best-practices/SKILL.md",
+      "computedHash": "f1b0f485cb2fc6f29b5fb12e78782626dce4b2c77a26e235372d17cc924868a0"
+    }
+  }
+}

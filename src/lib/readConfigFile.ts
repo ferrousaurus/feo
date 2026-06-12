@@ -3,6 +3,7 @@ import resolveAbsolutePath from "./resolveAbsolutePath";
 import { z } from "zod/mini";
 import keys from "../util/object/keys";
 import getProtocol from "./getProtocol";
+import readTextFile from "./io/readTextFile";
 
 const getParser = {
   ".json": () => JSON.parse,
@@ -48,7 +49,7 @@ export default async function readConfigFile(path: string) {
   }
   const contents =
     protocol === "file:"
-      ? await Bun.file(absolutePath).text()
+      ? await readTextFile(absolutePath)
       : await fetch(absolutePath)
           .then((r) => (r.ok ? r : Promise.reject(r)))
           .then((r) => r.text());
