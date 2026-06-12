@@ -2,9 +2,9 @@ import { Command } from "@cliffy/command";
 import { addDefaultParsers, createCliRenderer } from "@opentui/core";
 import { createRoot } from "@opentui/react";
 import { QueryClientProvider } from "@tanstack/react-query";
-import App from "./components/App";
-import queryClient from "./stores/queryClient";
-import VERSION from "./lib/version";
+import App from "~/components/App";
+import queryClient from "~/stores/queryClient";
+import VERSION from "~/lib/version";
 
 await new Command()
   .name("feo")

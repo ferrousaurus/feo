@@ -1,4 +1,4 @@
-import getRuntime from "../getRuntime";
+import getRuntime from "~/lib/getRuntime";
 
 const readTextFileNode = async (path: string) => {
   const fs = await import("node:fs/promises");

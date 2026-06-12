@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import resolveAbsolutePath from "./resolveAbsolutePath";
+import resolveAbsolutePath from "~/lib/resolveAbsolutePath";
 
 describe("resolveAbsolutePath", () => {
   it("returns a plain absolute path unchanged", () => {

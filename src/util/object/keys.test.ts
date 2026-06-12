@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test"
-import keys from "./keys"
+import keys from "~/util/object/keys"
 
 describe("keys", () => {
   it("returns keys of an object with known keys", () => {

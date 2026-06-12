@@ -4,13 +4,13 @@ import * as TOML from "@std/toml";
 import * as YAML from "@std/yaml";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useRef, type RefObject } from "react";
-import type { FeoConfig } from "../../data/feoConfig";
-import feoConfigValidator from "../../data/feoConfig";
-import writeFile from "../../lib/io/writeFile";
-import readConfigFile from "../../lib/readConfigFile";
-import resolveAbsolutePath from "../../lib/resolveAbsolutePath";
-import configMutationOptions from "../../data/configMutationOptions";
-import configQueryOptions from "../../data/configQueryOptions";
+import type { FeoConfig } from "~/data/feoConfig";
+import feoConfigValidator from "~/data/feoConfig";
+import writeFile from "~/lib/io/writeFile";
+import readConfigFile from "~/lib/readConfigFile";
+import resolveAbsolutePath from "~/lib/resolveAbsolutePath";
+import configMutationOptions from "~/data/configMutationOptions";
+import configQueryOptions from "~/data/configQueryOptions";
 
 const stringifiers = {
   ".jsonc": (obj: Record<string, unknown>) => JSON.stringify(obj, null, 2),

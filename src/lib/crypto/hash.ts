@@ -1,4 +1,4 @@
-import getRuntime from "../getRuntime";
+import getRuntime from "~/lib/getRuntime";
 
 async function shaNode(str: string) {
   const crypto = await import("node:crypto");

@@ -2,17 +2,17 @@ import { addDefaultParsers, createCliRenderer } from "@opentui/core";
 import { createRoot } from "@opentui/react";
 import * as TOML from "@std/toml";
 import { QueryClientProvider, useMutation, useQuery } from "@tanstack/react-query";
-import Shell from "./Shell";
-import feoConfigValidator, { type FeoConfig } from "../data/feoConfig";
-import readConfigFile from "../lib/readConfigFile";
-import resolveAbsolutePath from "../lib/resolveAbsolutePath";
-import queryClient from "../stores/queryClient";
-import { createStateStore, StateStoreContext } from "../stores/state";
-import keys from "../util/object/keys";
+import Shell from "~/components/Shell";
+import feoConfigValidator, { type FeoConfig } from "~/data/feoConfig";
+import readConfigFile from "~/lib/readConfigFile";
+import resolveAbsolutePath from "~/lib/resolveAbsolutePath";
+import queryClient from "~/stores/queryClient";
+import { createStateStore, StateStoreContext } from "~/stores/state";
+import keys from "~/util/object/keys";
 import { useMemo } from "react";
 import writeFile from "~/lib/io/writeFile";
-import configQueryOptions from "../data/configQueryOptions";
-import configMutationOptions from "../data/configMutationOptions";
+import configQueryOptions from "~/data/configQueryOptions";
+import configMutationOptions from "~/data/configMutationOptions";
 import { Command } from "@cliffy/command";
 
 export default function App() {

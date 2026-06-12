@@ -1,9 +1,9 @@
 import { stringify } from "@std/toml";
 import { mutationOptions } from "@tanstack/react-query";
-import writeFile from "../lib/io/writeFile";
-import resolveAbsolutePath from "../lib/resolveAbsolutePath";
-import type { FeoConfig } from "./feoConfig";
-import feoConfigValidator from "./feoConfig";
+import writeFile from "~/lib/io/writeFile";
+import resolveAbsolutePath from "~/lib/resolveAbsolutePath";
+import type { FeoConfig } from "~/data/feoConfig";
+import feoConfigValidator from "~/data/feoConfig";
 
 function moveSourceUp(config: FeoConfig, vars: { app: string; target: string; source: string }) {
   const app = config.configs[vars.app];

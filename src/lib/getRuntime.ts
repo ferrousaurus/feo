@@ -1,4 +1,4 @@
-import UnsupportedRuntimeException from "../util/error/UnsupportedRuntimeException";
+import UnsupportedRuntimeException from "~/util/error/UnsupportedRuntimeException";
 
 export default function getRuntime() {
   if ("Bun" in globalThis) {
