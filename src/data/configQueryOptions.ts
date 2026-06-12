@@ -1,15 +1,16 @@
-import { queryOptions } from "@tanstack/react-query";
+import feoConfigValidator from "#/data/feoConfig";
 import readConfigFile from "#/lib/readConfigFile";
 import resolveAbsolutePath from "#/lib/resolveAbsolutePath";
-import feoConfigValidator from "#/data/feoConfig";
+import { queryOptions } from "@tanstack/react-query";
 
-const configQueryOptions = queryOptions({
-  queryKey: ["~/.config/feo/config.toml"],
-  queryFn: async () => {
-    const contents = await readConfigFile(resolveAbsolutePath("~/.config/feo/config.toml"));
+const configQueryOptions = (path: string) =>
+  queryOptions({
+    queryKey: [path],
+    queryFn: async () => {
+      const contents = await readConfigFile(resolveAbsolutePath(path));
 
-    return feoConfigValidator.parse(contents);
-  },
-});
+      return feoConfigValidator.parse(contents);
+    },
+  });
 
 export default configQueryOptions;

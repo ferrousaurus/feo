@@ -1,16 +1,16 @@
-import { stringify } from "@std/toml";
-import { mutationOptions } from "@tanstack/react-query";
+import type { FeoConfig } from "#/data/feoConfig";
 import writeFile from "#/lib/io/writeFile";
 import resolveAbsolutePath from "#/lib/resolveAbsolutePath";
-import type { FeoConfig } from "#/data/feoConfig";
+import { stringify } from "@std/toml";
+import { mutationOptions } from "@tanstack/react-query";
 
-const configMutationOptions = mutationOptions({
-  mutationKey: ["write", "~/.config/feo/config.toml"],
-  mutationFn: async (config: FeoConfig) =>
-    await writeFile(resolveAbsolutePath("~/.config/feo/config.toml"), stringify(config)),
-  onMutate: async (vars, context) => {
-    await context.client.setQueryData(["~/.config/feo/config.toml"], vars);
-  },
-});
+const configMutationOptions = (configPath: string) =>
+  mutationOptions({
+    mutationKey: ["write", configPath],
+    mutationFn: async (config: FeoConfig) => await writeFile(resolveAbsolutePath(configPath), stringify(config)),
+    onMutate: async (vars, context) => {
+      await context.client.setQueryData([configPath], vars);
+    },
+  });
 
 export default configMutationOptions;

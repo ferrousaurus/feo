@@ -1,9 +1,9 @@
-import { stringify } from "@std/toml";
-import { mutationOptions } from "@tanstack/react-query";
-import writeFile from "#/lib/io/writeFile";
-import resolveAbsolutePath from "#/lib/resolveAbsolutePath";
 import type { FeoConfig } from "#/data/feoConfig";
 import feoConfigValidator from "#/data/feoConfig";
+import writeFile from "#/lib/io/writeFile";
+import resolveAbsolutePath from "#/lib/resolveAbsolutePath";
+import { stringify } from "@std/toml";
+import { mutationOptions } from "@tanstack/react-query";
 
 function moveSourceDown(config: FeoConfig, vars: { app: string; target: string; source: string }) {
   const app = config.configs[vars.app];
@@ -25,38 +25,39 @@ function moveSourceDown(config: FeoConfig, vars: { app: string; target: string; 
   return [...sources.slice(0, index), sources[index + 1], vars.source, ...sources.slice(index + 2)];
 }
 
-const moveSourceDownMutationOptions = mutationOptions({
-  mutationKey: ["moveSourceDown", "~/.config/feo/config.toml"],
-  mutationFn: async (vars: { app: string; target: string; source: string }, context) => {
-    const config = feoConfigValidator.safeParse(context.client.getQueryData(["~/.config/feo/config.toml"]));
-    if (!config.success) {
-      throw config.error;
-    }
-    const newConfig = feoConfigValidator.safeParse({
-      ...config.data,
-      configs: {
-        ...config.data.configs,
-        [vars.app]: {
-          ...config.data.configs[vars.app],
-          targets: {
-            ...(config.data.configs[vars.app]?.targets ?? {}),
-            [vars.target]: {
-              ...(config.data.configs[vars.target]?.targets[vars.target] ?? {}),
-              sources: moveSourceDown(config.data, vars),
+const moveSourceDownMutationOptions = (configPath: string) =>
+  mutationOptions({
+    mutationKey: ["moveSourceDown", configPath],
+    mutationFn: async (vars: { app: string; target: string; source: string }, context) => {
+      const config = feoConfigValidator.safeParse(context.client.getQueryData([configPath]));
+      if (!config.success) {
+        throw config.error;
+      }
+      const newConfig = feoConfigValidator.safeParse({
+        ...config.data,
+        configs: {
+          ...config.data.configs,
+          [vars.app]: {
+            ...config.data.configs[vars.app],
+            targets: {
+              ...(config.data.configs[vars.app]?.targets ?? {}),
+              [vars.target]: {
+                ...(config.data.configs[vars.app]?.targets[vars.target] ?? {}),
+                sources: moveSourceDown(config.data, vars),
+              },
             },
           },
         },
-      },
-    });
-    if (!newConfig.success) {
-      throw new Error("There was an error applying the change.");
-    }
-    await writeFile(resolveAbsolutePath("~/.config/feo/config.toml"), stringify(newConfig.data));
-    return newConfig.data;
-  },
-  onSuccess: async (data, _vars, _onMutateResult, context) => {
-    await context.client.setQueryData(["~/.config/feo/config.toml"], data);
-  },
-});
+      });
+      if (!newConfig.success) {
+        throw new Error("There was an error applying the change.");
+      }
+      await writeFile(resolveAbsolutePath(configPath), stringify(newConfig.data));
+      return newConfig.data;
+    },
+    onSuccess: async (data, _vars, _onMutateResult, context) => {
+      await context.client.setQueryData([configPath], data);
+    },
+  });
 
 export default moveSourceDownMutationOptions;

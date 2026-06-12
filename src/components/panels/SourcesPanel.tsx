@@ -6,6 +6,8 @@ import { useStateStore } from "#/stores/state";
 import configMutationOptions from "#/data/configMutationOptions";
 import moveSourceDownMutationOptions from "#/data/moveSourceDownMutationOptions";
 import moveSourceUpMutationOptions from "#/data/moveSourceUpMutationOptions";
+import { use } from "react";
+import { AppContext } from "#/components/App";
 
 export type SourcesPanelProps = {
   active: boolean;
@@ -47,8 +49,10 @@ function SourcesPanelKeybinds({ onNew }: { onNew?: () => void }) {
     })),
   );
 
-  const { mutateAsync: moveSourceUpAsync } = useMutation(moveSourceUpMutationOptions);
-  const { mutateAsync: moveSourceDownAsync } = useMutation(moveSourceDownMutationOptions);
+  const { configPath } = use(AppContext);
+
+  const { mutateAsync: moveSourceUpAsync } = useMutation(moveSourceUpMutationOptions(configPath));
+  const { mutateAsync: moveSourceDownAsync } = useMutation(moveSourceDownMutationOptions(configPath));
 
   useKeyboard((key) => {
     if (key.name === "j" || key.name === "down") {

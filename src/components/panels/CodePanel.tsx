@@ -3,7 +3,7 @@ import { useKeyboard } from "@opentui/react";
 import * as TOML from "@std/toml";
 import * as YAML from "@std/yaml";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useRef, type RefObject } from "react";
+import { use, useRef, type RefObject } from "react";
 import type { FeoConfig } from "#/data/feoConfig";
 import feoConfigValidator from "#/data/feoConfig";
 import writeFile from "#/lib/io/writeFile";
@@ -11,6 +11,7 @@ import readConfigFile from "#/lib/readConfigFile";
 import resolveAbsolutePath from "#/lib/resolveAbsolutePath";
 import configMutationOptions from "#/data/configMutationOptions";
 import configQueryOptions from "#/data/configQueryOptions";
+import { AppContext } from "../App";
 
 const stringifiers = {
   ".jsonc": (obj: Record<string, unknown>) => JSON.stringify(obj, null, 2),
@@ -69,9 +70,11 @@ function CodePanelKeybinds({
   onCancelWrite?: () => void;
   scrollRef: RefObject<ScrollBoxRenderable | null>;
 }) {
-  const { isSuccess, data } = useQuery(configQueryOptions);
+  const appContext = use(AppContext);
 
-  const { mutateAsync } = useMutation(configMutationOptions);
+  const { isSuccess, data } = useQuery(configQueryOptions(appContext.configPath));
+
+  const { mutateAsync } = useMutation(configMutationOptions(appContext.configPath));
 
   useKeyboard((key) => {
     if (isSuccess && key.name === "space") {

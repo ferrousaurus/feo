@@ -9,16 +9,21 @@ import resolveAbsolutePath from "#/lib/resolveAbsolutePath";
 import queryClient from "#/stores/queryClient";
 import { createStateStore, StateStoreContext } from "#/stores/state";
 import keys from "#/util/object/keys";
-import { useMemo } from "react";
+import { createContext, use, useMemo } from "react";
 import writeFile from "#/lib/io/writeFile";
 import configQueryOptions from "#/data/configQueryOptions";
 import configMutationOptions from "#/data/configMutationOptions";
 import { Command } from "@cliffy/command";
 
-export default function App() {
-  const { isPending, isError, isSuccess, error, data } = useQuery(configQueryOptions);
+export const AppContext = createContext<{ configPath: string }>({ configPath: "${HOME}/.config/feo/config.toml" });
 
-  const { mutateAsync } = useMutation(configMutationOptions);
+export type AppProps = {
+  configPath: string;
+};
+
+export default function App({ configPath }: Readonly<AppProps>) {
+  const { isPending, isError, isSuccess, error, data } = useQuery(configQueryOptions(configPath));
+  const { mutateAsync } = useMutation(configMutationOptions(configPath));
 
   const store = useMemo(() => {
     const app = isSuccess ? keys(data.configs)[0] : undefined;
@@ -43,8 +48,10 @@ export default function App() {
   }
 
   return (
-    <StateStoreContext value={store}>
-      <Shell config={data} onChangeConfig={(c) => void mutateAsync(c)} />
-    </StateStoreContext>
+    <AppContext value={{ configPath }}>
+      <StateStoreContext value={store}>
+        <Shell config={data} onChangeConfig={(c) => void mutateAsync(c)} />
+      </StateStoreContext>
+    </AppContext>
   );
 }
