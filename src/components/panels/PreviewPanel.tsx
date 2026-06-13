@@ -1,17 +1,14 @@
+import CodePanel, { type CodePanelProps } from "#/components/panels/CodePanel";
+import readConfigFile from "#/lib/readConfigFile";
 import { deepMerge } from "@std/collections";
 import { queryOptions, useQueries } from "@tanstack/react-query";
-import readConfigFile from "#/lib/readConfigFile";
-import { useStateStore } from "#/stores/state";
-import CodePanel, { type CodePanelProps } from "#/components/panels/CodePanel";
-import { useShallow } from "zustand/shallow";
 
 export type PreviewPanelProps = Omit<CodePanelProps, "config" | "path"> & {
   configs: string[];
+  target?: string;
 };
 
-export default function PreviewPanel({ configs, ...props }: Readonly<PreviewPanelProps>) {
-  const target = useStateStore((s) => s.target);
-
+export default function PreviewPanel({ configs, target, ...props }: Readonly<PreviewPanelProps>) {
   const { isPending, isError, error, data } = useQueries({
     queries: configs.map((c) =>
       queryOptions({

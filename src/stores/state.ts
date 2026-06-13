@@ -1,9 +1,9 @@
+import feoConfigValidator from "#/data/feoConfig";
+import queryClient from "#/stores/queryClient";
+import keys from "#/util/object/keys";
 import { createContext, use } from "react";
 import { create, useStore, type StoreApi } from "zustand";
 import type { UseBoundStore } from "zustand/react";
-import feoConfigValidator from "#/data/feoConfig";
-import keys from "#/util/object/keys";
-import queryClient from "#/stores/queryClient";
 
 const formats = [".json", ".yaml", ".toml"] as const;
 
@@ -11,6 +11,7 @@ export type State = {
   app: string | undefined;
   target: string | undefined;
   source: string | undefined;
+  configPath: string;
   previousApp: () => void;
   nextApp: () => void;
   previousTarget: () => void;
@@ -23,11 +24,12 @@ export const createStateStore = (initial: {
   app: string | undefined;
   target: string | undefined;
   source: string | undefined;
+  configPath: string;
 }) =>
   create<State>()((set, get) => ({
     ...initial,
     previousApp: () => {
-      const config = feoConfigValidator.safeParse(queryClient.getQueryData(["~/.config/feo/config.toml"]));
+      const config = feoConfigValidator.safeParse(queryClient.getQueryData([get().configPath]));
       if (!config.success) {
         throw config.error;
       }
@@ -40,7 +42,7 @@ export const createStateStore = (initial: {
         set({
           app: firstApp,
           target: firstTarget,
-          source: firstTarget !== undefined && targets !== undefined ? targets[firstTarget]?.sources[0] : undefined,
+          source: firstTarget !== undefined && targets !== undefined ? targets[firstTarget]?.sources[targets[firstTarget].sources.length - 1] : undefined,
         });
         return;
       }
@@ -67,12 +69,12 @@ export const createStateStore = (initial: {
       set({
         app: prev,
         target: firstTarget,
-        source: firstTarget === undefined ? undefined : targets[firstTarget]?.sources[0],
+        source: firstTarget === undefined ? undefined : targets[firstTarget]?.sources[targets[firstTarget].sources.length - 1],
       });
       return;
     },
     nextApp: () => {
-      const config = feoConfigValidator.safeParse(queryClient.getQueryData(["~/.config/feo/config.toml"]));
+      const config = feoConfigValidator.safeParse(queryClient.getQueryData([get().configPath]));
       if (!config.success) {
         throw config.error;
       }
@@ -85,7 +87,7 @@ export const createStateStore = (initial: {
         set({
           app: firstApp,
           target: firstTarget,
-          source: firstTarget !== undefined && targets !== undefined ? targets[firstTarget]?.sources[0] : undefined,
+          source: firstTarget !== undefined && targets !== undefined ? targets[firstTarget]?.sources[targets[firstTarget].sources.length - 1] : undefined,
         });
         return;
       }
@@ -112,12 +114,12 @@ export const createStateStore = (initial: {
       set({
         app: next,
         target: firstTarget,
-        source: firstTarget === undefined ? undefined : targets[firstTarget]?.sources[0],
+        source: firstTarget === undefined ? undefined : targets[firstTarget]?.sources[targets[firstTarget].sources.length - 1],
       });
       return;
     },
     previousTarget: () => {
-      const config = feoConfigValidator.safeParse(queryClient.getQueryData(["~/.config/feo/config.toml"]));
+      const config = feoConfigValidator.safeParse(queryClient.getQueryData([get().configPath]));
       if (!config.success) {
         throw config.error;
       }
@@ -135,7 +137,7 @@ export const createStateStore = (initial: {
         const firstTarget = targets[0];
         set({
           target: firstTarget,
-          source: firstTarget === undefined ? undefined : appConfig.targets[firstTarget]?.sources[0],
+          source: firstTarget === undefined ? undefined : appConfig.targets[firstTarget]?.sources[appConfig.targets[firstTarget].sources.length - 1],
         });
         return;
       }
@@ -150,11 +152,11 @@ export const createStateStore = (initial: {
       }
       set({
         target: prev,
-        source: appConfig.targets[prev]?.sources[0],
+        source: appConfig.targets[prev]?.sources[appConfig.targets[prev].sources.length - 1],
       });
     },
     nextTarget: () => {
-      const config = feoConfigValidator.safeParse(queryClient.getQueryData(["~/.config/feo/config.toml"]));
+      const config = feoConfigValidator.safeParse(queryClient.getQueryData([get().configPath]));
       if (!config.success) {
         throw config.error;
       }
@@ -172,7 +174,7 @@ export const createStateStore = (initial: {
         const firstTarget = targets[0];
         set({
           target: firstTarget,
-          source: firstTarget === undefined ? undefined : appConfig.targets[firstTarget]?.sources[0],
+          source: firstTarget === undefined ? undefined : appConfig.targets[firstTarget]?.sources[appConfig.targets[firstTarget].sources.length - 1],
         });
         return;
       }
@@ -187,11 +189,11 @@ export const createStateStore = (initial: {
       }
       set({
         target: next,
-        source: appConfig.targets[next]?.sources[0],
+        source: appConfig.targets[next]?.sources[appConfig.targets[next].sources.length - 1],
       });
     },
     previousSource: () => {
-      const config = feoConfigValidator.safeParse(queryClient.getQueryData(["~/.config/feo/config.toml"]));
+      const config = feoConfigValidator.safeParse(queryClient.getQueryData([get().configPath]));
       if (!config.success) {
         throw config.error;
       }
@@ -214,7 +216,7 @@ export const createStateStore = (initial: {
       const sources = targetConfig.sources;
       const currentSource = get().source;
       if (currentSource === undefined) {
-        set({ source: sources[0] });
+        set({ source: sources[sources.length - 1] });
         return;
       }
       const i = sources.indexOf(currentSource);
@@ -222,7 +224,7 @@ export const createStateStore = (initial: {
       set({ source: prev });
     },
     nextSource: () => {
-      const config = feoConfigValidator.safeParse(queryClient.getQueryData(["~/.config/feo/config.toml"]));
+      const config = feoConfigValidator.safeParse(queryClient.getQueryData([get().configPath]));
       if (!config.success) {
         throw config.error;
       }
@@ -245,7 +247,7 @@ export const createStateStore = (initial: {
       const sources = targetConfig.sources;
       const currentSource = get().source;
       if (currentSource === undefined) {
-        set({ source: sources[0] });
+        set({ source: sources[sources.length - 1] });
         return;
       }
       const i = sources.indexOf(currentSource);
@@ -259,6 +261,7 @@ export const StateStoreContext = createContext<UseBoundStore<StoreApi<State>>>(
     app: undefined,
     target: undefined,
     source: undefined,
+    configPath: "",
   }),
 );
 

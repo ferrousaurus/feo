@@ -9,7 +9,7 @@ import feoConfigValidator from "#/data/feoConfig";
 import writeFile from "#/lib/io/writeFile";
 import readConfigFile from "#/lib/readConfigFile";
 import resolveAbsolutePath from "#/lib/resolveAbsolutePath";
-import configMutationOptions from "#/data/configMutationOptions";
+import configMutationOptions from "#/data/writeConfigMutationOptions";
 import configQueryOptions from "#/data/configQueryOptions";
 import { AppContext } from "../App";
 

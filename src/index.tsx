@@ -6,15 +6,18 @@ import App from "#/components/App";
 import queryClient from "#/stores/queryClient";
 import VERSION from "#/lib/version";
 import tui from "#/tui";
+import execCommand from "./commands/exec";
+import configOption from "./commands/options/config";
+import feoConfigValidator from "./data/feoConfig";
+import resolveAbsolutePath from "./lib/resolveAbsolutePath";
 
 await new Command()
   .name("feo")
   .version(VERSION)
   .description("A configuration file manager")
-  .option("-c, --config <config:string>", "The configuration file to load", {
-    default: "${HOME}/.config/feo/config.toml",
-  })
+  .globalOption(configOption.flags, configOption.desc, configOption.opts)
   .action(async (options) => {
     await tui({ configPath: options.config });
   })
+  .command("exec", execCommand)
   .parse();

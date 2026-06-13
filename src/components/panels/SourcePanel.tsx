@@ -1,16 +1,14 @@
-import { useQuery } from "@tanstack/react-query";
-import readConfigFile from "#/lib/readConfigFile";
-import { useStateStore } from "#/stores/state";
 import CodePanel, { type CodePanelProps } from "#/components/panels/CodePanel";
+import readConfigFile from "#/lib/readConfigFile";
+import { useQuery } from "@tanstack/react-query";
 import path from "node:path";
 import { z } from "zod/mini";
-import keys from "#/util/object/keys";
 
-export type SourcePanelProps = Omit<CodePanelProps, "config" | "path" | "format">;
+export type SourcePanelProps = Omit<CodePanelProps, "config" | "path" | "format"> & {
+  source?: string;
+};
 
-export default function SourcePanel(props: Readonly<SourcePanelProps>) {
-  const source = useStateStore((s) => s.source);
-
+export default function SourcePanel({ source, ...props }: Readonly<SourcePanelProps>) {
   if (source === undefined) {
     return null;
   }
@@ -18,7 +16,7 @@ export default function SourcePanel(props: Readonly<SourcePanelProps>) {
   return <SourcePanelContent source={source} {...props} />;
 }
 
-function SourcePanelContent({ source, active: _active, ...props }: Readonly<SourcePanelProps & { source: string }>) {
+function SourcePanelContent({ source, ...props }: Readonly<SourcePanelProps & { source: string }>) {
   const { isPending, isError, error, data } = useQuery({
     queryKey: [source],
     queryFn: async () => await readConfigFile(source ?? ""),
@@ -40,5 +38,5 @@ function SourcePanelContent({ source, active: _active, ...props }: Readonly<Sour
     return null;
   }
 
-  return <CodePanel config={data ?? {}} path={source} format={validatedExt.data} active={false} {...props} />;
+  return <CodePanel config={data ?? {}} path={source} format={validatedExt.data} {...props} />;
 }
