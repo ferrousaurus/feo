@@ -11,7 +11,7 @@ import writeFile from "#/lib/io/writeFile";
 import resolveAbsolutePath from "#/lib/resolveAbsolutePath";
 import keys from "#/util/object/keys";
 import { useKeyboard } from "@opentui/react";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import nodePath from "node:path";
 import { Suspense, useState } from "react";
 
@@ -31,7 +31,7 @@ export type ShellProps = {
 };
 
 export default function Shell({ configPath, initialApplication, initialTarget, initialSource }: Readonly<ShellProps>) {
-  const { data: config } = useSuspenseQuery(configQueryOptions(configPath));
+  const queryClient = useQueryClient();
 
   const [panel, setPanel] = useState<(typeof panels)[number]>("apps");
   const [application, setApplication] = useState<string | undefined>(initialApplication);
@@ -48,14 +48,13 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
     setPanel((p) => panels[panels.indexOf(p) + 1] ?? panels[0]);
   };
 
-  const applicationData = application === undefined ? { targets: {} } : config.configs[application];
-
-  const targetData =
-    application === undefined || target === undefined ? { sources: [] } : applicationData?.targets[target];
-
   const handleNextApplication = () => {
+    const config = queryClient.getQueryData(configQueryOptions(configPath).queryKey);
+    if (config === undefined) {
+      return;
+    }
+    const apps = keys(config.configs);
     setApplication((currentApp) => {
-      const apps = keys(config.configs);
       if (currentApp === undefined) {
         const firstApp = apps[0];
         const targets = firstApp === undefined ? undefined : config.configs[firstApp]?.targets;
@@ -94,8 +93,12 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
   };
 
   const handlePreviousApplication = () => {
+    const config = queryClient.getQueryData(configQueryOptions(configPath).queryKey);
+    if (config === undefined) {
+      return;
+    }
+    const apps = keys(config.configs);
     setApplication((currentApp) => {
-      const apps = keys(config.configs);
       if (currentApp === undefined) {
         const firstApp = apps[0];
         const targets = firstApp === undefined ? undefined : config.configs[firstApp]?.targets;
@@ -134,6 +137,10 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
   };
 
   const handleNextTarget = () => {
+    const config = queryClient.getQueryData(configQueryOptions(configPath).queryKey);
+    if (config === undefined) {
+      return;
+    }
     setTarget((currentTarget) => {
       if (application === undefined) {
         return currentTarget;
@@ -167,6 +174,10 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
   };
 
   const handlePreviousTarget = () => {
+    const config = queryClient.getQueryData(configQueryOptions(configPath).queryKey);
+    if (config === undefined) {
+      return;
+    }
     setTarget((currentTarget) => {
       if (application === undefined) {
         return currentTarget;
@@ -200,6 +211,10 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
   };
 
   const handleNextSource = () => {
+    const config = queryClient.getQueryData(configQueryOptions(configPath).queryKey);
+    if (config === undefined) {
+      return;
+    }
     setSource((currentSource) => {
       if (application === undefined || target === undefined) {
         return currentSource;
@@ -220,6 +235,10 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
   };
 
   const handlePreviousSource = () => {
+    const config = queryClient.getQueryData(configQueryOptions(configPath).queryKey);
+    if (config === undefined) {
+      return;
+    }
     setSource((currentSource) => {
       if (application === undefined || target === undefined) {
         return currentSource;
@@ -240,6 +259,10 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
   };
 
   const handleWrite = (opts: { path: string; contents: string }) => {
+    const config = queryClient.getQueryData(configQueryOptions(configPath).queryKey);
+    if (config === undefined) {
+      return;
+    }
     setWriting((w) => {
       if (w === undefined) {
         return opts;
@@ -335,7 +358,7 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
         </box>
         <box flexGrow={1} width="50%">
           <box
-            title={`Preview (${config.settings.previewFormat})`}
+            title="Preview"
             height="50%"
             borderColor={panel === "preview" ? (writing !== undefined ? "red" : COLOR) : undefined}
             borderStyle="single"
@@ -343,10 +366,10 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
             <Suspense>
               <PreviewPanel
                 active={panel === "preview"}
+                application={application}
                 configPath={configPath}
                 target={target}
                 key="preview"
-                configs={targetData?.sources ?? []}
                 onWrite={handleWrite}
                 onCancelWrite={handleCancelWrite}
               />
