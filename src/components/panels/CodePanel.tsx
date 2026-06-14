@@ -1,17 +1,13 @@
+import configQueryOptions from "#/data/configQueryOptions";
+import fileQueryOptions from "#/data/fileQueryOptions";
+import configMutationOptions from "#/data/writeConfigMutationOptions";
+import syntaxStyle from "#/lib/style/syntaxStyle";
 import { RGBA, ScrollBoxRenderable, SyntaxStyle } from "@opentui/core";
 import { useKeyboard } from "@opentui/react";
 import * as TOML from "@std/toml";
 import * as YAML from "@std/yaml";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { use, useRef, type RefObject } from "react";
-import type { FeoConfig } from "#/data/feoConfig";
-import feoConfigValidator from "#/data/feoConfig";
-import writeFile from "#/lib/io/writeFile";
-import readConfigFile from "#/lib/readConfigFile";
-import resolveAbsolutePath from "#/lib/resolveAbsolutePath";
-import configMutationOptions from "#/data/writeConfigMutationOptions";
-import configQueryOptions from "#/data/configQueryOptions";
-import { AppContext } from "../App";
+import { useRef, type RefObject } from "react";
 
 const stringifiers = {
   ".jsonc": (obj: Record<string, unknown>) => JSON.stringify(obj, null, 2),
@@ -29,52 +25,24 @@ const filetypes = {
   ".toml": "toml",
 };
 
-export type CodePanelProps = {
-  active: boolean;
-  format: keyof typeof filetypes;
-  path?: string;
-  config: Record<string, unknown>;
-  onWrite?: (opts: { path: string; contents: string }) => void;
-  onCancelWrite?: () => void;
-};
-
-const syntaxStyle = SyntaxStyle.fromStyles({
-  string: { fg: RGBA.fromIndex(13) },
-  "string.special.key": { fg: RGBA.fromIndex(14) },
-  "string.special": { fg: RGBA.fromIndex(5) },
-  number: { fg: RGBA.fromIndex(3) },
-  "constant.builtin": { fg: RGBA.fromIndex(5) },
-  boolean: { fg: RGBA.fromIndex(5) },
-  escape: { fg: RGBA.fromIndex(5) },
-  comment: { fg: RGBA.fromIndex(4) },
-  label: { fg: RGBA.fromIndex(13) },
-  type: { fg: RGBA.fromIndex(2), bold: true },
-  attribute: { fg: RGBA.fromIndex(5) },
-  property: { fg: RGBA.fromIndex(14) },
-  "punctuation.delimiter": {},
-  "punctuation.bracket": {},
-  "punctuation.special": { fg: RGBA.fromIndex(5) },
-  operator: {},
-});
-
 function CodePanelKeybinds({
+  configPath,
   contents,
   path,
   onWrite,
   onCancelWrite,
   scrollRef,
 }: {
+  configPath: string;
   contents: string;
   path?: string;
   onWrite?: (opts: { path: string; contents: string }) => void;
   onCancelWrite?: () => void;
   scrollRef: RefObject<ScrollBoxRenderable | null>;
 }) {
-  const appContext = use(AppContext);
+  const { isSuccess, data } = useQuery(configQueryOptions(configPath));
 
-  const { isSuccess, data } = useQuery(configQueryOptions(appContext.configPath));
-
-  const { mutateAsync } = useMutation(configMutationOptions(appContext.configPath));
+  const { mutateAsync } = useMutation(configMutationOptions(configPath));
 
   useKeyboard((key) => {
     if (isSuccess && key.name === "space") {
@@ -114,24 +82,53 @@ function CodePanelKeybinds({
   return null;
 }
 
-export default function CodePanel({ path, format, active, config, onWrite, onCancelWrite }: Readonly<CodePanelProps>) {
+export type DefinedCodePanelProps = {
+  active: boolean;
+  configPath: string;
+  format: keyof typeof filetypes;
+  path: string;
+  onWrite?: (opts: { path: string; contents: string }) => void;
+  onCancelWrite?: () => void;
+};
+
+function DefinedCodePanel({
+  path,
+  format,
+  active,
+  configPath,
+  onWrite,
+  onCancelWrite,
+}: Readonly<DefinedCodePanelProps>) {
+  const { isPending, isError, error, data: config } = useQuery(fileQueryOptions(path));
+
   const ref = useRef<ScrollBoxRenderable>(null);
+
+  if (isPending) {
+    return <scrollbox ref={ref} />;
+  }
+
+  if (isError) {
+    return (
+      <scrollbox ref={ref}>
+        <text>{error.message}</text>
+      </scrollbox>
+    );
+  }
 
   const stringify = stringifiers[format];
 
   const contents = stringify(config);
 
-  const filetype = filetypes[format];
-
   return (
     <>
       <scrollbox ref={ref}>
-        <code content={contents} filetype={filetype} syntaxStyle={syntaxStyle} />
+        <code content={contents} filetype={filetypes[format]} syntaxStyle={syntaxStyle} />
       </scrollbox>
       {active && (
         <CodePanelKeybinds
           scrollRef={ref}
           contents={contents}
+          configPath={configPath}
           path={path}
           onWrite={onWrite}
           onCancelWrite={onCancelWrite}
@@ -139,4 +136,16 @@ export default function CodePanel({ path, format, active, config, onWrite, onCan
       )}
     </>
   );
+}
+
+export type CodePanelProps = Omit<DefinedCodePanelProps, "path"> & {
+  path?: string;
+};
+
+export default function CodePanel({ path, ...props }: Readonly<CodePanelProps>) {
+  if (path === undefined) {
+    return null;
+  }
+
+  return <DefinedCodePanel path={path} {...props} />;
 }

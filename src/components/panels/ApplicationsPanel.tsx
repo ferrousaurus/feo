@@ -1,9 +1,10 @@
 import addApplicationMutationOptions from "#/data/addApplicationMutationOptions";
+import configQueryOptions from "#/data/configQueryOptions";
 import deleteApplicationMutationOptions from "#/data/deleteAppMutationOptions";
+import keys from "#/util/object/keys";
 import { useKeyboard } from "@opentui/react";
-import { useMutation } from "@tanstack/react-query";
-import { use, useState } from "react";
-import { AppContext } from "../App";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
+import { useState } from "react";
 
 function ApplicationKeybinds({ onDelete, onCancel }: { onDelete?: () => void; onCancel?: () => void }) {
   useKeyboard((key) => {
@@ -18,9 +19,15 @@ function ApplicationKeybinds({ onDelete, onCancel }: { onDelete?: () => void; on
   return null;
 }
 
-function Application({ active, application }: { active: boolean; application: { name: string } }) {
-  const { configPath } = use(AppContext);
-
+function Application({
+  active,
+  application,
+  configPath,
+}: {
+  active: boolean;
+  application: string;
+  configPath: string;
+}) {
   const [deleting, setDeleting] = useState(false);
 
   const { mutateAsync } = useMutation(deleteApplicationMutationOptions(configPath));
@@ -30,7 +37,7 @@ function Application({ active, application }: { active: boolean; application: { 
       if (!d) {
         return true;
       }
-      void mutateAsync({ app: application.name });
+      void mutateAsync({ app: application });
       return false;
     });
   };
@@ -41,8 +48,8 @@ function Application({ active, application }: { active: boolean; application: { 
 
   return (
     <>
-      <text key={application.name} fg={active ? (deleting ? "red" : "cyan") : undefined}>
-        {application.name}
+      <text key={application} fg={active ? (deleting ? "red" : "cyan") : undefined}>
+        {application}
       </text>
       {active && <ApplicationKeybinds onDelete={handleDelete} onCancel={handleCancel} />}
     </>
@@ -113,7 +120,6 @@ function NewApplicationInput({
 
 export type ApplicationsPanelProps = {
   active: boolean;
-  applications: { name: string }[];
   configPath: string;
   application?: string;
   onNext?: () => void;
@@ -122,12 +128,16 @@ export type ApplicationsPanelProps = {
 
 export default function ApplicationsPanel({
   active,
-  applications,
   application,
   configPath,
   onNext,
   onPrevious,
 }: Readonly<ApplicationsPanelProps>) {
+  const { data: applications } = useSuspenseQuery({
+    ...configQueryOptions(configPath),
+    select: (d) => keys(d.configs),
+  });
+
   const [creating, setCreating] = useState(false);
 
   const handleNext = () => {
@@ -145,7 +155,7 @@ export default function ApplicationsPanel({
   return (
     <>
       {applications.map((a) => (
-        <Application key={a.name} active={application === a.name} application={a} />
+        <Application key={a} active={application === a} application={a} configPath={configPath} />
       ))}
       {creating && (
         <NewApplicationInput

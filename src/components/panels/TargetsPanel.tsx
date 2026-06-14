@@ -1,6 +1,8 @@
 import addTargetMutationOptions from "#/data/addTargetMutationOptions";
+import configQueryOptions from "#/data/configQueryOptions";
+import keys from "#/util/object/keys";
 import { useKeyboard } from "@opentui/react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
 export function Target({ active, target }: { active: boolean; target: string }) {
@@ -78,7 +80,6 @@ export type TargetFilesProps = {
   active: boolean;
   application: string;
   configPath: string;
-  targets: string[];
   target?: string;
   onNext?: () => void;
   onPrevious?: () => void;
@@ -88,12 +89,22 @@ export default function TargetsPanel({
   active,
   application,
   configPath,
-  targets,
   target,
   onNext,
   onPrevious,
 }: Readonly<TargetFilesProps>) {
   const [creating, setCreating] = useState(false);
+
+  const { data: targets } = useSuspenseQuery({
+    ...configQueryOptions(configPath),
+    select: (d) => {
+      const ts = d.configs[application]?.targets;
+      if (ts === undefined) {
+        return [];
+      }
+      return keys(ts);
+    },
+  });
 
   return (
     <>

@@ -1,15 +1,8 @@
-import { Command } from "@cliffy/command";
-import { addDefaultParsers, createCliRenderer } from "@opentui/core";
-import { createRoot } from "@opentui/react";
-import { QueryClientProvider } from "@tanstack/react-query";
-import App from "#/components/App";
-import queryClient from "#/stores/queryClient";
 import VERSION from "#/lib/version";
 import tui from "#/tui";
+import { Command } from "@cliffy/command";
 import execCommand from "./commands/exec";
 import configOption from "./commands/options/config";
-import feoConfigValidator from "./data/feoConfig";
-import resolveAbsolutePath from "./lib/resolveAbsolutePath";
 
 await new Command()
   .name("feo")

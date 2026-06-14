@@ -1,16 +1,15 @@
 import addSourceMutationOptions from "#/data/addSourceMutationOptions";
+import configQueryOptions from "#/data/configQueryOptions";
+import fileQueryOptions from "#/data/fileQueryOptions";
 import moveSourceDownMutationOptions from "#/data/moveSourceDownMutationOptions";
 import moveSourceUpMutationOptions from "#/data/moveSourceUpMutationOptions";
 import readConfigFile from "#/lib/readConfigFile";
 import { useKeyboard } from "@opentui/react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
 function Source({ active, file }: { file: string; active: boolean }) {
-  const { isError } = useQuery({
-    queryKey: [file],
-    queryFn: async () => await readConfigFile(file),
-  });
+  const { isError } = useQuery(fileQueryOptions(file));
 
   if (isError) {
     return (
@@ -126,7 +125,6 @@ export type SourcesPanelProps = {
   active: boolean;
   application: string;
   configPath: string;
-  sources: string[];
   source?: string;
   target: string;
   onNext?: () => void;
@@ -137,7 +135,6 @@ export default function SourcesPanel({
   active,
   application,
   configPath,
-  sources,
   source,
   target,
   onNext,
@@ -145,9 +142,20 @@ export default function SourcesPanel({
 }: Readonly<SourcesPanelProps>) {
   const [creating, setCreating] = useState(false);
 
+  const { data: sources } = useSuspenseQuery({
+    ...configQueryOptions(configPath),
+    select: (d) => {
+      const ss = d.configs[application]?.targets[target]?.sources;
+      if (ss === undefined) {
+        return [];
+      }
+      return ss;
+    },
+  });
+
   return (
     <>
-      {sources.map((s) => (
+      {sources.toReversed().map((s) => (
         <Source key={s} file={s} active={source === s} />
       ))}
       {application !== undefined && target !== undefined && creating && (
@@ -169,8 +177,12 @@ export default function SourcesPanel({
           target={target}
           source={source}
           configPath={configPath}
-          onNext={() => {}}
-          onPrevious={() => {}}
+          onNext={() => {
+            onNext?.();
+          }}
+          onPrevious={() => {
+            onPrevious?.();
+          }}
           onNew={() => {
             setCreating(true);
           }}

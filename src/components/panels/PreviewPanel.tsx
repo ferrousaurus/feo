@@ -1,14 +1,20 @@
 import CodePanel, { type CodePanelProps } from "#/components/panels/CodePanel";
+import configQueryOptions from "#/data/configQueryOptions";
 import readConfigFile from "#/lib/readConfigFile";
 import { deepMerge } from "@std/collections";
-import { queryOptions, useQueries } from "@tanstack/react-query";
+import { queryOptions, useQueries, useSuspenseQuery } from "@tanstack/react-query";
 
-export type PreviewPanelProps = Omit<CodePanelProps, "config" | "path"> & {
+export type PreviewPanelProps = Omit<CodePanelProps, "format" | "path"> & {
   configs: string[];
   target?: string;
 };
 
-export default function PreviewPanel({ configs, target, ...props }: Readonly<PreviewPanelProps>) {
+export default function PreviewPanel({ configPath, configs, target, ...props }: Readonly<PreviewPanelProps>) {
+  const { data: format } = useSuspenseQuery({
+    ...configQueryOptions(configPath),
+    select: (d) => d.settings.previewFormat,
+  });
+
   const { isPending, isError, error, data } = useQueries({
     queries: configs.map((c) =>
       queryOptions({
@@ -27,12 +33,12 @@ export default function PreviewPanel({ configs, target, ...props }: Readonly<Pre
   });
 
   if (isPending) {
-    return <></>;
+    return null;
   }
 
   if (isError) {
     return <text>{error?.message}</text>;
   }
 
-  return <CodePanel config={data ?? {}} path={target} {...props} />;
+  return <CodePanel configPath={configPath} path={target} format={format} {...props} />;
 }

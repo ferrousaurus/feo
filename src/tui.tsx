@@ -1,18 +1,15 @@
-import { Command } from "@cliffy/command";
 import { addDefaultParsers, createCliRenderer } from "@opentui/core";
 import { createRoot } from "@opentui/react";
-import { QueryClientProvider } from "@tanstack/react-query";
-import App from "#/components/App";
-import queryClient from "#/stores/queryClient";
-import VERSION from "#/lib/version";
-import type { FeoConfig } from "./data/feoConfig";
-import resolveAbsolutePath from "./lib/resolveAbsolutePath";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Suspense } from "react";
+import Shell from "./components/Shell";
 import feoConfigValidator from "./data/feoConfig";
-import { createStateStore, StateStoreContext } from "./stores/state";
-import keys from "./util/object/keys";
 import readConfigFile from "./lib/readConfigFile";
+import resolveAbsolutePath from "./lib/resolveAbsolutePath";
+import keys from "./util/object/keys";
+import configQueryOptions from "./data/configQueryOptions";
 
-export default async function tui({ configPath }: { configPath: string }) {
+const tui = async ({ configPath }: { configPath: string }) => {
   const config = feoConfigValidator.safeParse(await readConfigFile(resolveAbsolutePath(configPath)));
 
   if (!config.success) {
@@ -50,27 +47,26 @@ export default async function tui({ configPath }: { configPath: string }) {
     },
   ]);
 
-  const renderer = await createCliRenderer();
+  const queryClient = new QueryClient();
 
-  const app = keys(config.data.configs)[0];
-  const appConfig = app !== undefined ? config.data.configs[app] : undefined;
+  queryClient.setQueryData(configQueryOptions(configPath).queryKey, config.data);
+
+  const application = keys(config.data.configs)[0];
+  const appConfig = application !== undefined ? config.data.configs[application] : undefined;
   const targets = appConfig !== undefined ? keys(appConfig.targets) : undefined;
   const target = targets !== undefined ? targets[0] : undefined;
-  const sources = app !== undefined && target !== undefined ? appConfig?.targets[target]?.sources : undefined;
+  const sources = application !== undefined && target !== undefined ? appConfig?.targets[target]?.sources : undefined;
   const source = sources !== undefined ? sources[sources.length - 1] : undefined;
 
-  const store = createStateStore({
-    app,
-    target,
-    source,
-    configPath,
-  });
+  const renderer = await createCliRenderer();
 
   createRoot(renderer).render(
-    <StateStoreContext value={store}>
-      <QueryClientProvider client={queryClient}>
-        <App configPath={configPath} />
-      </QueryClientProvider>
-    </StateStoreContext>,
+    <QueryClientProvider client={queryClient}>
+      <Suspense>
+        <Shell configPath={configPath} initialApplication={application} initialTarget={target} initialSource={source} />
+      </Suspense>
+    </QueryClientProvider>,
   );
-}
+};
+
+export default tui;
