@@ -4,7 +4,7 @@ export default function Legend({ panel }: { panel: "apps" | "targets" | "preview
     case "targets": {
       return (
         <>
-          <text>q - Quit | Tab - Next Panel | Ctrl Tab - Previous Panel</text>
+          <text>Q - Quit | O/P - Panel | N - New</text>
           <text>j/↓ - Down | k/↑ - Up</text>
         </>
       );
@@ -12,23 +12,16 @@ export default function Legend({ panel }: { panel: "apps" | "targets" | "preview
     case "sources": {
       return (
         <>
-          <text>q - Quit | Tab - Next Panel | Ctrl Tab - Previous Panel</text>
-          <text>j/↓ - Down | Shift+j/↓ - Move Down | k/↑ - Up | Ctrl + k/↑ - Move Up</text>
-        </>
-      );
-    }
-    case "source": {
-      return (
-        <>
-          <text>q - Quit | Tab - Next Panel | Ctrl Tab - Previous Panel</text>
+          <text>Q - Quit | O/P - Panel | N - New | M - Move</text>
+          <text>j/↓ - Down | k/↑ - Up | [/] Scroll</text>
         </>
       );
     }
     case "preview": {
       return (
         <>
-          <text>q - Quit | Tab - Next Panel | Ctrl Tab - Previous Panel</text>
-          <text>Space - Next Format | Enter - Save | Escape - Cancel Save</text>
+          <text>Q - Quit | O/P - Panel | F - Change Preview Format | W - Write</text>
+          <text>j/↓ - Down | k/↑ - Up | [/] Scroll</text>
         </>
       );
     }

@@ -5,7 +5,9 @@ import { useKeyboard } from "@opentui/react";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
-export function Target({ active, target }: { active: boolean; target: string }) {
+type TargetProps = { active: boolean; target: string };
+
+export function Target({ active, target }: Readonly<TargetProps>) {
   return (
     <text key={target} fg={active ? "cyan" : undefined}>
       {target}
@@ -13,15 +15,13 @@ export function Target({ active, target }: { active: boolean; target: string }) 
   );
 }
 
-function TargetsPanelKeybinds({
-  onNext,
-  onPrevious,
-  onNew,
-}: {
+type TargetPanelKeybindsProps = {
   onNext: () => void;
   onPrevious?: () => void;
   onNew?: () => void;
-}) {
+};
+
+function TargetsPanelKeybinds({ onNext, onPrevious, onNew }: Readonly<TargetPanelKeybindsProps>) {
   useKeyboard((key) => {
     if (key.name === "j" || key.name === "down") {
       onNext?.();
@@ -39,17 +39,14 @@ function TargetsPanelKeybinds({
   return null;
 }
 
-function NewTargetInput({
-  app,
-  configPath,
-  onSubmit,
-  onCancel,
-}: {
+type NewTargetInputProps = {
   app: string;
   configPath: string;
   onSubmit?: () => void;
   onCancel?: () => void;
-}) {
+};
+
+function NewTargetInput({ app, configPath, onSubmit, onCancel }: Readonly<NewTargetInputProps>) {
   const [name, setName] = useState("");
 
   const { mutateAsync } = useMutation(addTargetMutationOptions(configPath));
@@ -83,6 +80,9 @@ export type TargetFilesProps = {
   target?: string;
   onNext?: () => void;
   onPrevious?: () => void;
+  creating: boolean;
+  onEnableCreate?: () => void;
+  onDisableCreate?: () => void;
 };
 
 export default function TargetsPanel({
@@ -92,9 +92,10 @@ export default function TargetsPanel({
   target,
   onNext,
   onPrevious,
+  creating,
+  onEnableCreate,
+  onDisableCreate,
 }: Readonly<TargetFilesProps>) {
-  const [creating, setCreating] = useState(false);
-
   const { data: targets } = useSuspenseQuery({
     ...configQueryOptions(configPath),
     select: (d) => {
@@ -116,17 +117,17 @@ export default function TargetsPanel({
           app={application}
           configPath={configPath}
           onSubmit={() => {
-            setCreating(false);
+            onDisableCreate?.();
           }}
           onCancel={() => {
-            setCreating(false);
+            onDisableCreate?.();
           }}
         />
       )}
       {active && !creating && (
         <TargetsPanelKeybinds
           onNew={() => {
-            setCreating(true);
+            onEnableCreate?.();
           }}
           onNext={() => {
             onNext?.();

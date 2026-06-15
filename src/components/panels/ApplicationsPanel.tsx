@@ -6,7 +6,12 @@ import { useKeyboard } from "@opentui/react";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
-function ApplicationKeybinds({ onDelete, onCancel }: { onDelete?: () => void; onCancel?: () => void }) {
+type ApplicationKeybindsProps = {
+  onDelete?: () => void;
+  onCancel?: () => void;
+};
+
+function ApplicationKeybinds({ onDelete, onCancel }: Readonly<ApplicationKeybindsProps>) {
   useKeyboard((key) => {
     if (key.name === "d") {
       onDelete?.();
@@ -19,15 +24,14 @@ function ApplicationKeybinds({ onDelete, onCancel }: { onDelete?: () => void; on
   return null;
 }
 
-function Application({
-  active,
-  application,
-  configPath,
-}: {
+type ApplicationProps = {
   active: boolean;
   application: string;
   configPath: string;
-}) {
+  enableKeybinds: boolean;
+};
+
+function Application({ active, application, configPath, enableKeybinds }: Readonly<ApplicationProps>) {
   const [deleting, setDeleting] = useState(false);
 
   const { mutateAsync } = useMutation(deleteApplicationMutationOptions(configPath));
@@ -51,20 +55,18 @@ function Application({
       <text key={application} fg={active ? (deleting ? "red" : "cyan") : undefined}>
         {application}
       </text>
-      {active && <ApplicationKeybinds onDelete={handleDelete} onCancel={handleCancel} />}
+      {active && enableKeybinds && <ApplicationKeybinds onDelete={handleDelete} onCancel={handleCancel} />}
     </>
   );
 }
 
-function ApplicationsPanelKeybinds({
-  onNext,
-  onPrevious,
-  onNew,
-}: {
+type ApplicationsPanelKeybindsProps = {
   onNext?: () => void;
   onPrevious?: () => void;
   onNew?: () => void;
-}) {
+};
+
+function ApplicationsPanelKeybinds({ onNext, onPrevious, onNew }: Readonly<ApplicationsPanelKeybindsProps>) {
   useKeyboard((key) => {
     if (key.name === "j" || key.name === "down") {
       onNext?.();
@@ -82,15 +84,9 @@ function ApplicationsPanelKeybinds({
   return null;
 }
 
-function NewApplicationInput({
-  configPath,
-  onSubmit,
-  onCancel,
-}: {
-  configPath: string;
-  onSubmit?: () => void;
-  onCancel?: () => void;
-}) {
+type NewApplicationInputProps = { configPath: string; onSubmit?: () => void; onCancel?: () => void };
+
+function NewApplicationInput({ configPath, onSubmit, onCancel }: Readonly<NewApplicationInputProps>) {
   const [name, setName] = useState("");
 
   const { mutateAsync } = useMutation(addApplicationMutationOptions(configPath));
@@ -124,6 +120,9 @@ export type ApplicationsPanelProps = {
   application?: string;
   onNext?: () => void;
   onPrevious?: () => void;
+  creating: boolean;
+  onEnableCreate?: () => void;
+  onDisableCreate?: () => void;
 };
 
 export default function ApplicationsPanel({
@@ -132,13 +131,14 @@ export default function ApplicationsPanel({
   configPath,
   onNext,
   onPrevious,
+  creating,
+  onEnableCreate,
+  onDisableCreate,
 }: Readonly<ApplicationsPanelProps>) {
   const { data: applications } = useSuspenseQuery({
     ...configQueryOptions(configPath),
     select: (d) => keys(d.configs),
   });
-
-  const [creating, setCreating] = useState(false);
 
   const handleNext = () => {
     onNext?.();
@@ -149,22 +149,28 @@ export default function ApplicationsPanel({
   };
 
   const handleNew = () => {
-    setCreating(true);
+    onEnableCreate?.();
   };
 
   return (
     <>
       {applications.map((a) => (
-        <Application key={a} active={application === a} application={a} configPath={configPath} />
+        <Application
+          key={a}
+          active={application === a}
+          application={a}
+          configPath={configPath}
+          enableKeybinds={!creating}
+        />
       ))}
       {creating && (
         <NewApplicationInput
           configPath={configPath}
           onSubmit={() => {
-            setCreating(false);
+            onDisableCreate?.();
           }}
           onCancel={() => {
-            setCreating(false);
+            onDisableCreate?.();
           }}
         />
       )}

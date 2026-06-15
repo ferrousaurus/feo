@@ -1,6 +1,5 @@
 import configQueryOptions from "#/data/configQueryOptions";
 import configMutationOptions from "#/data/writeConfigMutationOptions";
-import fileQueryOptions from "#/data/fileQueryOptions";
 import filetypes from "#/lib/filetypes";
 import readConfigFile from "#/lib/readConfigFile";
 import stringifiers from "#/lib/stringifiers";
@@ -11,13 +10,13 @@ import { deepMerge } from "@std/collections";
 import { queryOptions, useMutation, useQueries, useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { type RefObject, useRef } from "react";
 
-export type PreviewPanelProps = {
-  application?: string;
-  active: boolean;
+type PreviewCodeKeybindsProps = {
   configPath: string;
-  onCancelWrite?: () => void;
+  contents: string;
+  path?: string;
   onWrite?: (opts: { path: string; contents: string }) => void;
-  target?: string;
+  onCancelWrite?: () => void;
+  scrollRef: RefObject<ScrollBoxRenderable | null>;
 };
 
 function PreviewCodeKeybinds({
@@ -27,39 +26,34 @@ function PreviewCodeKeybinds({
   onWrite,
   onCancelWrite,
   scrollRef,
-}: {
-  configPath: string;
-  contents: string;
-  path?: string;
-  onWrite?: (opts: { path: string; contents: string }) => void;
-  onCancelWrite?: () => void;
-  scrollRef: RefObject<ScrollBoxRenderable | null>;
-}) {
+}: Readonly<PreviewCodeKeybindsProps>) {
   const { isSuccess, data } = useQuery(configQueryOptions(configPath));
   const { mutateAsync } = useMutation(configMutationOptions(configPath));
 
   useKeyboard((key) => {
-    if (isSuccess && key.name === "space") {
-      void mutateAsync({
-        ...data,
-        settings: {
-          ...data.settings,
-          previewFormat:
-            data.settings.previewFormat === ".json"
-              ? ".yaml"
-              : data.settings.previewFormat === ".yaml"
-                ? ".toml"
-                : ".json",
-        },
-      });
-    }
-
-    if (key.name === "j" || key.name === "down") {
+    if (key.name === "]") {
       scrollRef.current?.scrollBy(1);
     }
 
-    if (key.name === "k" || key.name === "up") {
+    if (key.name === "[") {
       scrollRef.current?.scrollBy(-1);
+    }
+
+    if (isSuccess) {
+      if (key.name === "f") {
+        void mutateAsync({
+          ...data,
+          settings: {
+            ...data.settings,
+            previewFormat:
+              data.settings.previewFormat === ".json"
+                ? ".yaml"
+                : data.settings.previewFormat === ".yaml"
+                  ? ".toml"
+                  : ".json",
+          },
+        });
+      }
     }
 
     if (key.name === "escape") {
@@ -75,6 +69,15 @@ function PreviewCodeKeybinds({
 
   return null;
 }
+
+export type PreviewPanelProps = {
+  application?: string;
+  active: boolean;
+  configPath: string;
+  onCancelWrite?: () => void;
+  onWrite?: (opts: { path: string; contents: string }) => void;
+  target?: string;
+};
 
 export default function PreviewPanel({
   application,
