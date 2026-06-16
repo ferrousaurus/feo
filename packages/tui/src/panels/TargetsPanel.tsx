@@ -1,79 +1,9 @@
-import addTargetMutationOptions from "#/data/addTargetMutationOptions";
 import configQueryOptions from "#/data/configQueryOptions";
+import { Target } from "#/components/targets/Target";
+import TargetsPanelKeybinds from "#/components/targets/TargetsPanelKeybinds";
+import NewTargetInput from "#/components/targets/NewTargetInput";
 import keys from "feo-utils/object/keys";
-import { useKeyboard } from "@opentui/react";
-import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
-import { useState } from "react";
-
-type TargetProps = { active: boolean; configPath: string; target: string };
-
-export function Target({ active, configPath, target }: Readonly<TargetProps>) {
-  const { data: theme } = useSuspenseQuery({ ...configQueryOptions(configPath), select: (d) => d.settings.theme });
-
-  return (
-    <text key={target} fg={active ? theme.active : theme.inactive}>
-      {target}
-    </text>
-  );
-}
-
-type TargetPanelKeybindsProps = {
-  onNext: () => void;
-  onPrevious?: () => void;
-  onNew?: () => void;
-};
-
-function TargetsPanelKeybinds({ onNext, onPrevious, onNew }: Readonly<TargetPanelKeybindsProps>) {
-  useKeyboard((key) => {
-    if (key.name === "j" || key.name === "down") {
-      onNext?.();
-    }
-
-    if (key.name === "k" || key.name === "up") {
-      onPrevious?.();
-    }
-
-    if (key.name === "n") {
-      onNew?.();
-    }
-  });
-
-  return null;
-}
-
-type NewTargetInputProps = {
-  app: string;
-  configPath: string;
-  onSubmit?: () => void;
-  onCancel?: () => void;
-};
-
-function NewTargetInput({ app, configPath, onSubmit, onCancel }: Readonly<NewTargetInputProps>) {
-  const [name, setName] = useState("");
-
-  const { mutateAsync } = useMutation(addTargetMutationOptions(configPath));
-
-  useKeyboard((key) => {
-    if (key.name === "escape") {
-      onCancel?.();
-    }
-  });
-
-  function handleSubmit() {
-    mutateAsync({
-      application: app,
-      target: name,
-    })
-      .then(() => {
-        onSubmit?.();
-      })
-      .catch(() => {
-        onSubmit?.();
-      });
-  }
-
-  return <input placeholder="New Target" focused onInput={setName} onSubmit={handleSubmit} />;
-}
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 export type TargetFilesProps = {
   active: boolean;

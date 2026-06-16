@@ -1,54 +1,14 @@
 import configQueryOptions from "#/data/configQueryOptions";
-import configMutationOptions from "#/data/writeConfigMutationOptions";
+import PreviewCodeKeybinds from "#/components/preview/PreviewCodeKeybinds";
 import filetypes from "feo-utils/config/filetypes";
 import readConfigFile from "feo-utils/config/readConfigFile";
 import stringifiers from "feo-utils/config/stringifiers";
 import syntaxStyle from "#/lib/syntaxStyle";
 import { ScrollBoxRenderable } from "@opentui/core";
-import { useKeyboard } from "@opentui/react";
 import { deepMerge } from "@std/collections";
-import { queryOptions, useMutation, useQueries, useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { queryOptions, useQueries, useSuspenseQuery } from "@tanstack/react-query";
 import path from "node:path";
-import { type RefObject, useRef } from "react";
-
-type PreviewCodeKeybindsProps = {
-  configPath: string;
-  contents: string;
-  path?: string;
-  onWrite?: (opts: { path: string; contents: string }) => void;
-  onCancelWrite?: () => void;
-  scrollRef: RefObject<ScrollBoxRenderable | null>;
-};
-
-function PreviewCodeKeybinds({
-  contents,
-  path,
-  onWrite,
-  onCancelWrite,
-  scrollRef,
-}: Readonly<PreviewCodeKeybindsProps>) {
-  useKeyboard((key) => {
-    if (key.name === "]") {
-      scrollRef.current?.scrollBy(1);
-    }
-
-    if (key.name === "[") {
-      scrollRef.current?.scrollBy(-1);
-    }
-
-    if (key.name === "escape") {
-      onCancelWrite?.();
-    }
-
-    if (path !== undefined && path !== "") {
-      if (key.name === "w") {
-        onWrite?.({ path, contents });
-      }
-    }
-  });
-
-  return null;
-}
+import { useRef } from "react";
 
 export type PreviewPanelProps = {
   application?: string;
