@@ -7,21 +7,15 @@
   },
   "devDependencies": {
     "@types/node": "^25.9.3",
-    "@types/react": "^19.2.17",
     "@typescript/native-preview": "^7.0.0-dev.20260615.1",
     "vitest": "^4.1.8"
   },
   "dependencies": {
-    "@cliffy/command": "npm:@jsr/cliffy__command@^1.2.1",
-    "@opentui/core": "^0.4.1",
-    "@opentui/react": "^0.4.1",
     "@std/collections": "npm:@jsr/std__collections@^1.2.0",
     "@std/json": "npm:@jsr/std__json@^1.1.0",
     "@std/jsonc": "npm:@jsr/std__jsonc@^1.0.2",
     "@std/toml": "npm:@jsr/std__toml@^1.0.11",
     "@std/yaml": "npm:@jsr/std__yaml@^1.1.1",
-    "@tanstack/react-query": "^5.101.0",
-    "react": "^19.2.6",
     "zod": "^4.4.3"
   }
 }

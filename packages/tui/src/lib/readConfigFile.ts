@@ -1,17 +1,7 @@
-import keys from "feo-utils/object/keys";
-import * as JSONC from "@std/jsonc";
-import * as TOML from "@std/toml";
-import * as YAML from "@std/yaml";
-import { z } from "zod/mini";
 import readFile from "feo-utils/io/readFile";
-
-const parsers = {
-  ".json": JSON.parse,
-  ".yaml": YAML.parse,
-  ".yml": YAML.parse,
-  ".toml": TOML.parse,
-  ".jsonc": JSONC.parse,
-} as const;
+import keys from "feo-utils/object/keys";
+import { z } from "zod/mini";
+import parsers from "./parsers";
 
 export class UnsupportedExtentionError extends Error {
   ext: string;

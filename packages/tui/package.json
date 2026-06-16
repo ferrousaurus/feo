@@ -14,7 +14,6 @@
     "vitest": "^4.1.8"
   },
   "dependencies": {
-    "@cliffy/command": "npm:@jsr/cliffy__command@^1.2.1",
     "@opentui/core": "^0.4.1",
     "@opentui/react": "^0.4.1",
     "@std/collections": "npm:@jsr/std__collections@^1.2.0",
