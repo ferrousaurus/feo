@@ -5,7 +5,7 @@ import { queryOptions } from "@tanstack/react-query";
 
 const configQueryOptions = (path: string) =>
   queryOptions({
-    queryKey: [path],
+    queryKey: [{ path, kind: "object" }],
     queryFn: async () => {
       const contents = await readConfigFile(resolveAbsolutePath(path));
 

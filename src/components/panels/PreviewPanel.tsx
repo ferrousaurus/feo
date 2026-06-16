@@ -8,6 +8,7 @@ import { ScrollBoxRenderable } from "@opentui/core";
 import { useKeyboard } from "@opentui/react";
 import { deepMerge } from "@std/collections";
 import { queryOptions, useMutation, useQueries, useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import path from "node:path";
 import { type RefObject, useRef } from "react";
 
 type PreviewCodeKeybindsProps = {
@@ -20,16 +21,12 @@ type PreviewCodeKeybindsProps = {
 };
 
 function PreviewCodeKeybinds({
-  configPath,
   contents,
   path,
   onWrite,
   onCancelWrite,
   scrollRef,
 }: Readonly<PreviewCodeKeybindsProps>) {
-  const { isSuccess, data } = useQuery(configQueryOptions(configPath));
-  const { mutateAsync } = useMutation(configMutationOptions(configPath));
-
   useKeyboard((key) => {
     if (key.name === "]") {
       scrollRef.current?.scrollBy(1);
@@ -39,29 +36,12 @@ function PreviewCodeKeybinds({
       scrollRef.current?.scrollBy(-1);
     }
 
-    if (isSuccess) {
-      if (key.name === "f") {
-        void mutateAsync({
-          ...data,
-          settings: {
-            ...data.settings,
-            previewFormat:
-              data.settings.previewFormat === ".json"
-                ? ".yaml"
-                : data.settings.previewFormat === ".yaml"
-                  ? ".toml"
-                  : ".json",
-          },
-        });
-      }
-    }
-
     if (key.name === "escape") {
       onCancelWrite?.();
     }
 
     if (path !== undefined && path !== "") {
-      if (key.name === "return") {
+      if (key.name === "w") {
         onWrite?.({ path, contents });
       }
     }
@@ -87,17 +67,14 @@ export default function PreviewPanel({
   onWrite,
   onCancelWrite,
 }: Readonly<PreviewPanelProps>) {
-  const { data: format } = useSuspenseQuery({
-    ...configQueryOptions(configPath),
-    select: (d) => d.settings.previewFormat,
-  });
-
   const { data: configs } = useSuspenseQuery({
     ...configQueryOptions(configPath),
     select: (d) => {
-      const applicationData = application === undefined ? { targets: {} } : d.configs[application];
+      if (application === undefined || target === undefined) {
+        return [];
+      }
 
-      return (application === undefined || target === undefined ? [] : applicationData?.targets[target]?.sources) ?? [];
+      return d.configs[application]?.targets[target]?.sources.map((s) => s.path) ?? [];
     },
   });
 
@@ -108,14 +85,16 @@ export default function PreviewPanel({
         queryFn: async () => await readConfigFile(c),
       }),
     ),
-    combine: (rs) => ({
-      isPending: rs.some((r) => r.isPending),
-      isError: rs.some((r) => r.isError),
-      error: rs.some((r) => r.isError)
-        ? new AggregateError(rs.flatMap((r) => (r.isError ? [r.error] : [])))
-        : undefined,
-      data: rs.every((r) => r.isSuccess) ? rs.reduce((p, c) => deepMerge(p, c.data), {}) : undefined,
-    }),
+    combine: (rs) => {
+      const errors = rs.filter((r) => r.isError).map((r) => r.error);
+
+      return {
+        isPending: rs.some((r) => r.isPending),
+        isError: errors.length > 0,
+        error: errors.length === 0 ? undefined : errors.length === 1 ? errors[0] : new AggregateError(errors),
+        data: rs.every((r) => r.isSuccess) ? rs.reduce((p, c) => deepMerge(p, c.data), {}) : undefined,
+      };
+    },
   });
 
   const ref = useRef<ScrollBoxRenderable>(null);
@@ -132,12 +111,25 @@ export default function PreviewPanel({
     return null;
   }
 
-  const stringify = stringifiers[format];
+  if (target === undefined) {
+    return <text>{target} is not defined</text>;
+  }
+
+  const { ext } = path.parse(target);
+
+  const stringify = stringifiers[ext] ?? ((obj) => obj.toString());
 
   return (
     <>
       <scrollbox ref={ref}>
-        <code content={stringify(data)} filetype={filetypes[format]} syntaxStyle={syntaxStyle} />
+        <line-number>
+          <code
+            wrapMode="none"
+            content={stringify(data)}
+            filetype={ext === undefined ? undefined : filetypes[ext]}
+            syntaxStyle={syntaxStyle}
+          />
+        </line-number>
       </scrollbox>
       {active && (
         <PreviewCodeKeybinds

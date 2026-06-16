@@ -1,10 +1,13 @@
 import addSourceMutationOptions from "#/data/addSourceMutationOptions";
 import configQueryOptions from "#/data/configQueryOptions";
-import fileQueryOptions from "#/data/fileQueryOptions";
+import deleteSourceMutationOptions from "#/data/deleteSourceMutationOptions";
+import type { Source } from "#/data/feoConfig";
 import moveSourceDownMutationOptions from "#/data/moveSourceDownMutationOptions";
 import moveSourceUpMutationOptions from "#/data/moveSourceUpMutationOptions";
+import textFileQueryOptions from "#/data/textFileQueryOptions";
+import useTitle from "#/hooks/useTitle";
+import COLORS from "#/lib/colors";
 import filetypes from "#/lib/filetypes";
-import stringifiers from "#/lib/stringifiers";
 import syntaxStyle from "#/lib/style/syntaxStyle";
 import type { ScrollBoxRenderable } from "@opentui/core";
 import { useKeyboard } from "@opentui/react";
@@ -13,10 +16,28 @@ import path from "node:path";
 import { useRef, useState } from "react";
 import { z } from "zod/mini";
 
-type ActiveSourceKeybindsProps = { onUp?: () => void; onDown?: () => void };
+type ActiveSourceKeybindsProps = {
+  onDelete?: () => void;
+  onCancel?: () => void;
+  onConfirm?: () => void;
+  onUp?: () => void;
+  onDown?: () => void;
+};
 
-function ActiveSourceKeybinds({ onUp, onDown }: Readonly<ActiveSourceKeybindsProps>) {
+function ActiveSourceKeybinds({ onDelete, onCancel, onConfirm, onUp, onDown }: Readonly<ActiveSourceKeybindsProps>) {
   useKeyboard((key) => {
+    if (key.name === "d") {
+      onDelete?.();
+    }
+
+    if (key.name === "escape") {
+      onCancel?.();
+    }
+
+    if (key.name === "enter") {
+      onConfirm?.();
+    }
+
     if (key.name === "]") {
       onDown?.();
     }
@@ -29,19 +50,25 @@ function ActiveSourceKeybinds({ onUp, onDown }: Readonly<ActiveSourceKeybindsPro
   return null;
 }
 
-type ActiveSourceProps = { enableKeybinds: boolean; file: string };
+type ActiveSourceProps = {
+  enableKeybinds: boolean;
+  configPath: string;
+  application: string;
+  target: string;
+  source: Source;
+};
 
-function ActiveSource({ enableKeybinds, file }: Readonly<ActiveSourceProps>) {
-  const { ext } = path.parse(file);
+function ActiveSource({ enableKeybinds, configPath, application, target, source }: Readonly<ActiveSourceProps>) {
+  const [deleting, setDeleting] = useState(false);
+
+  const { ext } = path.parse(source.path);
   const validatedExt = z.enum([".jsonc", ".json", ".yaml", ".yml", ".toml"]).safeParse(ext);
   const format = validatedExt.success ? validatedExt.data : null;
 
-  const { isPending, isError, error, data: config } = useQuery(fileQueryOptions(file));
+  const { isPending, isError, error, data } = useQuery(textFileQueryOptions(source.path));
   const ref = useRef<ScrollBoxRenderable>(null);
 
-  if (!format) {
-    return null;
-  }
+  const { mutateAsync } = useMutation(deleteSourceMutationOptions(configPath));
 
   if (isPending) {
     return <scrollbox ref={ref} />;
@@ -55,16 +82,46 @@ function ActiveSource({ enableKeybinds, file }: Readonly<ActiveSourceProps>) {
     );
   }
 
-  const stringify = stringifiers[format];
-  const contents = stringify(config);
+  const handleDelete = () => {
+    setDeleting(true);
+  };
+
+  const handleCancel = () => {
+    setDeleting(false);
+  };
+
+  const handleConfirm = () => {
+    setDeleting((d) => {
+      if (d) {
+        void mutateAsync({ app: application, target, source: source.path });
+      }
+      return false;
+    });
+  };
 
   return (
     <>
       <scrollbox ref={ref}>
-        <code content={contents} filetype={filetypes[format]} syntaxStyle={syntaxStyle} />
+        <line-number>
+          <code
+            wrapMode="none"
+            content={data ?? ""}
+            filetype={format === null ? "txt" : filetypes[format]}
+            syntaxStyle={syntaxStyle}
+          />
+        </line-number>
       </scrollbox>
       {enableKeybinds && (
         <ActiveSourceKeybinds
+          onDelete={() => {
+            handleDelete();
+          }}
+          onCancel={() => {
+            handleCancel();
+          }}
+          onConfirm={() => {
+            handleConfirm();
+          }}
           onUp={() => {
             ref.current?.scrollBy(-1);
           }}
@@ -78,52 +135,60 @@ function ActiveSource({ enableKeybinds, file }: Readonly<ActiveSourceProps>) {
 }
 
 type SourceProps = {
-  file: string;
+  configPath: string;
+  application: string;
+  target: string;
+  source: Source;
   active: boolean;
   enableKeybinds: boolean;
   moving: boolean;
 };
 
-function Source({ active, enableKeybinds, file, moving }: Readonly<SourceProps>) {
-  const { isError } = useQuery(fileQueryOptions(file));
+function Source({ active, enableKeybinds, application, target, source, configPath, moving }: Readonly<SourceProps>) {
+  const { isError } = useQuery(textFileQueryOptions(source.path));
+
+  const title = useTitle(source.path, 0.35, {
+    buffer: 8,
+    stringify: (title: string) => `┤${title}├`,
+  });
 
   if (isError) {
-    return <box borderColor="red" title={file} />;
+    return <box borderColor="red" title={title} />;
   }
 
   if (active) {
     return (
-      <box borderColor="cyan" borderStyle={moving ? "double" : undefined} title={file}>
-        <ActiveSource file={file} enableKeybinds={enableKeybinds} />
+      <box borderColor={COLORS.active} borderStyle={moving ? "double" : undefined} title={title}>
+        <ActiveSource
+          application={application}
+          target={target}
+          source={source}
+          configPath={configPath}
+          enableKeybinds={enableKeybinds}
+        />
       </box>
     );
   }
 
-  return <box borderColor="orange" title={file} />;
+  return <box borderColor="orange" title={title} />;
 }
 
 type SourcesPanelKeybindsProps = {
-  configPath: string;
-  application: string;
-  source?: string;
-  target: string;
   onNext?: () => void;
   onPrevious?: () => void;
   onNew?: () => void;
-  onDelete?: () => void;
   onMove?: () => void;
+  onCancel?: () => void;
+  onConfirm?: () => void;
 };
 
 function SourcesPanelKeybinds({
-  application,
-  configPath,
-  source,
-  target,
   onNext,
   onPrevious,
   onNew,
-  onDelete,
   onMove,
+  onConfirm,
+  onCancel,
 }: Readonly<SourcesPanelKeybindsProps>) {
   useKeyboard((key) => {
     if (key.name === "k" || key.name === "up") {
@@ -138,12 +203,16 @@ function SourcesPanelKeybinds({
       onNew?.();
     }
 
-    if (key.name === "d") {
-      onDelete?.();
-    }
-
     if (key.name === "m") {
       onMove?.();
+    }
+
+    if (key.name === "escape") {
+      onCancel?.();
+    }
+
+    if (key.name === "return") {
+      onConfirm?.();
     }
   });
 
@@ -190,7 +259,7 @@ export type SourcesPanelProps = {
   active: boolean;
   application: string;
   configPath: string;
-  source?: string;
+  source?: Source;
   target: string;
   onNext?: () => void;
   onPrevious?: () => void;
@@ -215,13 +284,7 @@ export default function SourcesPanel({
 
   const { data: sources } = useSuspenseQuery({
     ...configQueryOptions(configPath),
-    select: (d) => {
-      const ss = d.configs[application]?.targets[target]?.sources;
-      if (ss === undefined) {
-        return [];
-      }
-      return ss;
-    },
+    select: (d) => d.configs[application]?.targets[target]?.sources ?? [],
   });
 
   const { mutateAsync: moveSourceUpAsync } = useMutation(moveSourceUpMutationOptions(configPath));
@@ -231,14 +294,17 @@ export default function SourcesPanel({
     <>
       {sources.toReversed().map((s) => (
         <Source
-          key={s}
-          file={s}
-          active={source === s}
-          enableKeybinds={active && source === s && !creating}
-          moving={moving !== undefined}
+          key={s.path}
+          configPath={configPath}
+          application={application}
+          target={target}
+          source={s}
+          active={source?.path === s.path}
+          enableKeybinds={active && source?.path === s.path && !creating}
+          moving={moving === s.path}
         />
       ))}
-      {application !== undefined && target !== undefined && creating && (
+      {creating && (
         <NewSourceInput
           app={application}
           configPath={configPath}
@@ -253,10 +319,6 @@ export default function SourcesPanel({
       )}
       {active && !creating && (
         <SourcesPanelKeybinds
-          application={application}
-          target={target}
-          source={source}
-          configPath={configPath}
           onNext={() => {
             if (moving !== undefined) {
               moveSourceDownAsync({ app: application, target, source: moving });
@@ -272,11 +334,16 @@ export default function SourcesPanel({
             }
           }}
           onNew={() => {
-            onEnableCreate?.();
+            if (moving === undefined) {
+              onEnableCreate?.();
+            }
           }}
-          onDelete={() => {}}
           onMove={() => {
-            setMoving((m) => (m === undefined ? source : undefined));
+            setMoving((m) => (m === undefined ? source?.path : undefined));
+          }}
+          onCancel={() => {}}
+          onConfirm={() => {
+            setMoving((m) => (m === undefined ? source?.path : undefined));
           }}
         />
       )}

@@ -9,7 +9,7 @@ const deleteSourceMutationOptions = (configPath: string) =>
   mutationOptions({
     mutationKey: ["deleteSource", configPath],
     mutationFn: async (vars: { app: string; target: string; source: string }, context) => {
-      const config = feoConfigValidator.safeParse(context.client.getQueryData([configPath]));
+      const config = feoConfigValidator.safeParse(context.client.getQueryData([{ path: configPath, kind: "object" }]));
       if (!config.success) {
         throw config.error;
       }
@@ -20,7 +20,7 @@ const deleteSourceMutationOptions = (configPath: string) =>
               targets: {
                 [vars.target]: {
                   sources: config.data.configs[vars.app]?.targets[vars.target]?.sources.filter(
-                    (s) => s !== vars.source,
+                    (s) => s.path !== vars.source,
                   ),
                 },
               },
@@ -35,7 +35,7 @@ const deleteSourceMutationOptions = (configPath: string) =>
       return newConfig.data;
     },
     onSuccess: async (data, _vars, _onMutateResult, context) => {
-      await context.client.setQueryData([configPath], data);
+      await context.client.setQueryData([{ path: configPath, kind: "object" }], data);
     },
   });
 

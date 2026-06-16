@@ -16,21 +16,21 @@ function moveSourceUp(config: FeoConfig, vars: { app: string; target: string; so
     throw new Error("The App does not include the specified Target");
   }
   const sources = target.sources;
-  if (!sources.includes(vars.source)) {
+  if (!sources.some((s) => s.path === vars.source)) {
     throw new Error("The App's Target's Sources does not include the specified source");
   }
-  const index = sources.indexOf(vars.source);
+  const index = sources.findIndex((s) => s.path === vars.source);
   if (index === 0) {
     throw new Error("The specified Source is already the App's Target's first source.");
   }
-  return [...sources.slice(0, index - 1), vars.source, sources[index - 1], ...sources.slice(index + 1)];
+  return [...sources.slice(0, index - 1), sources[index], sources[index - 1], ...sources.slice(index + 1)];
 }
 
 const moveSourceUpMutationOptions = (configPath: string) =>
   mutationOptions({
     mutationKey: ["moveSourceUp", configPath],
     mutationFn: async (vars: { app: string; target: string; source: string }, context) => {
-      const config = feoConfigValidator.safeParse(context.client.getQueryData([configPath]));
+      const config = feoConfigValidator.safeParse(context.client.getQueryData([{ path: configPath, kind: "object" }]));
       if (!config.success) {
         throw config.error;
       }
@@ -63,7 +63,7 @@ const moveSourceUpMutationOptions = (configPath: string) =>
       }
     },
     onSuccess: async (data, _vars, _onMutateResult, context) => {
-      await context.client.setQueryData([configPath], data);
+      await context.client.setQueryData([{ path: configPath, kind: "object" }], data);
     },
   });
 

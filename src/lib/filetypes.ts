@@ -1,9 +1,9 @@
-const filetypes = {
-  ".jsonc": "jsonc",
+const filetypes: Record<string, string | undefined> = {
+  ".jsonc": "json",
   ".json": "json",
   ".yaml": "yaml",
   ".yml": "yaml",
   ".toml": "toml",
-} as const;
+};
 
 export default filetypes;

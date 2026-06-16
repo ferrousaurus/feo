@@ -4,12 +4,13 @@ import keys from "#/util/object/keys";
 import { useKeyboard } from "@opentui/react";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
+import COLORS from "#/lib/colors";
 
 type TargetProps = { active: boolean; target: string };
 
 export function Target({ active, target }: Readonly<TargetProps>) {
   return (
-    <text key={target} fg={active ? "cyan" : undefined}>
+    <text key={target} fg={active ? COLORS.active : COLORS.inactive}>
       {target}
     </text>
   );

@@ -2,7 +2,7 @@
   "compilerOptions": {
     // Environment setup & latest features
     "lib": ["ESNext"],
-    "types": ["bun", "react"],
+    "types": ["node", "react"],
     "target": "ESNext",
     "module": "Preserve",
     "moduleDetection": "force",

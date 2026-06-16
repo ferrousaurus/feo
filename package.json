@@ -4,32 +4,32 @@
   "type": "module",
   "private": true,
   "engines": {
-    "bun": "^1.3.14"
+    "node": ">=26",
+    "pnpm": ">=11"
   },
-  "packageManager": "bun@1.3.14",
+  "packageManager": "pnpm@11.5.2",
   "scripts": {
-    "dev": "bun run --watch src/index.tsx"
+    "dev": "tsx --experimental-ffi --watch src/index.ts",
+    "test": "vitest run"
   },
   "devDependencies": {
-    "@types/bun": "latest",
+    "@types/node": "^24.0.0",
     "@types/react": "^19.2.17",
-    "jsr": "^0.14.3"
-  },
-  "peerDependencies": {
-    "typescript": "^5"
+    "@typescript/native-preview": "^7.0.0-dev.20260615.1",
+    "tsx": "^4.19.0",
+    "vitest": "^4.1.8"
   },
   "dependencies": {
-    "@cliffy/command": "npm:@jsr/cliffy__command",
-    "@opentui/core": "^0.3.4",
-    "@opentui/react": "^0.3.4",
-    "@std/collections": "npm:@jsr/std__collections",
-    "@std/json": "npm:@jsr/std__json",
-    "@std/jsonc": "npm:@jsr/std__jsonc",
-    "@std/toml": "npm:@jsr/std__toml",
-    "@std/yaml": "npm:@jsr/std__yaml",
+    "@cliffy/command": "jsr:^1.2.1",
+    "@opentui/core": "^0.4.1",
+    "@opentui/react": "^0.4.1",
+    "@std/collections": "jsr:^1.2.0",
+    "@std/json": "jsr:^1.1.0",
+    "@std/jsonc": "jsr:^1.0.2",
+    "@std/toml": "jsr:^1.0.11",
+    "@std/yaml": "jsr:^1.1.1",
     "@tanstack/react-query": "^5.101.0",
     "react": "^19.2.6",
-    "zod": "^4.4.3",
-    "zustand": "^5.0.14"
+    "zod": "^4.4.3"
   }
 }

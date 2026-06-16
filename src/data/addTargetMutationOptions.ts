@@ -9,7 +9,7 @@ const addTargetMutationOptions = (configPath: string) =>
   mutationOptions({
     mutationKey: ["addTarget", configPath],
     mutationFn: async (vars: { application: string; target: string }, context) => {
-      const config = feoConfigValidator.safeParse(context.client.getQueryData([configPath]));
+      const config = feoConfigValidator.safeParse(context.client.getQueryData([{ path: configPath, kind: "object" }]));
       if (!config.success) {
         throw config.error;
       }
@@ -31,7 +31,7 @@ const addTargetMutationOptions = (configPath: string) =>
       return newConfig.data;
     },
     onSuccess: async (data, _vars, _onMutateResult, context) => {
-      await context.client.setQueryData([configPath], data);
+      await context.client.setQueryData([{ path: configPath, kind: "object" }], data);
     },
   });
 

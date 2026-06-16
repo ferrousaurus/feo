@@ -5,19 +5,25 @@ import keys from "#/util/object/keys";
 import { useKeyboard } from "@opentui/react";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
+import COLORS from "#/lib/colors";
 
 type ApplicationKeybindsProps = {
   onDelete?: () => void;
   onCancel?: () => void;
+  onConfirm?: () => void;
 };
 
-function ApplicationKeybinds({ onDelete, onCancel }: Readonly<ApplicationKeybindsProps>) {
+function ApplicationKeybinds({ onDelete, onCancel, onConfirm }: Readonly<ApplicationKeybindsProps>) {
   useKeyboard((key) => {
     if (key.name === "d") {
       onDelete?.();
     }
     if (key.name === "escape") {
       onCancel?.();
+    }
+
+    if (key.name === "return") {
+      onConfirm?.();
     }
   });
 
@@ -37,25 +43,30 @@ function Application({ active, application, configPath, enableKeybinds }: Readon
   const { mutateAsync } = useMutation(deleteApplicationMutationOptions(configPath));
 
   const handleDelete = () => {
-    setDeleting((d) => {
-      if (!d) {
-        return true;
-      }
-      void mutateAsync({ app: application });
-      return false;
-    });
+    setDeleting(true);
   };
 
   const handleCancel = () => {
     setDeleting(false);
   };
 
+  const handleConfirm = () => {
+    setDeleting((d) => {
+      if (d) {
+        void mutateAsync({ app: application });
+      }
+      return false;
+    });
+  };
+
   return (
     <>
-      <text key={application} fg={active ? (deleting ? "red" : "cyan") : undefined}>
+      <text key={application} fg={active ? (deleting ? COLORS.error : COLORS.active) : COLORS.inactive}>
         {application}
       </text>
-      {active && enableKeybinds && <ApplicationKeybinds onDelete={handleDelete} onCancel={handleCancel} />}
+      {active && enableKeybinds && (
+        <ApplicationKeybinds onDelete={handleDelete} onCancel={handleCancel} onConfirm={handleConfirm} />
+      )}
     </>
   );
 }

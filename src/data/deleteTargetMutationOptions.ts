@@ -8,7 +8,7 @@ const deleteTargetMutationOptions = (configPath: string) =>
   mutationOptions({
     mutationKey: ["deleteTarget", configPath],
     mutationFn: async (vars: { app: string; target: string; source: string }, context) => {
-      const config = feoConfigValidator.safeParse(context.client.getQueryData([configPath]));
+      const config = feoConfigValidator.safeParse(context.client.getQueryData([{ path: configPath, kind: "object" }]));
       if (!config.success) {
         throw config.error;
       }
@@ -17,7 +17,7 @@ const deleteTargetMutationOptions = (configPath: string) =>
       return config.data;
     },
     onSuccess: async (data, _vars, _onMutateResult, context) => {
-      await context.client.setQueryData([configPath], data);
+      await context.client.setQueryData([{ path: configPath, kind: "object" }], data);
     },
   });
 

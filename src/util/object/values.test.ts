@@ -1,4 +1,4 @@
-import { describe, expect, it } from "bun:test";
+import { describe, expect, it } from "vitest";
 import values from "#/util/object/values";
 
 describe("values", () => {

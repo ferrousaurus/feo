@@ -4,29 +4,68 @@ import PreviewPanel from "#/components/panels/PreviewPanel";
 import SourcesPanel from "#/components/panels/SourcesPanel";
 import TargetsPanel from "#/components/panels/TargetsPanel";
 import configQueryOptions from "#/data/configQueryOptions";
+import type { Source } from "#/data/feoConfig";
+import useTitle from "#/hooks/useTitle";
+import COLORS from "#/lib/colors";
 import sha from "#/lib/crypto/hash";
-import readTextFile from "#/lib/io/readTextFile";
 import writeFile from "#/lib/io/writeFile";
+import readFile from "#/lib/io/readFile";
 import resolveAbsolutePath from "#/lib/resolveAbsolutePath";
 import keys from "#/util/object/keys";
 import { useKeyboard } from "@opentui/react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import nodePath from "node:path";
 import { Suspense, useState } from "react";
 
-const COLOR = "cyan";
-
-const panels = ["apps", "targets", "sources", "preview"] as const;
+export const panels = ["apps", "targets", "sources", "preview"] as const;
 
 const handleQuit = () => {
   process.exit(1);
 };
 
+function ShellKeybinds({
+  onQuit,
+  onApplicationsPanel,
+  onTargetsPanel,
+  onSourcesPanel,
+  onPreviewPanel,
+}: {
+  onQuit?: () => void;
+  onApplicationsPanel?: () => void;
+  onTargetsPanel?: () => void;
+  onSourcesPanel?: () => void;
+  onPreviewPanel?: () => void;
+}) {
+  useKeyboard((key) => {
+    if (key.name === "q") {
+      onQuit?.();
+    }
+
+    if (key.name === "a") {
+      onApplicationsPanel?.();
+    }
+
+    if (key.name === "t") {
+      onTargetsPanel?.();
+    }
+
+    if (key.name === "s") {
+      onSourcesPanel?.();
+    }
+
+    if (key.name === "p") {
+      onPreviewPanel?.();
+    }
+  });
+
+  return null;
+}
+
 export type ShellProps = {
   configPath: string;
   initialApplication: string | undefined;
   initialTarget: string | undefined;
-  initialSource: string | undefined;
+  initialSource: Source | undefined;
 };
 
 export default function Shell({ configPath, initialApplication, initialTarget, initialSource }: Readonly<ShellProps>) {
@@ -35,18 +74,26 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
   const [panel, setPanel] = useState<(typeof panels)[number]>("apps");
   const [application, setApplication] = useState<string | undefined>(initialApplication);
   const [target, setTarget] = useState<string | undefined>(initialTarget);
-  const [source, setSource] = useState<string | undefined>(initialSource);
+  const [source, setSource] = useState<Source | undefined>(initialSource);
 
   const [writing, setWriting] = useState<{ path: string; contents: string } | undefined>(undefined);
 
   const [creating, setCreating] = useState<"application" | "target" | "source" | undefined>(undefined);
 
-  const handlePreviousPanel = () => {
-    setPanel((p) => panels[panels.indexOf(p) - 1] ?? panels[panels.length - 1] ?? panels[0]);
+  const handleApplicationsPanel = () => {
+    setPanel("apps");
   };
 
-  const handleNextPanel = () => {
-    setPanel((p) => panels[panels.indexOf(p) + 1] ?? panels[0]);
+  const handleTargetsPanel = () => {
+    setPanel("targets");
+  };
+
+  const handleSourcesPanel = () => {
+    setPanel("sources");
+  };
+
+  const handlePreviewPanel = () => {
+    setPanel("preview");
   };
 
   const handleNextApplication = () => {
@@ -72,11 +119,9 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
       if (i === -1) {
         return currentApp;
       }
-      const next = apps[i + 1] ?? apps[0];
+      const next = apps[i + 1];
       if (next === undefined) {
-        setTarget(undefined);
-        setSource(undefined);
-        return undefined;
+        return currentApp;
       }
       const targets = config.configs[next]?.targets;
       if (targets === undefined) {
@@ -113,7 +158,7 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
         return firstApp;
       }
       const i = apps.indexOf(currentApp);
-      if (i === -1) {
+      if (i <= 0) {
         return currentApp;
       }
       const prev = apps[i - 1] ?? apps[apps.length - 1];
@@ -166,10 +211,9 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
       if (ni === -1) {
         return currentTarget;
       }
-      const next = targets[ni + 1] ?? targets[0];
+      const next = targets[ni + 1];
       if (next === undefined) {
-        setSource(undefined);
-        return undefined;
+        return currentTarget;
       }
       if (target !== next) {
         setSource(appConfig.targets[next]?.sources[appConfig.targets[next].sources.length - 1]);
@@ -202,7 +246,7 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
         return firstTarget;
       }
       const pi = targets.indexOf(currentTarget);
-      if (pi === -1) {
+      if (pi <= 0) {
         return currentTarget;
       }
       const previous = targets[pi - 1] ?? targets[targets.length - 1];
@@ -231,13 +275,20 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
         return currentSource;
       }
       if (currentSource === undefined) {
-        return sources[0];
+        const firstSource = sources[0];
+        if (firstSource === undefined) {
+        }
+        return firstSource;
       }
       const i = sources.indexOf(currentSource);
       if (i === -1) {
         return currentSource;
       }
-      return sources[i + 1] ?? sources[0];
+      const next = sources[i + 1];
+      if (next === undefined) {
+        return currentSource;
+      }
+      return next;
     });
   };
 
@@ -261,7 +312,11 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
       if (i === -1) {
         return currentSource;
       }
-      return sources[i - 1] ?? sources[sources.length - 1];
+      const prev = sources[i - 1];
+      if (prev === undefined) {
+        return currentSource;
+      }
+      return prev;
     });
   };
 
@@ -282,15 +337,17 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
       }
       const path = resolveAbsolutePath(opts.path);
       const { dir, ext, name } = nodePath.parse(path);
-      void readTextFile(path).then(async (currentFileContents) => {
-        if (currentFileContents !== null) {
-          await writeFile(
-            `${dir}/${name}.${await sha(currentFileContents)}.feo-bkup${config.settings.previewFormat}`,
-            currentFileContents,
-          );
-        }
-        await writeFile(`${dir}/${name}${config.settings.previewFormat}`, w.contents);
-      });
+      void readFile(path)
+        .then((f) => f.text())
+        .then(async (currentFileContents) => {
+          if (currentFileContents !== null) {
+            await writeFile(
+              `${dir}/${name}.${sha(currentFileContents)}.feo-bkup${config.settings.previewFormat}`,
+              currentFileContents,
+            );
+          }
+          await writeFile(`${dir}/${name}${config.settings.previewFormat}`, w.contents);
+        });
       return undefined;
     });
   };
@@ -299,62 +356,89 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
     setWriting(undefined);
   };
 
-  useKeyboard((key) => {
-    if (creating === undefined) {
-      if (key.name === "q") {
-        handleQuit();
-      }
+  const stringifyTitle = (title: string) => `┤${title}├`;
 
-      if (key.name === "o") {
-        handlePreviousPanel();
-      }
-
-      if (key.name === "p") {
-        handleNextPanel();
-      }
-    }
-  });
+  const applicationsTitle = useTitle("[A]pplications", 0.3, { stringify: stringifyTitle });
+  const targetsTitle = useTitle("[T]argets", 0.3, { stringify: stringifyTitle });
+  const sourcesTitle = useTitle("[S]ources", 0.35, { stringify: stringifyTitle });
+  const previewTitle = useTitle("[P]review", 0.35, { stringify: stringifyTitle });
 
   return (
-    <box>
-      <box height="100%" width="100%" flexDirection="row" justifyContent="space-between" alignItems="center">
-        <box flexGrow={1} width="30%">
+    <>
+      <box>
+        <box height="100%" width="100%" flexDirection="row" justifyContent="space-between" alignItems="center">
+          <box flexGrow={1} width="30%">
+            <box
+              title={applicationsTitle}
+              height="50%"
+              borderColor={panel === "apps" ? COLORS.active : COLORS.inactive}
+              borderStyle="single"
+            >
+              <Suspense>
+                <ApplicationsPanel
+                  active={panel === "apps"}
+                  configPath={configPath}
+                  application={application}
+                  onNext={handleNextApplication}
+                  onPrevious={handlePreviousApplication}
+                  creating={creating === "application"}
+                  onEnableCreate={() => {
+                    setCreating("application");
+                  }}
+                  onDisableCreate={() => {
+                    setCreating(undefined);
+                  }}
+                />
+              </Suspense>
+            </box>
+            <box
+              title={targetsTitle}
+              height="50%"
+              borderColor={panel === "targets" ? COLORS.active : COLORS.inactive}
+              borderStyle="single"
+            >
+              <Suspense>
+                {application !== undefined && (
+                  <TargetsPanel
+                    active={panel === "targets"}
+                    configPath={configPath}
+                    application={application}
+                    target={target}
+                    onNext={handleNextTarget}
+                    onPrevious={handlePreviousTarget}
+                    creating={creating === "target"}
+                    onEnableCreate={() => {
+                      setCreating("target");
+                    }}
+                    onDisableCreate={() => {
+                      setCreating(undefined);
+                    }}
+                  />
+                )}
+              </Suspense>
+            </box>
+          </box>
           <box
-            title="Applications"
-            height="50%"
-            borderColor={panel === "apps" ? COLOR : undefined}
+            flexGrow={1}
+            width="35%"
+            title={sourcesTitle}
+            height="100%"
+            borderColor={panel === "sources" ? (writing !== undefined ? COLORS.error : COLORS.active) : COLORS.inactive}
             borderStyle="single"
           >
             <Suspense>
-              <ApplicationsPanel
-                active={panel === "apps"}
-                configPath={configPath}
-                application={application}
-                onNext={handleNextApplication}
-                onPrevious={handlePreviousApplication}
-                creating={creating === "application"}
-                onEnableCreate={() => {
-                  setCreating("application");
-                }}
-                onDisableCreate={() => {
-                  setCreating(undefined);
-                }}
-              />
-            </Suspense>
-          </box>
-          <box title="Targets" height="50%" borderColor={panel === "targets" ? COLOR : undefined} borderStyle="single">
-            <Suspense>
-              {application !== undefined && (
-                <TargetsPanel
-                  active={panel === "targets"}
+              {application !== undefined && target !== undefined && (
+                <SourcesPanel
+                  active={panel === "sources"}
                   configPath={configPath}
                   application={application}
                   target={target}
-                  onNext={handleNextTarget}
-                  onPrevious={handlePreviousTarget}
-                  creating={creating === "target"}
+                  source={source}
+                  onNext={handleNextSource}
+                  onPrevious={handlePreviousSource}
+                  creating={creating === "source"}
                   onEnableCreate={() => {
-                    setCreating("target");
+                    setCreating("source");
                   }}
                   onDisableCreate={() => {
                     setCreating(undefined);
@@ -363,59 +447,39 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
               )}
             </Suspense>
           </box>
-        </box>
-        <box
-          flexGrow={1}
-          width="35%"
-          title="Sources"
-          height="100%"
-          borderColor={panel === "sources" ? (writing !== undefined ? "red" : COLOR) : undefined}
-          borderStyle="single"
-        >
-          <Suspense>
-            {application !== undefined && target !== undefined && (
-              <SourcesPanel
-                active={panel === "sources"}
+          <box
+            flexGrow={1}
+            width="35%"
+            title={previewTitle}
+            height="100%"
+            borderColor={panel === "preview" ? (writing ? COLORS.error : COLORS.active) : COLORS.inactive}
+            borderStyle="single"
+          >
+            <Suspense>
+              <PreviewPanel
                 configPath={configPath}
+                active={panel === "preview"}
                 application={application}
                 target={target}
-                source={source}
-                onNext={handleNextSource}
-                onPrevious={handlePreviousSource}
-                creating={creating === "source"}
-                onEnableCreate={() => {
-                  setCreating("source");
-                }}
-                onDisableCreate={() => {
-                  setCreating(undefined);
-                }}
+                onWrite={handleWrite}
+                onCancelWrite={handleCancelWrite}
               />
-            )}
-          </Suspense>
+            </Suspense>
+          </box>
         </box>
-        <box
-          flexGrow={1}
-          width="35%"
-          title="Preview"
-          height="100%"
-          borderColor={panel === "preview" ? COLOR : undefined}
-          borderStyle="single"
-        >
-          <Suspense>
-            <PreviewPanel
-              configPath={configPath}
-              active={panel === "preview"}
-              application={application}
-              target={target}
-              onWrite={handleWrite}
-              onCancelWrite={handleCancelWrite}
-            />
-          </Suspense>
+        <box height={3} width="100%">
+          <Legend panel={panel} />
         </box>
       </box>
-      <box height={2} width="100%">
-        <Legend panel={panel} />
-      </box>
-    </box>
+      {!creating && (
+        <ShellKeybinds
+          onQuit={handleQuit}
+          onApplicationsPanel={handleApplicationsPanel}
+          onTargetsPanel={handleTargetsPanel}
+          onSourcesPanel={handleSourcesPanel}
+          onPreviewPanel={handlePreviewPanel}
+        />
+      )}
+    </>
   );
 }

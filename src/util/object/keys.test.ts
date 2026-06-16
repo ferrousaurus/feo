@@ -1,4 +1,4 @@
-import { describe, expect, it } from "bun:test";
+import { describe, expect, it } from "vitest";
 import keys from "#/util/object/keys";
 
 describe("keys", () => {

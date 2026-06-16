@@ -1,22 +1,19 @@
+import spawn from "#/lib/proc/spawn";
 import { Command } from "@cliffy/command";
-import nodeChildProcess from "node:child_process";
 import configOption from "./options/config";
 
 const execCommand = new Command()
   .description("Execute a subcommand with symlinks")
   .option(configOption.flags, configOption.desc, configOption.opts)
   .arguments("[args...:string]")
-  .action(async (options, command, ...args) => {
-    const result = nodeChildProcess.spawnSync(command, args, {
+  .action(async (_options, command, ...args) => {
+    const proc = await spawn(command, args, {
       stdio: "inherit",
     });
 
-    if (result.error) {
-      console.error(result.error.message);
-      process.exit(1);
-    }
-
-    process.exit(result.status ?? 1);
+    proc.once("close", (exitCode) => {
+      process.exit(exitCode ?? 1);
+    });
   });
 
 export default execCommand;
