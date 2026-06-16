@@ -5,7 +5,7 @@ import useTitle from "#/hooks/useTitle";
 import ActiveSource from "#/components/sources/ActiveSource";
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 
-type SourceProps = {
+export type SourceProps = {
   configPath: string;
   application: string;
   target: string;

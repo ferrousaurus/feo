@@ -3,7 +3,7 @@ import { useKeyboard } from "@opentui/react";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 
-type NewTargetInputProps = {
+export type NewTargetInputProps = {
   app: string;
   configPath: string;
   onSubmit?: () => void;

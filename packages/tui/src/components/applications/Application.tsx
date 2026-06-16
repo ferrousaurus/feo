@@ -4,7 +4,7 @@ import ApplicationKeybinds from "#/components/applications/ApplicationKeybinds";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
-type ApplicationProps = {
+export type ApplicationProps = {
   active: boolean;
   application: string;
   configPath: string;

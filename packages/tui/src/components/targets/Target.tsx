@@ -1,7 +1,7 @@
 import configQueryOptions from "#/data/configQueryOptions";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
-type TargetProps = { active: boolean; configPath: string; target: string };
+export type TargetProps = { active: boolean; configPath: string; target: string };
 
 export function Target({ active, configPath, target }: Readonly<TargetProps>) {
   const { data: theme } = useSuspenseQuery({ ...configQueryOptions(configPath), select: (d) => d.settings.theme });

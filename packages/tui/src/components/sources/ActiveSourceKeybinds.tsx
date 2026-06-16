@@ -1,6 +1,6 @@
 import { useKeyboard } from "@opentui/react";
 
-type ActiveSourceKeybindsProps = {
+export type ActiveSourceKeybindsProps = {
   onDelete?: () => void;
   onCancel?: () => void;
   onConfirm?: () => void;

@@ -2,7 +2,7 @@ import type { ScrollBoxRenderable } from "@opentui/core";
 import { useKeyboard } from "@opentui/react";
 import { type RefObject } from "react";
 
-type PreviewCodeKeybindsProps = {
+export type PreviewCodeKeybindsProps = {
   configPath: string;
   contents: string;
   path?: string;

@@ -1,6 +1,6 @@
 import { useKeyboard } from "@opentui/react";
 
-type SourcesPanelKeybindsProps = {
+export type SourcesPanelKeybindsProps = {
   onNext?: () => void;
   onPrevious?: () => void;
   onNew?: () => void;

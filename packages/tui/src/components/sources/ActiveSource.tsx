@@ -10,7 +10,7 @@ import path from "node:path";
 import { useRef, useState } from "react";
 import { z } from "zod/mini";
 
-type ActiveSourceProps = {
+export type ActiveSourceProps = {
   enableKeybinds: boolean;
   configPath: string;
   application: string;
