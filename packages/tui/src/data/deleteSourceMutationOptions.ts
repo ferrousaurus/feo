@@ -3,7 +3,7 @@ import resolveAbsolutePath from "feo-utils/fs/resolveAbsolutePath";
 import { deepMerge } from "@std/collections";
 import { stringify } from "@std/toml";
 import { mutationOptions } from "@tanstack/react-query";
-import feoConfigValidator from "./feoConfig";
+import feoConfigValidator from "#/data/feoConfig";
 
 const deleteSourceMutationOptions = (configPath: string) =>
   mutationOptions({

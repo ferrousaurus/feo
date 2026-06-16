@@ -1,4 +1,4 @@
-import { panels } from "../Shell";
+import { panels } from "#/components/Shell";
 
 export default function Legend({ mode, panel }: { panel: (typeof panels)[number]; mode?: "creating" }) {
   switch (panel) {

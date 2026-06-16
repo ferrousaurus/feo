@@ -2,7 +2,7 @@ import writeFile from "feo-utils/io/writeFile";
 import resolveAbsolutePath from "feo-utils/fs/resolveAbsolutePath";
 import { stringify } from "@std/toml";
 import { mutationOptions } from "@tanstack/react-query";
-import feoConfigValidator from "./feoConfig";
+import feoConfigValidator from "#/data/feoConfig";
 
 const deleteApplicationMutationOptions = (configPath: string) =>
   mutationOptions({

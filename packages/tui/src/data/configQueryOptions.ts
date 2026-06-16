@@ -1,7 +1,7 @@
 import feoConfigValidator from "#/data/feoConfig";
-import readConfigFile from "#/lib/readConfigFile";
-import resolveAbsolutePath from "feo-utils/fs/resolveAbsolutePath";
 import { queryOptions } from "@tanstack/react-query";
+import readConfigFile from "feo-utils/config/readConfigFile";
+import resolveAbsolutePath from "feo-utils/fs/resolveAbsolutePath";
 
 const configQueryOptions = (path: string) =>
   queryOptions({

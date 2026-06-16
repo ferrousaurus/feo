@@ -1,8 +1,8 @@
 import configQueryOptions from "#/data/configQueryOptions";
 import configMutationOptions from "#/data/writeConfigMutationOptions";
-import filetypes from "#/lib/filetypes";
-import readConfigFile from "#/lib/readConfigFile";
-import stringifiers from "#/lib/stringifiers";
+import filetypes from "feo-utils/config/filetypes";
+import readConfigFile from "feo-utils/config/readConfigFile";
+import stringifiers from "feo-utils/config/stringifiers";
 import syntaxStyle from "#/lib/syntaxStyle";
 import { ScrollBoxRenderable } from "@opentui/core";
 import { useKeyboard } from "@opentui/react";

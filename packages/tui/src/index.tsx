@@ -2,12 +2,12 @@ import { addDefaultParsers, createCliRenderer } from "@opentui/core";
 import { createRoot } from "@opentui/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Suspense } from "react";
-import Shell from "./components/Shell";
-import feoConfigValidator from "./data/feoConfig";
-import readConfigFile from "./lib/readConfigFile";
+import Shell from "#/components/Shell";
+import feoConfigValidator from "#/data/feoConfig";
+import readConfigFile from "#/lib/readConfigFile";
 import resolveAbsolutePath from "feo-utils/fs/resolveAbsolutePath";
 import keys from "feo-utils/object/keys";
-import configQueryOptions from "./data/configQueryOptions";
+import configQueryOptions from "#/data/configQueryOptions";
 
 const tui = async ({ configPath }: { configPath: string }) => {
   const config = feoConfigValidator.safeParse(await readConfigFile(resolveAbsolutePath(configPath)));

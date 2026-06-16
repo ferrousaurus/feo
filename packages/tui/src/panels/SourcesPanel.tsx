@@ -7,7 +7,7 @@ import moveSourceUpMutationOptions from "#/data/moveSourceUpMutationOptions";
 import textFileQueryOptions from "#/data/textFileQueryOptions";
 import useTitle from "#/hooks/useTitle";
 import COLORS from "#/lib/colors";
-import filetypes from "#/lib/filetypes";
+import filetypes from "feo-utils/config/filetypes";
 import syntaxStyle from "#/lib/syntaxStyle";
 import type { ScrollBoxRenderable } from "@opentui/core";
 import { useKeyboard } from "@opentui/react";

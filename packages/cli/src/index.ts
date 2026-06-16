@@ -1,8 +1,8 @@
 import VERSION from "#/lib/version";
 import tui from "feo-tui";
 import { Command } from "@cliffy/command";
-import execCommand from "./commands/exec";
-import configOption from "./commands/options/config";
+import execCommand from "#/commands/exec";
+import configOption from "#/commands/options/config";
 
 await new Command()
   .name("feo")

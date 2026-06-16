@@ -1,7 +1,7 @@
+import parsers from "#/config/parsers";
+import { z } from "zod/mini";
 import readFile from "feo-utils/io/readFile";
 import keys from "feo-utils/object/keys";
-import { z } from "zod/mini";
-import parsers from "./parsers";
 
 export class UnsupportedExtentionError extends Error {
   ext: string;

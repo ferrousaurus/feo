@@ -4,7 +4,7 @@ import type { DeepPartial } from "feo-utils/object/DeepPartial";
 import { deepMerge } from "@std/collections";
 import { stringify } from "@std/toml";
 import { mutationOptions } from "@tanstack/react-query";
-import feoConfigValidator, { type FeoConfig } from "./feoConfig";
+import feoConfigValidator, { type FeoConfig } from "#/data/feoConfig";
 
 const patchConfigMutationOptions = (configPath: string) =>
   mutationOptions({

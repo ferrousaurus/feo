@@ -1,6 +1,6 @@
 import spawn from "#/lib/proc/spawn";
 import { Command } from "@cliffy/command";
-import configOption from "./options/config";
+import configOption from "#/commands/options/config";
 
 const execCommand = new Command()
   .description("Execute a subcommand with symlinks")
