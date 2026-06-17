@@ -4,30 +4,8 @@
   "workspaces": {
     "": {
       "name": "feo",
-    },
-    "packages/cli": {
-      "name": "feo-cli",
       "dependencies": {
-        "@cliffy/command": "npm:@jsr/cliffy__command@^1.2.1",
-        "@std/collections": "npm:@jsr/std__collections@^1.2.0",
-        "@std/json": "npm:@jsr/std__json@^1.1.0",
-        "@std/jsonc": "npm:@jsr/std__jsonc@^1.0.2",
-        "@std/toml": "npm:@jsr/std__toml@^1.0.11",
-        "@std/yaml": "npm:@jsr/std__yaml@^1.1.1",
-        "@tanstack/react-query": "^5.101.0",
-        "feo-tui": "workspace:*",
-        "feo-utils": "workspace:*",
-        "zod": "^4.4.3",
-      },
-      "devDependencies": {
-        "@types/node": "^25.9.3",
-        "@typescript/native-preview": "^7.0.0-dev.20260615.1",
-        "vitest": "^4.1.8",
-      },
-    },
-    "packages/tui": {
-      "name": "feo-tui",
-      "dependencies": {
+        "@cliffy/command": "npm:@jsr/cliffy__command",
         "@opentui/core": "^0.4.1",
         "@opentui/react": "^0.4.1",
         "@std/collections": "npm:@jsr/std__collections@^1.2.0",
@@ -36,29 +14,12 @@
         "@std/toml": "npm:@jsr/std__toml@^1.0.11",
         "@std/yaml": "npm:@jsr/std__yaml@^1.1.1",
         "@tanstack/react-query": "^5.101.0",
-        "feo-utils": "workspace:*",
         "react": "^19.2.6",
-        "zod": "^4.4.3",
+        "zod": "npm:@jsr/zod__zod@^4.4.3",
       },
       "devDependencies": {
         "@types/node": "^25.9.3",
         "@types/react": "^19.2.17",
-        "@typescript/native-preview": "^7.0.0-dev.20260615.1",
-        "vitest": "^4.1.8",
-      },
-    },
-    "packages/utils": {
-      "name": "feo-utils",
-      "dependencies": {
-        "@std/collections": "npm:@jsr/std__collections@^1.2.0",
-        "@std/json": "npm:@jsr/std__json@^1.1.0",
-        "@std/jsonc": "npm:@jsr/std__jsonc@^1.0.2",
-        "@std/toml": "npm:@jsr/std__toml@^1.0.11",
-        "@std/yaml": "npm:@jsr/std__yaml@^1.1.1",
-        "zod": "^4.4.3",
-      },
-      "devDependencies": {
-        "@types/node": "^25.9.3",
         "@typescript/native-preview": "^7.0.0-dev.20260615.1",
         "vitest": "^4.1.8",
       },
@@ -291,12 +252,6 @@
 
     "fdir": ["fdir@6.5.0", "", { "peerDependencies": { "picomatch": "^3 || ^4" }, "optionalPeers": ["picomatch"] }, "sha512-tIbYtZbucOs0BRGqPJkshJUYdL+SDH7dVM8gjy+ERp3WAUjLEFJE+02kanyHtwjWOnwrKYBiwAmM0p4kLJAnXg=="],
 
-    "feo-cli": ["feo-cli@workspace:packages/cli"],
-
-    "feo-tui": ["feo-tui@workspace:packages/tui"],
-
-    "feo-utils": ["feo-utils@workspace:packages/utils"],
-
     "fsevents": ["fsevents@2.3.3", "", { "os": "darwin" }, "sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw=="],
 
     "get-east-asian-width": ["get-east-asian-width@1.6.0", "", {}, "sha512-QRbvDIbx6YklUe6RxeTeleMR0yv3cYH6PsPZHcnVn7xv7zO1BHN8r0XETu8n6Ye3Q+ahtSarc3WgtNWmehIBfA=="],
@@ -391,7 +346,7 @@
 
     "ws": ["ws@8.21.0", "", { "peerDependencies": { "bufferutil": "^4.0.1", "utf-8-validate": ">=5.0.2" }, "optionalPeers": ["bufferutil", "utf-8-validate"] }, "sha512-Vsp28b7DRcimFQvrqu2Wek3z1iYxDCWqHYB8Qsnk/S4RfaCQzPGPyBNuVjJV3cd6UiKtUtp6sNM77gWvzcCH+g=="],
 
-    "zod": ["zod@4.4.3", "", {}, "sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ=="],
+    "zod": ["@jsr/zod__zod@4.4.3", "https://npm.jsr.io/~/11/@jsr/zod__zod/4.4.3.tgz", {}, "sha512-MSBpUXksX0So5K6mU8QCt1kNBZ8Dkd6IoTMCqrra8ED0U2RM9eqRrM7IJMgcVJMYoDMaZyhOIPgY+ZVEJI5Y9w=="],
 
     "react-devtools-core/ws": ["ws@7.5.11", "", { "peerDependencies": { "bufferutil": "^4.0.1", "utf-8-validate": "^5.0.2" }, "optionalPeers": ["bufferutil", "utf-8-validate"] }, "sha512-zS54Oen9bITtp7kp2XM3AydrCIq1D+HwJOuH+c+e4LfpL/lotP5osijd+UoMnxwAam1GN8R4KtLAyIrIcBNpiA=="],
   }

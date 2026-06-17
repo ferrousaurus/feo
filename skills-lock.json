@@ -12,6 +12,12 @@
       "sourceType": "github",
       "skillPath": "ferrousaurus-typescript-best-practices/SKILL.md",
       "computedHash": "f1b0f485cb2fc6f29b5fb12e78782626dce4b2c77a26e235372d17cc924868a0"
+    },
+    "opentui": {
+      "source": "anomalyco/opentui",
+      "sourceType": "github",
+      "skillPath": "packages/web/src/content/SKILL.md",
+      "computedHash": "1bdc3b78601e9a38acea372ad0ca6173b1fbe9fde315e5f13c7c52bf99789205"
     }
   }
 }
