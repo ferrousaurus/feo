@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Suspense } from "react";
 import Shell from "#/components/Shell";
 import feoConfigValidator from "#/data/feoConfig";
-import readConfigFile from "#/lib/readConfigFile";
+import readConfigFile from "feo-utils/config/readConfigFile";
 import resolveAbsolutePath from "feo-utils/fs/resolveAbsolutePath";
 import keys from "feo-utils/object/keys";
 import configQueryOptions from "#/data/configQueryOptions";
