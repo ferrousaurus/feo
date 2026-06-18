@@ -3,13 +3,12 @@ import path from "node:path";
 import type { ScrollBoxRenderable } from "@opentui/core";
 import { useQuery } from "@tanstack/react-query";
 import { useRef } from "react";
-import { z } from "zod/mini";
 
 import Keybinds from "#/components/Keybinds";
 
 import type { FeoSource as SourceData } from "#/data/feoConfig";
 import sourceContentQueryOptions from "#/data/sourceContentQueryOptions";
-import filetypes from "#/lib/config/filetypes";
+import filetypes, { supportedExtensionSchema } from "#/lib/config/filetypes";
 import syntaxStyle from "#/lib/syntaxStyle";
 
 export type ActiveSourceProps = {
@@ -20,7 +19,7 @@ export type ActiveSourceProps = {
 
 export default function ActiveSource({ enableKeybinds, configPath, source }: Readonly<ActiveSourceProps>) {
   const { ext } = path.parse(source.path);
-  const validatedExt = z.enum([".jsonc", ".json", ".yaml", ".yml", ".toml"]).safeParse(ext);
+  const validatedExt = supportedExtensionSchema.safeParse(ext);
   const format = validatedExt.success ? validatedExt.data : null;
 
   const { isPending, isError, error, data, refetch } = useQuery(sourceContentQueryOptions(source));

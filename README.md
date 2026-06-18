@@ -31,12 +31,12 @@ pnpm dev           # run with hot-reload
 
 The TUI has four panels, switchable by their shortcut key:
 
-| Key | Panel | Description |
-|-----|-------|-------------|
-| `a` | Applications | List of apps. `n` to create, `d` to delete. |
-| `t` | Targets | Targets for the selected app. `n` to create, `d` to delete. |
-| `s` | Sources | Source files for the selected target. `m` to reorder, `r` to refresh. |
-| `p` | Preview | Merged config for the selected target. `w` to write to the target path. |
+| Key | Panel        | Description                                                             |
+| --- | ------------ | ----------------------------------------------------------------------- |
+| `a` | Applications | List of apps. `n` to create, `d` to delete.                             |
+| `t` | Targets      | Targets for the selected app. `n` to create, `d` to delete.             |
+| `s` | Sources      | Source files for the selected target. `m` to reorder, `r` to refresh.   |
+| `p` | Preview      | Merged config for the selected target. `w` to write to the target path. |
 
 Navigate within lists with `j`/`k` or `↑`/`↓`. Scroll content with `[`/`]`. Press `q` to quit.
 
@@ -54,30 +54,24 @@ Default config location: `~/.config/feo/config.jsonc`
     },
     "theme": {
       // customizable colors
-    }
+    },
   },
   "configs": {
     "starship": {
       "targets": {
         "~/.config/starship.toml": {
-          "sources": [
-            { "path": "~/dotfiles/starship/base.toml" },
-            { "path": "~/dotfiles/starship/work.toml" }
-          ]
-        }
-      }
+          "sources": [{ "path": "~/dotfiles/starship/base.toml" }, { "path": "~/dotfiles/starship/work.toml" }],
+        },
+      },
     },
     "vscode": {
       "targets": {
         "~/.config/Code/User/settings.jsonc": {
-          "sources": [
-            { "path": "~/dotfiles/vscode/base.jsonc" },
-            { "path": "~/dotfiles/vscode/extensions.jsonc" }
-          ]
-        }
-      }
-    }
-  }
+          "sources": [{ "path": "~/dotfiles/vscode/base.jsonc" }, { "path": "~/dotfiles/vscode/extensions.jsonc" }],
+        },
+      },
+    },
+  },
 }
 ```
 
@@ -89,23 +83,26 @@ Paths support `~`, `${VAR}`, and `${VAR:-fallback}` expansion. Remote sources vi
 
 ## Keybinds
 
-| Action | Default |
-|--------|---------|
-| cancel | `escape` |
-| confirm | `return` |
-| down / up | `j` / `k` (or `↓` / `↑`) |
-| delete | `d` |
-| move | `m` |
-| new | `n` |
-| refresh | `r` |
-| scroll up | `[` |
-| scroll down | `]` |
-| write | `w` |
-| quit | `q` |
+| Action      | Default                  |
+| ----------- | ------------------------ |
+| cancel      | `escape`                 |
+| confirm     | `return`                 |
+| down / up   | `j` / `k` (or `↓` / `↑`) |
+| delete      | `d`                      |
+| move        | `m`                      |
+| new         | `n`                      |
+| refresh     | `r`                      |
+| scroll up   | `[`                      |
+| scroll down | `]`                      |
+| write       | `w`                      |
+| quit        | `q`                      |
 
 ## Supported file types
 
-`.jsonc` · `.json` · `.yaml` · `.yml` · `.toml`
+`.jsonc` · `.json` · `.yaml` · `.yml` · `.toml` · `.md` · `.mdx`
+
+> [!CAUTION]
+> For `.md` and `.mdx`, the parser/stringifier treats any frontmatter as YAML and exposes the body of the document as a `content` property. If the frontmatter contains a `content` property, _it will override the document body_.
 
 ## Development
 
