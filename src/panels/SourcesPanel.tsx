@@ -1,7 +1,8 @@
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
-import Keybinds from "#/components/keybinds/Keybinds";
+import Keybinds from "#/components/Keybinds";
+
 import NewSourceInput from "#/components/sources/NewSourceInput";
 import Source from "#/components/sources/Source";
 import configQueryOptions from "#/data/configQueryOptions";

@@ -12,7 +12,9 @@ import readConfigFile from "#/lib/config/readConfigFile";
 import resolveAbsolutePath from "#/lib/fs/resolveAbsolutePath";
 import keys from "#/lib/object/keys";
 
+import sourceContentQueryOptions from "./data/sourceContentQueryOptions";
 import filetypes, { supportedExtensionSchema } from "./lib/config/filetypes";
+import values from "./lib/object/values";
 
 export type TuiProps = { configPath: string };
 
@@ -59,6 +61,15 @@ const tui = async ({ configPath }: Readonly<TuiProps>) => {
   const ext = supportedExtensionSchema.parse(npath.parse(configPath).ext);
 
   queryClient.setQueryData(configQueryOptions(configPath).queryKey, filetypes[ext].stringify(config.data));
+
+  await Promise.allSettled(
+    values(config.data.configs)
+      .flatMap((c) => values(c.targets))
+      .flatMap((t) => t.sources)
+      .map((s) => {
+        queryClient.prefetchQuery(sourceContentQueryOptions(s));
+      }),
+  );
 
   const application = keys(config.data.configs)[0];
   const appConfig = application !== undefined ? config.data.configs[application] : undefined;

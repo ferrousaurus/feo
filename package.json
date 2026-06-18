@@ -14,7 +14,7 @@
     "lint:fix": "oxlint --fix",
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check",
-    "build:check": "tsgo --noEmit",
+    "check": "tsgo --noEmit",
     "build": "rolldown -c",
     "start": "node --experimental-ffi dist/bundle.js"
   },

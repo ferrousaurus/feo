@@ -5,7 +5,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useRef } from "react";
 import { z } from "zod/mini";
 
-import Keybinds from "#/components/keybinds/Keybinds";
+import Keybinds from "#/components/Keybinds";
+
 import type { FeoSource as SourceData } from "#/data/feoConfig";
 import sourceContentQueryOptions from "#/data/sourceContentQueryOptions";
 import filetypes from "#/lib/config/filetypes";

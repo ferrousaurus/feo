@@ -2,7 +2,8 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 
 import Application from "#/components/applications/Application";
 import NewApplicationInput from "#/components/applications/NewApplicationInput";
-import Keybinds from "#/components/keybinds/Keybinds";
+import Keybinds from "#/components/Keybinds";
+
 import configQueryOptions from "#/data/configQueryOptions";
 import keys from "#/lib/object/keys";
 

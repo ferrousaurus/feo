@@ -1,5 +1,4 @@
 import { defineConfig } from "rolldown";
-import { resolve } from "node:path";
 
 export default defineConfig({
   input: "src/index.ts",
@@ -7,8 +6,8 @@ export default defineConfig({
     codeSplitting: false,
     file: "./dist/bundle.js",
     format: "esm",
+    minify: true,
   },
   external: ["@opentui/core", /node:\w+/],
-  minify: "true",
   tsconfig: "./tsconfig.json",
 });

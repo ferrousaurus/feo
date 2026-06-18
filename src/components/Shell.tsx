@@ -2,7 +2,7 @@ import npath from "node:path";
 
 import { useKeyboard, useRenderer } from "@opentui/react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Suspense, useState } from "react";
+import { Suspense, useReducer, useState } from "react";
 
 import configQueryOptions from "#/data/configQueryOptions";
 import type { FeoSource } from "#/data/feoConfig";
@@ -19,6 +19,7 @@ import PreviewPanel from "#/panels/PreviewPanel";
 import SourcesPanel from "#/panels/SourcesPanel";
 import TargetsPanel from "#/panels/TargetsPanel";
 
+import { deepMerge } from "@std/collections";
 import Panel from "./Panel";
 
 export const panels = ["apps", "targets", "sources", "preview"] as const;
@@ -63,6 +64,13 @@ function ShellKeybinds({
   return null;
 }
 
+type ShellState = {
+  panel: (typeof panels)[number];
+  application: string | undefined;
+  target: string | undefined;
+  source: FeoSource | undefined;
+};
+
 export type ShellProps = {
   configPath: string;
   initialApplication: string | undefined;
@@ -73,10 +81,20 @@ export type ShellProps = {
 export default function Shell({ configPath, initialApplication, initialTarget, initialSource }: Readonly<ShellProps>) {
   const queryClient = useQueryClient();
 
-  const [panel, setPanel] = useState<(typeof panels)[number]>("apps");
-  const [application, setApplication] = useState<string | undefined>(initialApplication);
-  const [target, setTarget] = useState<string | undefined>(initialTarget);
-  const [source, setSource] = useState<FeoSource | undefined>(initialSource);
+  const [{ panel, application, target, source }, dispatch] = useReducer(
+    (p: ShellState, c: Partial<ShellState> | ((state: ShellState) => Partial<ShellState>)) => {
+      if (typeof c === "function") {
+        return deepMerge(p, c(p));
+      }
+      return deepMerge(p, c);
+    },
+    {
+      panel: "apps",
+      application: initialApplication,
+      target: initialTarget,
+      source: initialSource,
+    },
+  );
 
   const [_writing, setWriting] = useState<{ path: string; contents: string } | undefined>(undefined);
 
@@ -91,19 +109,19 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
   };
 
   const handleApplicationsPanel = () => {
-    setPanel("apps");
+    dispatch({ panel: "apps" });
   };
 
   const handleTargetsPanel = () => {
-    setPanel("targets");
+    dispatch({ panel: "targets" });
   };
 
   const handleSourcesPanel = () => {
-    setPanel("sources");
+    dispatch({ panel: "sources" });
   };
 
   const handlePreviewPanel = () => {
-    setPanel("preview");
+    dispatch({ panel: "preview" });
   };
 
   const handleNextApplication = () => {
@@ -115,33 +133,35 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
     const data = filetypes[ext].parse(text);
     const config = feoConfigValidator.parse(data);
     const apps = keys(config.configs);
-    setApplication((currentApp) => {
-      if (currentApp === undefined) {
+    dispatch((s) => {
+      if (s.application === undefined) {
         const firstApp = apps[0];
         const targets = firstApp === undefined ? undefined : config.configs[firstApp]?.targets;
         const firstTarget = targets === undefined ? undefined : keys(targets)[0];
-        setTarget(firstTarget);
-        setSource(firstTarget !== undefined && targets !== undefined ? targets[firstTarget]?.sources[0] : undefined);
-        return firstApp;
+        return {
+          application: firstApp,
+          target: firstTarget,
+          source: firstTarget !== undefined && targets !== undefined ? targets[firstTarget]?.sources[0] : undefined,
+        };
       }
-      const i = apps.indexOf(currentApp);
+      const i = apps.indexOf(s.application);
       if (i === -1) {
-        return currentApp;
+        return { application: s.application };
       }
       const next = apps[i + 1];
       if (next === undefined) {
-        return currentApp;
+        return { application: s.application };
       }
       const targets = config.configs[next]?.targets;
       if (targets === undefined) {
-        setTarget(undefined);
-        setSource(undefined);
-        return next;
+        return { application: next, target: undefined, source: undefined };
       }
       const firstTarget = keys(targets)[0];
-      setTarget(firstTarget);
-      setSource(firstTarget === undefined ? undefined : targets[firstTarget]?.sources[0]);
-      return next;
+      return {
+        application: next,
+        target: firstTarget,
+        source: firstTarget === undefined ? undefined : targets[firstTarget]?.sources[0],
+      };
     });
   };
 
@@ -154,35 +174,35 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
     const data = filetypes[ext].parse(text);
     const config = feoConfigValidator.parse(data);
     const apps = keys(config.configs);
-    setApplication((currentApp) => {
-      if (currentApp === undefined) {
+    dispatch((s) => {
+      if (s.application === undefined) {
         const firstApp = apps[0];
         const targets = firstApp === undefined ? undefined : config.configs[firstApp]?.targets;
         const firstTarget = targets === undefined ? undefined : keys(targets)[0];
-        setTarget(firstTarget);
-        setSource(firstTarget !== undefined && targets !== undefined ? targets[firstTarget]?.sources[0] : undefined);
-        return firstApp;
+        return {
+          application: firstApp,
+          target: firstTarget,
+          source: firstTarget !== undefined && targets !== undefined ? targets[firstTarget]?.sources[0] : undefined,
+        };
       }
-      const i = apps.indexOf(currentApp);
+      const i = apps.indexOf(s.application);
       if (i <= 0) {
-        return currentApp;
+        return { application: s.application };
       }
       const prev = apps[i - 1] ?? apps[apps.length - 1];
       if (prev === undefined) {
-        setTarget(undefined);
-        setSource(undefined);
-        return undefined;
+        return { application: undefined, target: undefined, source: undefined };
       }
       const targets = config.configs[prev]?.targets;
       if (targets === undefined) {
-        setTarget(undefined);
-        setSource(undefined);
-        return prev;
+        return { application: prev, target: undefined, source: undefined };
       }
       const firstTarget = keys(targets)[0];
-      setTarget(firstTarget);
-      setSource(firstTarget === undefined ? undefined : targets[firstTarget]?.sources[0]);
-      return prev;
+      return {
+        application: prev,
+        target: firstTarget,
+        source: firstTarget === undefined ? undefined : targets[firstTarget]?.sources[0],
+      };
     });
   };
 
@@ -194,34 +214,34 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
     const ext = supportedExtensionSchema.parse(npath.parse(configPath).ext);
     const data = filetypes[ext].parse(text);
     const config = feoConfigValidator.parse(data);
-    setTarget((currentTarget) => {
-      if (application === undefined) {
-        return currentTarget;
+    dispatch((s) => {
+      if (s.application === undefined) {
+        return { target: s.target };
       }
-      const appConfig = config.configs[application];
+      const appConfig = config.configs[s.application];
       if (appConfig === undefined) {
-        return currentTarget;
+        return { target: s.target };
       }
-      const targets = keys(appConfig.targets);
-      if (currentTarget === undefined) {
-        const firstTarget = targets[0];
-        if (target !== firstTarget) {
-          setSource(firstTarget === undefined ? undefined : appConfig.targets[firstTarget]?.sources[0]);
-        }
-        return firstTarget;
+      const tgts = keys(appConfig.targets);
+      if (s.target === undefined) {
+        const firstTarget = tgts[0];
+        return {
+          target: firstTarget,
+          source: firstTarget === undefined ? undefined : appConfig.targets[firstTarget]?.sources[0],
+        };
       }
-      const ni = targets.indexOf(currentTarget);
+      const ni = tgts.indexOf(s.target);
       if (ni === -1) {
-        return currentTarget;
+        return { target: s.target };
       }
-      const next = targets[ni + 1];
+      const next = tgts[ni + 1];
       if (next === undefined) {
-        return currentTarget;
+        return { target: s.target };
       }
-      if (target !== next) {
-        setSource(appConfig.targets[next]?.sources[0]);
-      }
-      return next;
+      return {
+        target: next,
+        source: appConfig.targets[next]?.sources[0],
+      };
     });
   };
 
@@ -233,33 +253,34 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
     const ext = supportedExtensionSchema.parse(npath.parse(configPath).ext);
     const data = filetypes[ext].parse(text);
     const config = feoConfigValidator.parse(data);
-    setTarget((currentTarget) => {
-      if (application === undefined) {
-        return currentTarget;
+    dispatch((s) => {
+      if (s.application === undefined) {
+        return { target: s.target };
       }
-      const appConfig = config.configs[application];
+      const appConfig = config.configs[s.application];
       if (appConfig === undefined) {
-        return currentTarget;
+        return { target: s.target };
       }
-      const targets = keys(appConfig.targets);
-      if (currentTarget === undefined) {
-        const firstTarget = targets[0];
-        setSource(firstTarget === undefined ? undefined : appConfig.targets[firstTarget]?.sources[0]);
-        return firstTarget;
+      const tgts = keys(appConfig.targets);
+      if (s.target === undefined) {
+        const firstTarget = tgts[0];
+        return {
+          target: firstTarget,
+          source: firstTarget === undefined ? undefined : appConfig.targets[firstTarget]?.sources[0],
+        };
       }
-      const pi = targets.indexOf(currentTarget);
+      const pi = tgts.indexOf(s.target);
       if (pi <= 0) {
-        return currentTarget;
+        return { target: s.target };
       }
-      const previous = targets[pi - 1] ?? targets[targets.length - 1];
+      const previous = tgts[pi - 1] ?? tgts[tgts.length - 1];
       if (previous === undefined) {
-        setSource(undefined);
-        return undefined;
+        return { target: undefined, source: undefined };
       }
-      if (target !== previous) {
-        setSource(appConfig.targets[previous]?.sources[0]);
-      }
-      return previous;
+      return {
+        target: previous,
+        source: appConfig.targets[previous]?.sources[0],
+      };
     });
   };
 
@@ -271,29 +292,29 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
     const ext = supportedExtensionSchema.parse(npath.parse(configPath).ext);
     const data = filetypes[ext].parse(text);
     const config = feoConfigValidator.parse(data);
-    setSource((currentSource) => {
-      if (application === undefined || target === undefined) {
-        return currentSource;
+    dispatch((s) => {
+      if (s.application === undefined || s.target === undefined) {
+        return { source: s.source };
       }
-      const sources = config.configs[application]?.targets[target]?.sources;
+      const sources = config.configs[s.application]?.targets[s.target]?.sources;
       if (sources === undefined) {
-        return currentSource;
+        return { source: s.source };
       }
-      if (currentSource === undefined) {
+      if (s.source === undefined) {
         const firstSource = sources[0];
         if (firstSource === undefined) {
         }
-        return firstSource;
+        return { source: firstSource };
       }
-      const i = sources.findIndex((s) => s.path === currentSource.path);
+      const i = sources.findIndex((src) => src.path === s.source?.path);
       if (i === -1) {
-        return currentSource;
+        return { source: s.source };
       }
       const next = sources[i + 1];
       if (next === undefined) {
-        return currentSource;
+        return { source: s.source };
       }
-      return next;
+      return { source: next };
     });
   };
 
@@ -305,26 +326,26 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
     const ext = supportedExtensionSchema.parse(npath.parse(configPath).ext);
     const data = filetypes[ext].parse(text);
     const config = feoConfigValidator.parse(data);
-    setSource((currentSource) => {
-      if (application === undefined || target === undefined) {
-        return currentSource;
+    dispatch((s) => {
+      if (s.application === undefined || s.target === undefined) {
+        return { source: s.source };
       }
-      const sources = config.configs[application]?.targets[target]?.sources;
+      const sources = config.configs[s.application]?.targets[s.target]?.sources;
       if (sources === undefined) {
-        return currentSource;
+        return { source: s.source };
       }
-      if (currentSource === undefined) {
-        return sources[sources.length - 1];
+      if (s.source === undefined) {
+        return { source: sources[sources.length - 1] };
       }
-      const i = sources.findIndex((s) => s.path === currentSource.path);
+      const i = sources.findIndex((src) => src.path === s.source?.path);
       if (i === -1) {
-        return currentSource;
+        return { source: s.source };
       }
       const prev = sources[i - 1];
       if (prev === undefined) {
-        return currentSource;
+        return { source: s.source };
       }
-      return prev;
+      return { source: prev };
     });
   };
 

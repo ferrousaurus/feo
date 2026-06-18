@@ -32,6 +32,6 @@
       "#/*": ["./src/*"],
     },
   },
-  "include": ["./src/*"],
-  "exclude": ["./oxfmt.config.ts", "./oxlint.config.ts", "./vitest.config.ts"],
+  "include": ["src"],
+  "exclude": ["oxfmt.config.ts", "oxlint.config.ts", "vitest.config.ts"],
 }
