@@ -23,7 +23,7 @@ export default function NewSourceInput({ app, configPath, target, onSubmit, onCa
   });
 
   function handleSubmit() {
-    mutateAsync({
+    void mutateAsync({
       application: app,
       target,
       source: name,

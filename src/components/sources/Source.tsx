@@ -1,9 +1,12 @@
-import configQueryOptions from "#/data/configQueryOptions";
-import type { Source as SourceData } from "#/data/feoConfig";
-import textFileQueryOptions from "#/data/textFileQueryOptions";
-import useTitle from "#/hooks/useTitle";
 import ActiveSource from "#/components/sources/ActiveSource";
-import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import configQueryOptions from "#/data/configQueryOptions";
+import deleteSourceMutationOptions from "#/data/deleteSourceMutationOptions";
+import type { FeoSource as SourceData } from "#/data/feoConfig";
+import sourceContentQueryOptions from "#/data/sourceContentQueryOptions";
+import useTitle from "#/hooks/useTitle";
+import { useMutation, useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import Keybinds from "#/components/keybinds/Keybinds";
 
 export type SourceProps = {
   configPath: string;
@@ -15,7 +18,7 @@ export type SourceProps = {
   moving: boolean;
 };
 
-export default function SourceComponent({
+export default function Source({
   active,
   enableKeybinds,
   application,
@@ -24,8 +27,12 @@ export default function SourceComponent({
   configPath,
   moving,
 }: Readonly<SourceProps>) {
-  const { isError } = useQuery(textFileQueryOptions(source.path));
-  const { data: theme } = useSuspenseQuery({ ...configQueryOptions(configPath), select: (d) => d.settings.theme });
+  const [deleting, setDeleting] = useState(false);
+  const { mutateAsync } = useMutation(deleteSourceMutationOptions(configPath));
+
+  const { isError } = useQuery(sourceContentQueryOptions(source));
+  const { data: config } = useSuspenseQuery(configQueryOptions(configPath));
+  const theme = config.settings.theme;
 
   const title = useTitle(source.path, 0.35, {
     buffer: 8,
@@ -43,16 +50,41 @@ export default function SourceComponent({
   }
 
   if (active) {
+    const handleDelete = () => {
+      setDeleting(true);
+    };
+
+    const handleCancel = () => {
+      setDeleting(false);
+    };
+
+    const handleConfirm = () => {
+      setDeleting((d) => {
+        if (d) {
+          void mutateAsync({ app: application, target, source: source.path });
+        }
+        return false;
+      });
+    };
+
     return (
-      <box borderColor={theme.active} borderStyle={moving ? "double" : undefined} title={title}>
-        <ActiveSource
-          application={application}
-          target={target}
-          source={source}
-          configPath={configPath}
-          enableKeybinds={enableKeybinds}
-        />
-      </box>
+      <>
+        <box
+          borderColor={deleting ? theme.error : theme.active}
+          borderStyle={moving ? "double" : undefined}
+          title={title}
+        >
+          <ActiveSource source={source} configPath={configPath} enableKeybinds={enableKeybinds} />
+        </box>
+        {enableKeybinds && (
+          <Keybinds
+            configPath={configPath}
+            onCancel={handleCancel}
+            onConfirm={handleConfirm}
+            onDelete={handleDelete}
+          />
+        )}
+      </>
     );
   }
 

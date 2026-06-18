@@ -1,4 +1,4 @@
-import PreviewCodeKeybinds from "#/components/preview/PreviewCodeKeybinds";
+import Keybinds from "#/components/keybinds/Keybinds";
 import configQueryOptions from "#/data/configQueryOptions";
 import filetypes, { supportedExtensionSchema } from "#/lib/config/filetypes";
 import getMergedConfig from "#/lib/getMergedConfig";
@@ -76,13 +76,12 @@ export default function PreviewPanel({
         </line-number>
       </scrollbox>
       {active && (
-        <PreviewCodeKeybinds
-          scrollRef={ref}
-          contents={stringify(data)}
+        <Keybinds
           configPath={configPath}
-          path={target}
-          onWrite={onWrite}
-          onCancelWrite={onCancelWrite}
+          onCancel={onCancelWrite}
+          onScrollUp={() => { ref.current?.scrollBy(-1); }}
+          onScrollDown={() => { ref.current?.scrollBy(1); }}
+          onWrite={target !== undefined && target !== "" ? () => { onWrite?.({ path: target, contents: stringify(data) }); } : undefined}
         />
       )}
     </>

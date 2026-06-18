@@ -1,7 +1,7 @@
 import configQueryOptions from "#/data/configQueryOptions";
 import { Target } from "#/components/targets/Target";
-import TargetsPanelKeybinds from "#/components/targets/TargetsPanelKeybinds";
 import NewTargetInput from "#/components/targets/NewTargetInput";
+import Keybinds from "#/components/keybinds/Keybinds";
 import keys from "#/lib/object/keys";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
@@ -28,21 +28,21 @@ export default function TargetsPanel({
   onEnableCreate,
   onDisableCreate,
 }: Readonly<TargetFilesProps>) {
-  const { data: targets } = useSuspenseQuery({
-    ...configQueryOptions(configPath),
-    select: (d) => {
-      const ts = d.configs[application]?.targets;
-      if (ts === undefined) {
-        return [];
-      }
-      return keys(ts);
-    },
-  });
+  const { data: config } = useSuspenseQuery(configQueryOptions(configPath));
+  const targetsData = config.configs[application]?.targets;
+  const targets = targetsData === undefined ? [] : keys(targetsData);
 
   return (
     <>
       {targets.map((t) => (
-        <Target key={t} target={t} configPath={configPath} active={target === t} application={application} enableKeybinds={active && target === t && !creating} />
+        <Target
+          key={t}
+          target={t}
+          configPath={configPath}
+          active={target === t}
+          application={application}
+          enableKeybinds={active && target === t && !creating}
+        />
       ))}
       {application !== undefined && creating && (
         <NewTargetInput
@@ -57,16 +57,16 @@ export default function TargetsPanel({
         />
       )}
       {active && !creating && (
-        <TargetsPanelKeybinds
+        <Keybinds
           configPath={configPath}
           onNew={() => {
             onEnableCreate?.();
           }}
-          onNext={() => {
-            onNext?.();
-          }}
-          onPrevious={() => {
+          onUp={() => {
             onPrevious?.();
+          }}
+          onDown={() => {
+            onNext?.();
           }}
         />
       )}

@@ -1,22 +1,32 @@
+import configQueryOptions from "#/data/configQueryOptions";
+import type { FeoSource } from "#/data/feoConfig";
+import feoConfigValidator from "#/data/feoConfig";
+import filetypes, { supportedExtensionSchema } from "#/lib/config/filetypes";
+import sha from "#/lib/crypto/hash";
+import resolveAbsolutePath from "#/lib/fs/resolveAbsolutePath";
+import readFile from "#/lib/io/readFile";
+import writeFile from "#/lib/io/writeFile";
+import keys from "#/lib/object/keys";
 import ApplicationsPanel from "#/panels/ApplicationsPanel";
 import Legend from "#/panels/LegendPanel";
 import PreviewPanel from "#/panels/PreviewPanel";
 import SourcesPanel from "#/panels/SourcesPanel";
 import TargetsPanel from "#/panels/TargetsPanel";
-import configQueryOptions from "#/data/configQueryOptions";
-import type { Source } from "#/data/feoConfig";
-import useTitle from "#/hooks/useTitle";
-import sha from "#/lib/crypto/hash";
-import writeFile from "#/lib/io/writeFile";
-import readFile from "#/lib/io/readFile";
-import resolveAbsolutePath from "#/lib/fs/resolveAbsolutePath";
-import keys from "#/lib/object/keys";
 import { useKeyboard, useRenderer } from "@opentui/react";
-import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
-import nodePath from "node:path";
-import { Suspense, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import npath from "node:path";
+import { Suspense, use, useState } from "react";
+import Panel from "./Panel";
 
 export const panels = ["apps", "targets", "sources", "preview"] as const;
+
+type ShellKeybindsProps = {
+  onQuit?: () => void;
+  onApplicationsPanel?: () => void;
+  onTargetsPanel?: () => void;
+  onSourcesPanel?: () => void;
+  onPreviewPanel?: () => void;
+};
 
 function ShellKeybinds({
   onQuit,
@@ -24,13 +34,7 @@ function ShellKeybinds({
   onTargetsPanel,
   onSourcesPanel,
   onPreviewPanel,
-}: {
-  onQuit?: () => void;
-  onApplicationsPanel?: () => void;
-  onTargetsPanel?: () => void;
-  onSourcesPanel?: () => void;
-  onPreviewPanel?: () => void;
-}) {
+}: ShellKeybindsProps) {
   useKeyboard((key) => {
     if (key.name === "q") {
       onQuit?.();
@@ -60,26 +64,25 @@ export type ShellProps = {
   configPath: string;
   initialApplication: string | undefined;
   initialTarget: string | undefined;
-  initialSource: Source | undefined;
+  initialSource: FeoSource | undefined;
 };
 
 export default function Shell({ configPath, initialApplication, initialTarget, initialSource }: Readonly<ShellProps>) {
   const queryClient = useQueryClient();
 
-  const { data: theme } = useSuspenseQuery({ ...configQueryOptions(configPath), select: (d) => d.settings.theme });
-
   const [panel, setPanel] = useState<(typeof panels)[number]>("apps");
   const [application, setApplication] = useState<string | undefined>(initialApplication);
   const [target, setTarget] = useState<string | undefined>(initialTarget);
-  const [source, setSource] = useState<Source | undefined>(initialSource);
+  const [source, setSource] = useState<FeoSource | undefined>(initialSource);
 
-  const [writing, setWriting] = useState<{ path: string; contents: string } | undefined>(undefined);
+  const [_writing, setWriting] = useState<{ path: string; contents: string } | undefined>(undefined);
 
   const [creating, setCreating] = useState<"application" | "target" | "source" | undefined>(undefined);
 
   const renderer = useRenderer();
 
   const handleQuit = () => {
+    queryClient.unmount();
     renderer.destroy();
     process.exit(0);
   };
@@ -101,10 +104,13 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
   };
 
   const handleNextApplication = () => {
-    const config = queryClient.getQueryData(configQueryOptions(configPath).queryKey);
-    if (config === undefined) {
+    const text = queryClient.getQueryData(configQueryOptions(configPath).queryKey);
+    if (text === undefined) {
       return;
     }
+    const ext = supportedExtensionSchema.parse(npath.parse(configPath).ext);
+    const data = filetypes[ext].parse(text);
+    const config = feoConfigValidator.parse(data);
     const apps = keys(config.configs);
     setApplication((currentApp) => {
       if (currentApp === undefined) {
@@ -137,10 +143,13 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
   };
 
   const handlePreviousApplication = () => {
-    const config = queryClient.getQueryData(configQueryOptions(configPath).queryKey);
-    if (config === undefined) {
+    const text = queryClient.getQueryData(configQueryOptions(configPath).queryKey);
+    if (text === undefined) {
       return;
     }
+    const ext = supportedExtensionSchema.parse(npath.parse(configPath).ext);
+    const data = filetypes[ext].parse(text);
+    const config = feoConfigValidator.parse(data);
     const apps = keys(config.configs);
     setApplication((currentApp) => {
       if (currentApp === undefined) {
@@ -175,10 +184,13 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
   };
 
   const handleNextTarget = () => {
-    const config = queryClient.getQueryData(configQueryOptions(configPath).queryKey);
-    if (config === undefined) {
+    const text = queryClient.getQueryData(configQueryOptions(configPath).queryKey);
+    if (text === undefined) {
       return;
     }
+    const ext = supportedExtensionSchema.parse(npath.parse(configPath).ext);
+    const data = filetypes[ext].parse(text);
+    const config = feoConfigValidator.parse(data);
     setTarget((currentTarget) => {
       if (application === undefined) {
         return currentTarget;
@@ -211,10 +223,13 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
   };
 
   const handlePreviousTarget = () => {
-    const config = queryClient.getQueryData(configQueryOptions(configPath).queryKey);
-    if (config === undefined) {
+    const text = queryClient.getQueryData(configQueryOptions(configPath).queryKey);
+    if (text === undefined) {
       return;
     }
+    const ext = supportedExtensionSchema.parse(npath.parse(configPath).ext);
+    const data = filetypes[ext].parse(text);
+    const config = feoConfigValidator.parse(data);
     setTarget((currentTarget) => {
       if (application === undefined) {
         return currentTarget;
@@ -246,10 +261,13 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
   };
 
   const handleNextSource = () => {
-    const config = queryClient.getQueryData(configQueryOptions(configPath).queryKey);
-    if (config === undefined) {
+    const text = queryClient.getQueryData(configQueryOptions(configPath).queryKey);
+    if (text === undefined) {
       return;
     }
+    const ext = supportedExtensionSchema.parse(npath.parse(configPath).ext);
+    const data = filetypes[ext].parse(text);
+    const config = feoConfigValidator.parse(data);
     setSource((currentSource) => {
       if (application === undefined || target === undefined) {
         return currentSource;
@@ -264,7 +282,7 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
         }
         return firstSource;
       }
-      const i = sources.indexOf(currentSource);
+      const i = sources.findIndex((s) => s.path === currentSource.path);
       if (i === -1) {
         return currentSource;
       }
@@ -277,10 +295,13 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
   };
 
   const handlePreviousSource = () => {
-    const config = queryClient.getQueryData(configQueryOptions(configPath).queryKey);
-    if (config === undefined) {
+    const text = queryClient.getQueryData(configQueryOptions(configPath).queryKey);
+    if (text === undefined) {
       return;
     }
+    const ext = supportedExtensionSchema.parse(npath.parse(configPath).ext);
+    const data = filetypes[ext].parse(text);
+    const config = feoConfigValidator.parse(data);
     setSource((currentSource) => {
       if (application === undefined || target === undefined) {
         return currentSource;
@@ -292,7 +313,7 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
       if (currentSource === undefined) {
         return sources[sources.length - 1];
       }
-      const i = sources.indexOf(currentSource);
+      const i = sources.findIndex((s) => s.path === currentSource.path);
       if (i === -1) {
         return currentSource;
       }
@@ -305,10 +326,6 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
   };
 
   const handleWrite = (opts: { path: string; contents: string }) => {
-    const config = queryClient.getQueryData(configQueryOptions(configPath).queryKey);
-    if (config === undefined) {
-      return;
-    }
     setWriting((w) => {
       if (w === undefined) {
         return opts;
@@ -320,7 +337,7 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
         return w; // TODO: Error messaging
       }
       const path = resolveAbsolutePath(opts.path);
-      const { dir, ext, name } = nodePath.parse(path);
+      const { dir, ext, name } = npath.parse(path);
       void readFile(path)
         .then((f) => f.text())
         .then(async (currentFileContents) => {
@@ -337,24 +354,12 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
     setWriting(undefined);
   };
 
-  const stringifyTitle = (title: string) => `┤${title}├`;
-
-  const applicationsTitle = useTitle("[A]pplications", 0.3, { stringify: stringifyTitle });
-  const targetsTitle = useTitle("[T]argets", 0.3, { stringify: stringifyTitle });
-  const sourcesTitle = useTitle("[S]ources", 0.35, { stringify: stringifyTitle });
-  const previewTitle = useTitle("[P]review", 0.35, { stringify: stringifyTitle });
-
   return (
     <>
       <box>
         <box height="100%" width="100%" flexDirection="row" justifyContent="space-between" alignItems="center">
           <box flexGrow={1} width="30%">
-            <box
-              title={applicationsTitle}
-              height="50%"
-              borderColor={panel === "apps" ? theme.active : theme.inactive}
-              borderStyle="single"
-            >
+            <Panel title="[A]pplications" height="50%" active={panel === "apps"} configPath={configPath}>
               <Suspense>
                 <ApplicationsPanel
                   active={panel === "apps"}
@@ -371,13 +376,8 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
                   }}
                 />
               </Suspense>
-            </box>
-            <box
-              title={targetsTitle}
-              height="50%"
-              borderColor={panel === "targets" ? theme.active : theme.inactive}
-              borderStyle="single"
-            >
+            </Panel>
+            <Panel title="[T]argets" height="50%" active={panel === "targets"} configPath={configPath}>
               <Suspense>
                 {application !== undefined && (
                   <TargetsPanel
@@ -397,15 +397,15 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
                   />
                 )}
               </Suspense>
-            </box>
+            </Panel>
           </box>
-          <box
+          <Panel
             flexGrow={1}
             width="35%"
-            title={sourcesTitle}
+            title="[S]ources"
             height="100%"
-            borderColor={panel === "sources" ? (writing !== undefined ? theme.error : theme.active) : theme.inactive}
-            borderStyle="single"
+            active={panel === "sources"}
+            configPath={configPath}
           >
             <Suspense>
               {application !== undefined && target !== undefined && (
@@ -427,14 +427,15 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
                 />
               )}
             </Suspense>
-          </box>
-          <box
+          </Panel>
+          <Panel
             flexGrow={1}
             width="35%"
-            title={previewTitle}
+            title="[P]review"
             height="100%"
-            borderColor={panel === "preview" ? (writing ? theme.error : theme.active) : theme.inactive}
+            active={panel === "preview"}
             borderStyle="single"
+            configPath={configPath}
           >
             <Suspense>
               <PreviewPanel
@@ -446,7 +447,7 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
                 onCancelWrite={handleCancelWrite}
               />
             </Suspense>
-          </box>
+          </Panel>
         </box>
         <box height={3} width="100%">
           <Legend panel={panel} />

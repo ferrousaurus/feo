@@ -1,40 +1,27 @@
-import deleteSourceMutationOptions from "#/data/deleteSourceMutationOptions";
-import type { Source as SourceData } from "#/data/feoConfig";
-import textFileQueryOptions from "#/data/textFileQueryOptions";
-import syntaxStyle from "#/lib/syntaxStyle";
-import ActiveSourceKeybinds from "#/components/sources/ActiveSourceKeybinds";
+import Keybinds from "#/components/keybinds/Keybinds";
+import type { FeoSource as SourceData } from "#/data/feoConfig";
+import sourceContentQueryOptions from "#/data/sourceContentQueryOptions";
 import filetypes from "#/lib/config/filetypes";
+import syntaxStyle from "#/lib/syntaxStyle";
 import type { ScrollBoxRenderable } from "@opentui/core";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import path from "node:path";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { z } from "zod/mini";
 
 export type ActiveSourceProps = {
   enableKeybinds: boolean;
   configPath: string;
-  application: string;
-  target: string;
   source: SourceData;
 };
 
-export default function ActiveSource({
-  enableKeybinds,
-  configPath,
-  application,
-  target,
-  source,
-}: Readonly<ActiveSourceProps>) {
-  const [deleting, setDeleting] = useState(false);
-
+export default function ActiveSource({ enableKeybinds, configPath, source }: Readonly<ActiveSourceProps>) {
   const { ext } = path.parse(source.path);
   const validatedExt = z.enum([".jsonc", ".json", ".yaml", ".yml", ".toml"]).safeParse(ext);
   const format = validatedExt.success ? validatedExt.data : null;
 
-  const { isPending, isError, error, data, refetch } = useQuery(textFileQueryOptions(source.path));
+  const { isPending, isError, error, data, refetch } = useQuery(sourceContentQueryOptions(source));
   const ref = useRef<ScrollBoxRenderable>(null);
-
-  const { mutateAsync } = useMutation(deleteSourceMutationOptions(configPath));
 
   if (isPending) {
     return <scrollbox ref={ref} />;
@@ -47,23 +34,6 @@ export default function ActiveSource({
       </scrollbox>
     );
   }
-
-  const handleDelete = () => {
-    setDeleting(true);
-  };
-
-  const handleCancel = () => {
-    setDeleting(false);
-  };
-
-  const handleConfirm = () => {
-    setDeleting((d) => {
-      if (d) {
-        void mutateAsync({ app: application, target, source: source.path });
-      }
-      return false;
-    });
-  };
 
   return (
     <>
@@ -78,17 +48,8 @@ export default function ActiveSource({
         </line-number>
       </scrollbox>
       {enableKeybinds && (
-        <ActiveSourceKeybinds
+        <Keybinds
           configPath={configPath}
-          onDelete={() => {
-            handleDelete();
-          }}
-          onCancel={() => {
-            handleCancel();
-          }}
-          onConfirm={() => {
-            handleConfirm();
-          }}
           onScrollUp={() => {
             ref.current?.scrollBy(-1);
           }}

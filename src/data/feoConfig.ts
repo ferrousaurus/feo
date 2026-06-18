@@ -4,7 +4,7 @@ export const sourceValidator = z.object({
   path: z.string(),
 });
 
-export type Source = z.infer<typeof sourceValidator>;
+export type FeoSource = z.infer<typeof sourceValidator>;
 
 const keymapValidator = z.pipe(
   z.union([z.array(z.string()), z.string()]),
@@ -79,12 +79,7 @@ const feoConfigValidator = z.object({
       targets: z.record(
         z.string(),
         z.object({
-          sources: z.array(
-            z.pipe(
-              z.union([z.string(), sourceValidator]),
-              z.transform((s) => (typeof s === "string" ? sourceValidator.parse({ path: s }) : s)),
-            ),
-          ),
+          sources: z.array(sourceValidator),
         }),
       ),
     }),

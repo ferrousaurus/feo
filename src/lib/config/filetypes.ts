@@ -1,3 +1,4 @@
+import * as JSONC from "@std/jsonc";
 import * as TOML from "@std/toml";
 import * as YAML from "@std/yaml";
 import { z } from "zod/mini";
@@ -18,7 +19,7 @@ const filetypes: Record<
 > = {
   ".jsonc": {
     filetype: "json",
-    parse: (str) => recordValidator.parse(JSON.parse(str)),
+    parse: (str) => recordValidator.parse(JSONC.parse(str)),
     stringify: (obj) => JSON.stringify(obj, null, 2),
   },
   ".json": {

@@ -1,7 +1,7 @@
 import configQueryOptions from "#/data/configQueryOptions";
 import Application from "#/components/applications/Application";
-import ApplicationsPanelKeybinds from "#/components/applications/ApplicationsPanelKeybinds";
 import NewApplicationInput from "#/components/applications/NewApplicationInput";
+import Keybinds from "#/components/keybinds/Keybinds";
 import keys from "#/lib/object/keys";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
@@ -26,10 +26,8 @@ export default function ApplicationsPanel({
   onEnableCreate,
   onDisableCreate,
 }: Readonly<ApplicationsPanelProps>) {
-  const { data: applications } = useSuspenseQuery({
-    ...configQueryOptions(configPath),
-    select: (d) => keys(d.configs),
-  });
+  const { data: config } = useSuspenseQuery(configQueryOptions(configPath));
+  const applications = keys(config.configs);
 
   const handleNext = () => {
     onNext?.();
@@ -66,7 +64,12 @@ export default function ApplicationsPanel({
         />
       )}
       {active && !creating && (
-        <ApplicationsPanelKeybinds configPath={configPath} onNext={handleNext} onPrevious={handlePrevious} onNew={handleNew} />
+        <Keybinds
+          configPath={configPath}
+          onNew={handleNew}
+          onUp={handlePrevious}
+          onDown={handleNext}
+        />
       )}
     </>
   );

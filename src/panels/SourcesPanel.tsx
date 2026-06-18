@@ -1,18 +1,19 @@
 import configQueryOptions from "#/data/configQueryOptions";
-import type { Source } from "#/data/feoConfig";
+import type { FeoSource } from "#/data/feoConfig";
 import moveSourceDownMutationOptions from "#/data/moveSourceDownMutationOptions";
 import moveSourceUpMutationOptions from "#/data/moveSourceUpMutationOptions";
-import SourceComponent from "#/components/sources/Source";
-import SourcesPanelKeybinds from "#/components/sources/SourcesPanelKeybinds";
+import Source from "#/components/sources/Source";
 import NewSourceInput from "#/components/sources/NewSourceInput";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
+import Keybinds from "#/components/keybinds/Keybinds";
+import addSourceMutationOptions from "#/data/addSourceMutationOptions";
 
 export type SourcesPanelProps = {
   active: boolean;
   application: string;
   configPath: string;
-  source?: Source;
+  source?: FeoSource;
   target: string;
   onNext?: () => void;
   onPrevious?: () => void;
@@ -35,18 +36,17 @@ export default function SourcesPanel({
 }: Readonly<SourcesPanelProps>) {
   const [moving, setMoving] = useState<string | undefined>(undefined);
 
-  const { data: sources } = useSuspenseQuery({
-    ...configQueryOptions(configPath),
-    select: (d) => d.configs[application]?.targets[target]?.sources ?? [],
-  });
+  const { data: config } = useSuspenseQuery(configQueryOptions(configPath));
+  const sources = config.configs[application]?.targets[target]?.sources ?? [];
 
+  const { mutateAsync: addSourceAsync } = useMutation(addSourceMutationOptions(configPath));
   const { mutateAsync: moveSourceUpAsync } = useMutation(moveSourceUpMutationOptions(configPath));
   const { mutateAsync: moveSourceDownAsync } = useMutation(moveSourceDownMutationOptions(configPath));
 
   return (
     <>
       {sources.map((s) => (
-        <SourceComponent
+        <Source
           key={s.path}
           configPath={configPath}
           application={application}
@@ -71,22 +71,8 @@ export default function SourcesPanel({
         />
       )}
       {active && !creating && (
-        <SourcesPanelKeybinds
+        <Keybinds
           configPath={configPath}
-          onNext={() => {
-            if (moving !== undefined) {
-              moveSourceDownAsync({ app: application, target, source: moving });
-            } else {
-              onNext?.();
-            }
-          }}
-          onPrevious={() => {
-            if (moving !== undefined) {
-              moveSourceUpAsync({ app: application, target, source: moving });
-            } else {
-              onPrevious?.();
-            }
-          }}
           onNew={() => {
             if (moving === undefined) {
               onEnableCreate?.();
@@ -95,9 +81,19 @@ export default function SourcesPanel({
           onMove={() => {
             setMoving((m) => (m === undefined ? source?.path : undefined));
           }}
-          onCancel={() => {}}
-          onConfirm={() => {
-            setMoving((m) => (m === undefined ? source?.path : undefined));
+          onUp={() => {
+            if (moving !== undefined) {
+              moveSourceUpAsync({ app: application, target, source: moving });
+            } else {
+              onPrevious?.();
+            }
+          }}
+          onDown={() => {
+            if (moving !== undefined) {
+              moveSourceDownAsync({ app: application, target, source: moving });
+            } else {
+              onNext?.();
+            }
           }}
         />
       )}

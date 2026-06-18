@@ -8,8 +8,12 @@ import readConfigFile from "#/lib/config/readConfigFile";
 import resolveAbsolutePath from "#/lib/fs/resolveAbsolutePath";
 import keys from "#/lib/object/keys";
 import configQueryOptions from "#/data/configQueryOptions";
+import npath from "node:path";
+import filetypes, { supportedExtensionSchema } from "./lib/config/filetypes";
 
-const tui = async ({ configPath }: { configPath: string }) => {
+export type TuiProps = { configPath: string };
+
+const tui = async ({ configPath }: Readonly<TuiProps>) => {
   const config = feoConfigValidator.safeParse(await readConfigFile(resolveAbsolutePath(configPath)));
 
   if (!config.success) {
@@ -49,7 +53,9 @@ const tui = async ({ configPath }: { configPath: string }) => {
 
   const queryClient = new QueryClient();
 
-  queryClient.setQueryData(configQueryOptions(configPath).queryKey, config.data);
+  const ext = supportedExtensionSchema.parse(npath.parse(configPath).ext);
+
+  queryClient.setQueryData(configQueryOptions(configPath).queryKey, filetypes[ext].stringify(config.data));
 
   const application = keys(config.data.configs)[0];
   const appConfig = application !== undefined ? config.data.configs[application] : undefined;

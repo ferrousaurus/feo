@@ -1,6 +1,6 @@
 import configQueryOptions from "#/data/configQueryOptions";
 import deleteApplicationMutationOptions from "#/data/deleteAppMutationOptions";
-import ApplicationKeybinds from "#/components/applications/ApplicationKeybinds";
+import Keybinds from "#/components/keybinds/Keybinds";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
@@ -14,7 +14,8 @@ export type ApplicationProps = {
 export default function Application({ active, application, configPath, enableKeybinds }: Readonly<ApplicationProps>) {
   const [deleting, setDeleting] = useState(false);
 
-  const { data: theme } = useSuspenseQuery({ ...configQueryOptions(configPath), select: (d) => d.settings.theme });
+  const { data: config } = useSuspenseQuery(configQueryOptions(configPath));
+  const theme = config.settings.theme;
 
   const { mutateAsync } = useMutation(deleteApplicationMutationOptions(configPath));
 
@@ -41,7 +42,7 @@ export default function Application({ active, application, configPath, enableKey
         {application}
       </text>
       {active && enableKeybinds && (
-        <ApplicationKeybinds configPath={configPath} onDelete={handleDelete} onCancel={handleCancel} onConfirm={handleConfirm} />
+        <Keybinds configPath={configPath} onCancel={handleCancel} onConfirm={handleConfirm} onDelete={handleDelete} />
       )}
     </>
   );

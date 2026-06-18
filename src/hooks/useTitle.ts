@@ -6,11 +6,15 @@ export type UseTitleOptions = {
 };
 
 export default function useTitle(
-  title: string,
+  title: string | undefined,
   percentage: number,
   { buffer = 6, stringify = (str) => str }: UseTitleOptions,
 ) {
   const { width } = useTerminalDimensions();
+
+  if (title === undefined) {
+    return undefined;
+  }
 
   const max = Math.floor(width * percentage) - buffer;
 
