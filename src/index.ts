@@ -1,6 +1,5 @@
 import { Command } from "@cliffy/command";
 
-import execCommand from "#/commands/exec";
 import configOption from "#/commands/options/config";
 import VERSION from "#/lib/version";
 import tui from "#/tui";
@@ -13,5 +12,4 @@ await new Command()
   .action(async (options) => {
     await tui({ configPath: options.config });
   })
-  .command("exec", execCommand)
   .parse();
