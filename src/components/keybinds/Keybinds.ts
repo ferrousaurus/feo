@@ -2,7 +2,7 @@ import { useKeyboard } from "@opentui/react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
 import configQueryOptions from "#/data/configQueryOptions";
-
+import entries from "#/lib/object/entries";
 export type KeybindsProps = {
   configPath: string;
   onCancel?: () => void;
@@ -34,19 +34,28 @@ export default function Keybinds({
 }: Readonly<KeybindsProps>) {
   const { data } = useSuspenseQuery(configQueryOptions(configPath));
 
+  const handlerMap = {
+    cancel: onCancel,
+    confirm: onConfirm,
+    delete: onDelete,
+    down: onDown,
+    move: onMove,
+    new: onNew,
+    refresh: onRefresh,
+    scrollDown: onScrollDown,
+    scrollUp: onScrollUp,
+    up: onUp,
+    write: onWrite,
+  } as const;
+
+  const binds = entries(data.settings.keymap)
+    .map(([action, keys]) => [keys, handlerMap[action]] as const)
+    .filter(([, handler]) => handler !== undefined);
+
   useKeyboard((key) => {
-    const keymap = data.settings.keymap;
-    if (onCancel && keymap.cancel.includes(key.name)) onCancel();
-    if (onConfirm && keymap.confirm.includes(key.name)) onConfirm();
-    if (onDelete && keymap.delete.includes(key.name)) onDelete();
-    if (onDown && keymap.down.includes(key.name)) onDown();
-    if (onMove && keymap.move.includes(key.name)) onMove();
-    if (onNew && keymap.new.includes(key.name)) onNew();
-    if (onRefresh && keymap.refresh.includes(key.name)) onRefresh();
-    if (onScrollDown && keymap.scrollDown.includes(key.name)) onScrollDown();
-    if (onScrollUp && keymap.scrollUp.includes(key.name)) onScrollUp();
-    if (onUp && keymap.up.includes(key.name)) onUp();
-    if (onWrite && keymap.write.includes(key.name)) onWrite();
+    for (const [, handler] of binds.filter(([keys]) => keys.includes(key.name))) {
+      handler?.();
+    }
   });
 
   return null;
