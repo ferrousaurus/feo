@@ -26,7 +26,7 @@ class UserProfile extends React.Component<UserProfileProps, UserProfileState> {
   }
 
   render() {
-    return <button onClick={this.handleClick}>{this.state.isLoading ? 'Loading' : 'Done'}</button>;
+    return <button onClick={this.handleClick}>{this.state.isLoading ? "Loading" : "Done"}</button>;
   }
 }
 ```
@@ -43,7 +43,7 @@ function UserProfile({ userId }: UserProfileProps) {
 
   const handleClick = () => setIsLoading(false);
 
-  return <button onClick={handleClick}>{isLoading ? 'Loading' : 'Done'}</button>;
+  return <button onClick={handleClick}>{isLoading ? "Loading" : "Done"}</button>;
 }
 ```
 

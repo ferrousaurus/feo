@@ -1,8 +1,9 @@
-import resolveAbsolutePath from "#/lib/fs/resolveAbsolutePath";
+import fs from "node:fs/promises";
+
+import { z } from "zod/mini";
 
 import getProtocol from "#/lib/fs/getProtocol";
-import fs from "node:fs/promises";
-import { z } from "zod/mini";
+import resolveAbsolutePath from "#/lib/fs/resolveAbsolutePath";
 
 export class NotFoundError extends Error {
   constructor(filename: string | URL) {

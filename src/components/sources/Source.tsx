@@ -1,12 +1,13 @@
+import { useMutation, useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { useState } from "react";
+
+import Keybinds from "#/components/keybinds/Keybinds";
 import ActiveSource from "#/components/sources/ActiveSource";
 import configQueryOptions from "#/data/configQueryOptions";
 import deleteSourceMutationOptions from "#/data/deleteSourceMutationOptions";
 import type { FeoSource as SourceData } from "#/data/feoConfig";
 import sourceContentQueryOptions from "#/data/sourceContentQueryOptions";
 import useTitle from "#/hooks/useTitle";
-import { useMutation, useQuery, useSuspenseQuery } from "@tanstack/react-query";
-import { useState } from "react";
-import Keybinds from "#/components/keybinds/Keybinds";
 
 export type SourceProps = {
   configPath: string;
@@ -77,12 +78,7 @@ export default function Source({
           <ActiveSource source={source} configPath={configPath} enableKeybinds={enableKeybinds} />
         </box>
         {enableKeybinds && (
-          <Keybinds
-            configPath={configPath}
-            onCancel={handleCancel}
-            onConfirm={handleConfirm}
-            onDelete={handleDelete}
-          />
+          <Keybinds configPath={configPath} onCancel={handleCancel} onConfirm={handleConfirm} onDelete={handleDelete} />
         )}
       </>
     );

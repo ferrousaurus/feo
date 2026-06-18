@@ -15,16 +15,24 @@ When a component's state needs to reset in response to a prop change (e.g., swit
 
 ```tsx
 function ProfileEditor({ userId }: ProfileEditorProps) {
-  const [draft, setDraft] = useState('');
+  const [draft, setDraft] = useState("");
   const [hasChanges, setHasChanges] = useState(false);
 
   // 🔴 Avoid: Resetting state in an Effect on prop change
   useEffect(() => {
-    setDraft('');
+    setDraft("");
     setHasChanges(false);
   }, [userId]);
 
-  return <textarea value={draft} onChange={(e) => { setDraft(e.target.value); setHasChanges(true); }} />;
+  return (
+    <textarea
+      value={draft}
+      onChange={(e) => {
+        setDraft(e.target.value);
+        setHasChanges(true);
+      }}
+    />
+  );
 }
 ```
 
@@ -38,12 +46,20 @@ function ProfilePage({ userId }: ProfilePageProps) {
 }
 
 function ProfileEditor({ userId }: ProfileEditorProps) {
-  const [draft, setDraft] = useState('');
+  const [draft, setDraft] = useState("");
   const [hasChanges, setHasChanges] = useState(false);
 
   // When userId changes, ProfilePage renders <ProfileEditor key={newUserId} />,
   // which unmounts and remounts ProfileEditor, resetting all state automatically.
-  return <textarea value={draft} onChange={(e) => { setDraft(e.target.value); setHasChanges(true); }} />;
+  return (
+    <textarea
+      value={draft}
+      onChange={(e) => {
+        setDraft(e.target.value);
+        setHasChanges(true);
+      }}
+    />
+  );
 }
 ```
 

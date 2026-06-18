@@ -1,26 +1,19 @@
 {
   "name": "feo",
   "private": true,
-  "type": "module",
-  "engines": {
-    "pnpm": "^11.5.2",
-    "node": "^26.3.0"
-  },
   "os": [
     "darwin",
     "linux"
   ],
-  "packageManager": "pnpm@11.5.2",
+  "type": "module",
   "scripts": {
     "dev": "tsx --experimental-ffi --watch src/index.ts",
     "check": "tsgo -b",
-    "test": "vitest run"
-  },
-  "devDependencies": {
-    "@types/node": "^25.9.3",
-    "@types/react": "^19.2.17",
-    "@typescript/native-preview": "^7.0.0-dev.20260615.1",
-    "vitest": "^4.1.8"
+    "test": "vitest run",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "fmt": "oxfmt",
+    "fmt:check": "oxfmt --check"
   },
   "dependencies": {
     "@cliffy/command": "npm:@jsr/cliffy__command@^1.2.1",
@@ -35,5 +28,18 @@
     "react": "^19.2.6",
     "tsx": "^4.22.4",
     "zod": "^4.4.3"
-  }
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.3",
+    "@types/react": "^19.2.17",
+    "@typescript/native-preview": "^7.0.0-dev.20260615.1",
+    "oxfmt": "^0.55.0",
+    "oxlint": "^1.70.0",
+    "vitest": "^4.1.8"
+  },
+  "engines": {
+    "node": "^26.3.0",
+    "pnpm": "^11.7.0"
+  },
+  "packageManager": "pnpm@11.7.0"
 }

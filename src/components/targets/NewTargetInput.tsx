@@ -1,7 +1,8 @@
-import addTargetMutationOptions from "#/data/addTargetMutationOptions";
 import { useKeyboard } from "@opentui/react";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
+
+import addTargetMutationOptions from "#/data/addTargetMutationOptions";
 
 export type NewTargetInputProps = {
   app: string;

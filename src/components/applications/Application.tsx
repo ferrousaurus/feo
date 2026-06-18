@@ -1,8 +1,9 @@
-import configQueryOptions from "#/data/configQueryOptions";
-import deleteApplicationMutationOptions from "#/data/deleteAppMutationOptions";
-import Keybinds from "#/components/keybinds/Keybinds";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
+
+import Keybinds from "#/components/keybinds/Keybinds";
+import configQueryOptions from "#/data/configQueryOptions";
+import deleteApplicationMutationOptions from "#/data/deleteAppMutationOptions";
 
 export type ApplicationProps = {
   active: boolean;

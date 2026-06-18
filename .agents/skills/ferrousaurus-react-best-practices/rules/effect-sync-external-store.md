@@ -26,11 +26,11 @@ function useOnlineStatus() {
     }
 
     updateState();
-    window.addEventListener('online', updateState);
-    window.addEventListener('offline', updateState);
+    window.addEventListener("online", updateState);
+    window.addEventListener("offline", updateState);
     return () => {
-      window.removeEventListener('online', updateState);
-      window.removeEventListener('offline', updateState);
+      window.removeEventListener("online", updateState);
+      window.removeEventListener("offline", updateState);
     };
   }, []);
 
@@ -42,11 +42,11 @@ function useOnlineStatus() {
 
 ```tsx
 function subscribe(callback: () => void) {
-  window.addEventListener('online', callback);
-  window.addEventListener('offline', callback);
+  window.addEventListener("online", callback);
+  window.addEventListener("offline", callback);
   return () => {
-    window.removeEventListener('online', callback);
-    window.removeEventListener('offline', callback);
+    window.removeEventListener("online", callback);
+    window.removeEventListener("offline", callback);
   };
 }
 
@@ -68,6 +68,7 @@ Most of the time you won't write `useSyncExternalStore` directly. Library hooks 
 - **TanStack Query** — `useQuery()` wraps `useSyncExternalStore`
 
 You should only write `useSyncExternalStore` when:
+
 - Subscribing to browser APIs (`navigator.onLine`, `window.matchMedia`, `IntersectionObserver`)
 - Subscribing to third-party imperative libraries that manage their own state
 - Creating a custom store hook for app-level state

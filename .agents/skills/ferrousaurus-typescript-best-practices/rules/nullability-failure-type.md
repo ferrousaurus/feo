@@ -26,26 +26,26 @@ function findUser(id: string): User {
 **Correct (returning undefined for expected "not found"):**
 
 ```typescript
-const findUser = (id: string): User | undefined =>
-  db.find(id);
+const findUser = (id: string): User | undefined => db.find(id);
 ```
 
 **When to throw vs return undefined:**
 
 Return `T | undefined` when:
+
 - The function is a lookup/query that may not find a result
 - The failure is an expected, normal outcome
 - The caller should decide how to handle the absence
 
 Throw an exception when:
+
 - The failure is truly exceptional and unexpected
 - The function is performing a mutation that failed
 - The failure should bubble up and be caught at a boundary
 
 ```typescript
 // Return undefined — "not found" is normal
-const findUser = (id: string): User | undefined =>
-  db.find(id);
+const findUser = (id: string): User | undefined => db.find(id);
 
 // Throw — "already exists" is exceptional
 async function createUser(data: CreateUserDTO): Promise<User> {

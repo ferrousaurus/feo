@@ -21,10 +21,7 @@ const user = data as User;
 
 ```typescript
 const isUser = (value: unknown): value is User =>
-  typeof value === 'object' &&
-  value !== null &&
-  'name' in value &&
-  'email' in value;
+  typeof value === "object" && value !== null && "name" in value && "email" in value;
 
 if (isUser(data)) {
   // data is now narrowed to User
@@ -35,17 +32,12 @@ if (isUser(data)) {
 **Common type guards:**
 
 ```typescript
-const isString = (value: unknown): value is string =>
-  typeof value === 'string';
+const isString = (value: unknown): value is string => typeof value === "string";
 
-const isNonNullable = <T,>(value: T): value is NonNullable<T> =>
-  value !== null && value !== undefined;
+const isNonNullable = <T>(value: T): value is NonNullable<T> => value !== null && value !== undefined;
 
-const hasProperty = <K extends string>(
-  value: unknown,
-  key: K,
-): value is Record<K, unknown> =>
-  typeof value === 'object' && value !== null && key in value;
+const hasProperty = <K extends string>(value: unknown, key: K): value is Record<K, unknown> =>
+  typeof value === "object" && value !== null && key in value;
 ```
 
 For complex validation at API boundaries, use a runtime validation library (Zod, valibot) instead of manual type guards. Type guards are appropriate for narrowing within your application where the runtime check is simple.

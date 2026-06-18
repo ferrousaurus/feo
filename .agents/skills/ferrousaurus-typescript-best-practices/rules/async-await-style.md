@@ -32,6 +32,7 @@ async function fetchUserData(id: string) {
 ```
 
 Async/await benefits:
+
 - Linear control flow — reads top to bottom
 - `try/catch` or `.catch()` for error handling (see `async-catch-over-trycatch`)
 - Easier to set breakpoints and debug

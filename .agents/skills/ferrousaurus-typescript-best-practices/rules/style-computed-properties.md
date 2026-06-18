@@ -24,10 +24,7 @@ for (const key of Object.keys(source)) {
 
 ```typescript
 const config = Object.fromEntries(
-  Object.entries(source).map(([key, value]: [string, string]) => [
-    key.toUpperCase(),
-    value,
-  ]),
+  Object.entries(source).map(([key, value]: [string, string]) => [key.toUpperCase(), value]),
 );
 ```
 

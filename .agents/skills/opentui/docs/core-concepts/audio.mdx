@@ -14,20 +14,20 @@ OpenTUI exposes a native miniaudio-backed `Audio` engine from `@opentui/core`. I
 ## Basic usage
 
 ```typescript
-import { Audio } from "@opentui/core"
+import { Audio } from "@opentui/core";
 
-const audio = Audio.create({ autoStart: false })
+const audio = Audio.create({ autoStart: false });
 
 audio.on("error", (error, context) => {
-  console.error(`${context.action}: ${error.message}`)
-})
+  console.error(`${context.action}: ${error.message}`);
+});
 
-const sound = await audio.loadSoundFile("click.wav")
+const sound = await audio.loadSoundFile("click.wav");
 if (sound != null && audio.start()) {
-  audio.play(sound, { volume: 0.8, pan: 0, loop: false })
+  audio.play(sound, { volume: 0.8, pan: 0, loop: false });
 }
 
-audio.dispose()
+audio.dispose();
 ```
 
 Use `setupAudio(options?)` when you prefer a function wrapper around `Audio.create(options?)`.
@@ -70,16 +70,16 @@ For headless mixing, tests, benchmarks, or manual `mixFrames()` output, use `sta
 Bun embeds files in `bun build --compile` executables when they are imported with `with { type: "file" }`. Read the embedded file as bytes and pass it to `loadSound()` so audio decodes from memory instead of a file path.
 
 ```typescript
-import { file } from "bun"
-import { Audio } from "@opentui/core"
-import clickPath from "./click.wav" with { type: "file" }
+import { file } from "bun";
+import { Audio } from "@opentui/core";
+import clickPath from "./click.wav" with { type: "file" };
 
-const audio = Audio.create({ autoStart: false })
-const clickBytes = await file(clickPath).bytes()
-const click = audio.loadSound(clickBytes)
+const audio = Audio.create({ autoStart: false });
+const clickBytes = await file(clickPath).bytes();
+const click = audio.loadSound(clickBytes);
 
 if (click != null && audio.start()) {
-  audio.play(click)
+  audio.play(click);
 }
 ```
 
@@ -94,16 +94,16 @@ Coming soon.
 Select devices before starting the engine:
 
 ```typescript
-const audio = Audio.create({ autoStart: false })
-const devices = audio.listPlaybackDevices() ?? []
-const device = devices.find((item) => item.isDefault) ?? devices[0]
+const audio = Audio.create({ autoStart: false });
+const devices = audio.listPlaybackDevices() ?? [];
+const device = devices.find((item) => item.isDefault) ?? devices[0];
 
 if (device) {
-  audio.selectPlaybackDevice(device.index)
+  audio.selectPlaybackDevice(device.index);
 }
 
 if (!audio.start()) {
-  console.error("No playback device available")
+  console.error("No playback device available");
 }
 ```
 

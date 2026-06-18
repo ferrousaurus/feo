@@ -1,9 +1,10 @@
-import configQueryOptions from "#/data/configQueryOptions";
-import { Target } from "#/components/targets/Target";
-import NewTargetInput from "#/components/targets/NewTargetInput";
-import Keybinds from "#/components/keybinds/Keybinds";
-import keys from "#/lib/object/keys";
 import { useSuspenseQuery } from "@tanstack/react-query";
+
+import Keybinds from "#/components/keybinds/Keybinds";
+import NewTargetInput from "#/components/targets/NewTargetInput";
+import { Target } from "#/components/targets/Target";
+import configQueryOptions from "#/data/configQueryOptions";
+import keys from "#/lib/object/keys";
 
 export type TargetFilesProps = {
   active: boolean;

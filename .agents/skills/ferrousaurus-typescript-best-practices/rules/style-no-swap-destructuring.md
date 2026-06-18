@@ -30,6 +30,7 @@ b = temp;
 ```
 
 The temporary variable approach:
+
 - Is immediately obvious to any reader
 - Doesn't require understanding destructuring assignment
 - Works in all languages (not a JS-specific trick)

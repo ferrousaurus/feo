@@ -1,14 +1,17 @@
+import npath from "node:path";
+
 import { addDefaultParsers, createCliRenderer } from "@opentui/core";
 import { createRoot } from "@opentui/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Suspense } from "react";
+
 import Shell from "#/components/Shell";
+import configQueryOptions from "#/data/configQueryOptions";
 import feoConfigValidator from "#/data/feoConfig";
 import readConfigFile from "#/lib/config/readConfigFile";
 import resolveAbsolutePath from "#/lib/fs/resolveAbsolutePath";
 import keys from "#/lib/object/keys";
-import configQueryOptions from "#/data/configQueryOptions";
-import npath from "node:path";
+
 import filetypes, { supportedExtensionSchema } from "./lib/config/filetypes";
 
 export type TuiProps = { configPath: string };

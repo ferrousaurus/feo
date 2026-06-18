@@ -32,8 +32,8 @@ type User = {
 `type` handles everything `interface` does, plus unions, intersections, and advanced type operations:
 
 ```typescript
-type Status = 'active' | 'inactive' | 'pending';
-type Admin = User & { role: 'admin'; permissions: string[] };
+type Status = "active" | "inactive" | "pending";
+type Admin = User & { role: "admin"; permissions: string[] };
 type Result<T> = { ok: true; value: T } | { ok: false; error: string };
 ```
 

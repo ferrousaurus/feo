@@ -16,16 +16,16 @@ Use ternary expressions (`?:`) for conditional assignments and return values. Te
 ```typescript
 let label: string;
 if (isActive) {
-  label = 'Active';
+  label = "Active";
 } else {
-  label = 'Inactive';
+  label = "Inactive";
 }
 ```
 
 **Correct (ternary for assignment):**
 
 ```typescript
-const label = isActive ? 'Active' : 'Inactive';
+const label = isActive ? "Active" : "Inactive";
 ```
 
 **Correct (ternary in return):**

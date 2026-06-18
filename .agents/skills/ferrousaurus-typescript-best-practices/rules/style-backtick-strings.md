@@ -14,8 +14,8 @@ Use backtick strings (template literals) for all strings, including plain string
 **Incorrect (single or double quotes):**
 
 ```typescript
-const name = 'Alice';
-const greeting = 'Hello, ' + name + '!';
+const name = "Alice";
+const greeting = "Hello, " + name + "!";
 const path = "/api/users/" + id;
 ```
 
@@ -28,6 +28,7 @@ const path = `/api/users/${id}`;
 ```
 
 Backtick strings are always correct:
+
 - Plain strings: `` `Hello` ``
 - Interpolated strings: `` `Hello, ${name}!` ``
 - Multi-line strings: `` `line 1\nline 2` ``

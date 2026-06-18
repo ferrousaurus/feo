@@ -36,15 +36,11 @@ items.filter((item: Item) => item.active);
 **Correct (explicit types on standalone functions):**
 
 ```typescript
-const process = (data: Data[]) =>
-  data.map((x: Data) => x.value);
+const process = (data: Data[]) => data.map((x: Data) => x.value);
 ```
 
 **Correct (generic with descriptive names):**
 
 ```typescript
-const mapItems = <TInput, TOutput>(
-  items: TInput[],
-  transform: (item: TInput) => TOutput,
-) => items.map(transform);
+const mapItems = <TInput, TOutput>(items: TInput[], transform: (item: TInput) => TOutput) => items.map(transform);
 ```

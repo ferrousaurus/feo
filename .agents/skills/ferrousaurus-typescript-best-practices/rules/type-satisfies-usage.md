@@ -14,14 +14,14 @@ tags: type, satisfies, widening, type-checking
 **Incorrect (using satisfies when you need immutability):**
 
 ```typescript
-const config = { port: 3000, host: 'localhost' } satisfies Config;
+const config = { port: 3000, host: "localhost" } satisfies Config;
 // typeof config = { port: number; host: string } — widened, mutable
 ```
 
 **Correct (as const for immutability and narrow types):**
 
 ```typescript
-const config = { port: 3000, host: 'localhost' } as const;
+const config = { port: 3000, host: "localhost" } as const;
 // typeof config = { readonly port: 3000; readonly host: 'localhost' }
 ```
 
@@ -35,9 +35,9 @@ type ThemeColors = {
 };
 
 const colors = {
-  primary: '#007bff',
-  secondary: '#6c757d',
-  accent: '#28a745',
+  primary: "#007bff",
+  secondary: "#6c757d",
+  accent: "#28a745",
 } satisfies ThemeColors;
 // typeof colors = { primary: '#007bff'; secondary: '#6c757d'; accent: '#28a745' }
 // Narrow types preserved, but verified against ThemeColors

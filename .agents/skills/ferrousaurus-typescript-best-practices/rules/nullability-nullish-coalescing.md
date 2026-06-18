@@ -15,7 +15,7 @@ Always use `??` (nullish coalescing) for default values, not `||` (logical OR). 
 
 ```typescript
 const count = items.length || 10;
-const name = user.name || 'Unknown';
+const name = user.name || "Unknown";
 const isEnabled = config.enabled || false;
 ```
 
@@ -25,7 +25,7 @@ When `items.length` is `0`, `user.name` is `""`, or `config.enabled` is `false`,
 
 ```typescript
 const count = items.length ?? 10;
-const name = user.name ?? 'Unknown';
+const name = user.name ?? "Unknown";
 const isEnabled = config.enabled ?? false;
 ```
 

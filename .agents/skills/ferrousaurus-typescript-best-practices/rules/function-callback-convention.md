@@ -15,7 +15,7 @@ When defining callbacks — whether passed as arguments, stored in variables, or
 
 ```typescript
 function isActive(user: User) {
-  return user.status === 'active';
+  return user.status === "active";
 }
 const activeUsers = users.filter(isActive);
 ```
@@ -23,16 +23,16 @@ const activeUsers = users.filter(isActive);
 **Incorrect (arrow function for side-effecting callback):**
 
 ```typescript
-button.addEventListener('click', (event: MouseEvent) => {
+button.addEventListener("click", (event: MouseEvent) => {
   await saveData(formData);
-  logEvent('form-submitted', { timestamp: Date.now() });
+  logEvent("form-submitted", { timestamp: Date.now() });
 });
 ```
 
 **Correct (arrow for pure callback):**
 
 ```typescript
-const isActive = (user: User) => user.status === 'active';
+const isActive = (user: User) => user.status === "active";
 const activeUsers = users.filter(isActive);
 ```
 
@@ -41,9 +41,9 @@ const activeUsers = users.filter(isActive);
 ```typescript
 function handleSubmit(event: MouseEvent) {
   await saveData(formData);
-  logEvent('form-submitted', { timestamp: Date.now() });
+  logEvent("form-submitted", { timestamp: Date.now() });
 }
-button.addEventListener('click', handleSubmit);
+button.addEventListener("click", handleSubmit);
 ```
 
 This applies to all callback contexts: array methods, event handlers, Promise chains, and custom higher-order functions.

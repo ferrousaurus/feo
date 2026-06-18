@@ -28,10 +28,14 @@ return (
 
 ```tsx
 // ❌ Wrong: renders "0" when items.length is 0
-{items.length && <ItemList items={items} />}
+{
+  items.length && <ItemList items={items} />;
+}
 
 // ✅ Correct: boolean on the left side
-{items.length > 0 && <ItemList items={items} />}
+{
+  items.length > 0 && <ItemList items={items} />;
+}
 ```
 
 ### Ternary for either/or rendering
@@ -48,8 +52,12 @@ When conditional rendering involves multiple states or guard clauses, use early 
 
 ```tsx
 function UserProfile({ userId }: UserProfileProps) {
-  const { data: user, isLoading, error } = useQuery({
-    queryKey: ['user', userId],
+  const {
+    data: user,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["user", userId],
     queryFn: () => fetchUser(userId),
   });
 
@@ -63,13 +71,13 @@ function UserProfile({ userId }: UserProfileProps) {
 
 ### Summary
 
-| Pattern | Use When |
-|---------|----------|
-| `condition && <Element />` | Show or hide a single element |
-| `condition ? <A /> : <B />` | Render one of two different elements |
-| Early return | Guard clauses, loading/error/empty states |
-| Extracted function | Complex conditional logic, multiple branches |
-| Object map | Static mapping from value to element/class |
+| Pattern                     | Use When                                     |
+| --------------------------- | -------------------------------------------- |
+| `condition && <Element />`  | Show or hide a single element                |
+| `condition ? <A /> : <B />` | Render one of two different elements         |
+| Early return                | Guard clauses, loading/error/empty states    |
+| Extracted function          | Complex conditional logic, multiple branches |
+| Object map                  | Static mapping from value to element/class   |
 
 ### Cross-References
 

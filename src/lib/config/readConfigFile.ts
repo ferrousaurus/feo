@@ -1,7 +1,8 @@
+import { z } from "zod/mini";
+
 import filetypes from "#/lib/config/filetypes";
 import readFile from "#/lib/io/readFile";
 import keys from "#/lib/object/keys";
-import { z } from "zod/mini";
 
 export class UnsupportedExtentionError extends Error {
   ext: string;

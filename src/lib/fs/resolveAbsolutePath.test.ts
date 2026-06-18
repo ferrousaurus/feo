@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import resolveAbsolutePath from "#/lib/fs/resolveAbsolutePath";
 
 describe("resolveAbsolutePath", () => {

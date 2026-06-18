@@ -15,8 +15,12 @@ Use early returns for null checks, loading states, and error states before the m
 
 ```tsx
 function UserProfile({ userId }: UserProfileProps) {
-  const { data: user, isLoading, error } = useQuery({
-    queryKey: ['user', userId],
+  const {
+    data: user,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["user", userId],
     queryFn: () => fetchUser(userId),
   });
 
@@ -42,8 +46,12 @@ function UserProfile({ userId }: UserProfileProps) {
 
 ```tsx
 function UserProfile({ userId }: UserProfileProps) {
-  const { data: user, isLoading, error } = useQuery({
-    queryKey: ['user', userId],
+  const {
+    data: user,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["user", userId],
     queryFn: () => fetchUser(userId),
   });
 
@@ -65,6 +73,7 @@ Early returns follow the "fail fast" principle. Each guard clause says "here's w
 ### Order of early returns
 
 Follow a consistent order:
+
 1. Loading states
 2. Error states
 3. Empty/null states

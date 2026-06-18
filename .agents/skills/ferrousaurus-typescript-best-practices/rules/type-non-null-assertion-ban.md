@@ -15,23 +15,22 @@ The non-null assertion operator (`!`) is a type assertion. It tells TypeScript t
 
 ```typescript
 const name = user!.name;
-const element = document.querySelector('.box')! as HTMLElement;
+const element = document.querySelector(".box")! as HTMLElement;
 const items = data!.items;
 ```
 
 **Correct (optional chaining + nullish coalescing):**
 
 ```typescript
-const name = user?.name ?? 'Unknown';
+const name = user?.name ?? "Unknown";
 ```
 
 **Correct (type guard):**
 
 ```typescript
-const isHTMLElement = (el: Element | null): el is HTMLElement =>
-  el !== null && el instanceof HTMLElement;
+const isHTMLElement = (el: Element | null): el is HTMLElement => el !== null && el instanceof HTMLElement;
 
-const element = document.querySelector('.box');
+const element = document.querySelector(".box");
 if (isHTMLElement(element)) {
   // element is now HTMLElement
 }
@@ -41,7 +40,7 @@ if (isHTMLElement(element)) {
 
 ```typescript
 if (data === null || data === undefined) {
-  throw new NotFoundError('Data not found');
+  throw new NotFoundError("Data not found");
 }
 // data is now non-null, TypeScript narrows automatically
 const items = data.items;

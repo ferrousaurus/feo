@@ -65,6 +65,7 @@ export default Badge;
 ```
 
 This pattern ensures:
+
 - The default export makes the file's purpose immediately clear
 - Named props type export allows consumers to reference `UserProfileProps`
 - The pure/side-effect convention is preserved at the export level

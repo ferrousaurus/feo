@@ -1,7 +1,8 @@
-import addApplicationMutationOptions from "#/data/addApplicationMutationOptions";
 import { useKeyboard } from "@opentui/react";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
+
+import addApplicationMutationOptions from "#/data/addApplicationMutationOptions";
 
 export type NewApplicationInputProps = { configPath: string; onSubmit?: () => void; onCancel?: () => void };
 

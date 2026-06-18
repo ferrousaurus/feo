@@ -15,9 +15,9 @@ Call data-fetching hooks directly in the component that needs the data. Do not h
 
 ```tsx
 function Dashboard() {
-  const { data: user } = useQuery({ queryKey: ['user', userId], queryFn: () => fetchUser(userId) });
-  const { data: notifications } = useQuery({ queryKey: ['notifications'], queryFn: fetchNotifications });
-  const { data: orders } = useQuery({ queryKey: ['orders', userId], queryFn: () => fetchOrders(userId) });
+  const { data: user } = useQuery({ queryKey: ["user", userId], queryFn: () => fetchUser(userId) });
+  const { data: notifications } = useQuery({ queryKey: ["notifications"], queryFn: fetchNotifications });
+  const { data: orders } = useQuery({ queryKey: ["orders", userId], queryFn: () => fetchOrders(userId) });
 
   return (
     <div>
@@ -45,17 +45,23 @@ function Dashboard() {
 }
 
 function UserProfile({ userId }: UserProfileProps) {
-  const { data: user } = useQuery({ queryKey: ['user', userId], queryFn: () => fetchUser(userId) });
+  const { data: user } = useQuery({ queryKey: ["user", userId], queryFn: () => fetchUser(userId) });
   return <div>{user?.name}</div>;
 }
 
 function NotificationList() {
-  const { data: notifications } = useQuery({ queryKey: ['notifications'], queryFn: fetchNotifications });
-  return <ul>{notifications?.map((n) => <li key={n.id}>{n.text}</li>)}</ul>;
+  const { data: notifications } = useQuery({ queryKey: ["notifications"], queryFn: fetchNotifications });
+  return (
+    <ul>
+      {notifications?.map((n) => (
+        <li key={n.id}>{n.text}</li>
+      ))}
+    </ul>
+  );
 }
 
 function OrderHistory({ userId }: OrderHistoryProps) {
-  const { data: orders } = useQuery({ queryKey: ['orders', userId], queryFn: () => fetchOrders(userId) });
+  const { data: orders } = useQuery({ queryKey: ["orders", userId], queryFn: () => fetchOrders(userId) });
   return <div>{orders?.length} orders</div>;
 }
 ```
@@ -67,12 +73,12 @@ When multiple components need the same data, they use the same `queryKey`. TanSt
 ```tsx
 // Both components use the same queryKey — only one fetch occurs
 function Header() {
-  const { data: user } = useQuery({ queryKey: ['user', userId], queryFn: () => fetchUser(userId) });
+  const { data: user } = useQuery({ queryKey: ["user", userId], queryFn: () => fetchUser(userId) });
   return <div>{user?.name}</div>;
 }
 
 function Sidebar() {
-  const { data: user } = useQuery({ queryKey: ['user', userId], queryFn: () => fetchUser(userId) });
+  const { data: user } = useQuery({ queryKey: ["user", userId], queryFn: () => fetchUser(userId) });
   return <div>{user?.email}</div>;
 }
 ```

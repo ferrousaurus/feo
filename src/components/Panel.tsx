@@ -1,7 +1,8 @@
-import configQueryOptions from "#/data/configQueryOptions";
-import useTitle from "#/hooks/useTitle";
 import type { BoxProps } from "@opentui/react";
 import { useSuspenseQuery } from "@tanstack/react-query";
+
+import configQueryOptions from "#/data/configQueryOptions";
+import useTitle from "#/hooks/useTitle";
 
 export type PanelProps = BoxProps & {
   active: boolean;

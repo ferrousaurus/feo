@@ -14,6 +14,7 @@ The choice between controlled and uncontrolled inputs depends on the component l
 ### Controlled inputs (default)
 
 Use controlled inputs when:
+
 - Using Mantine components (they're controlled-by-default)
 - The input value needs to be validated in real-time
 - The input value affects other UI (cross-field dependencies, conditional rendering)
@@ -21,7 +22,7 @@ Use controlled inputs when:
 
 ```tsx
 function SearchInput() {
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
 
   return <TextInput label="Search" value={query} onChange={(e) => setQuery(e.target.value)} />;
 }
@@ -30,6 +31,7 @@ function SearchInput() {
 ### Uncontrolled inputs (specific cases)
 
 Use uncontrolled inputs (with `useRef`) when:
+
 - Using `<input type="file" />` — file inputs cannot be meaningfully controlled
 - The input value is never read or validated — truly fire-and-forget
 - The form library uses uncontrolled fields internally (TanStack Form can operate in uncontrolled mode for performance)
@@ -54,7 +56,7 @@ TanStack Form manages field state internally. From React's perspective, form fie
 ```tsx
 function LoginForm() {
   const form = useForm({
-    defaultValues: { email: '', password: '' },
+    defaultValues: { email: "", password: "" },
     onSubmit: async ({ value }) => login(value),
   });
 

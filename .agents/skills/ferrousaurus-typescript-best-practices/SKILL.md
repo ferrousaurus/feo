@@ -14,6 +14,7 @@ Comprehensive TypeScript writing conventions, designed for AI agents and LLMs. C
 ## When to Apply
 
 Reference these guidelines when:
+
 - Writing new TypeScript code
 - Reviewing TypeScript for style consistency
 - Refactoring TypeScript code
@@ -26,16 +27,16 @@ The central convention is **pure functions use arrow syntax, side-effecting func
 
 ## Rule Categories by Priority
 
-| Priority | Category | Impact | Prefix |
-|----------|----------|--------|--------|
-| 1 | Function Declarations | CRITICAL | `function-` |
-| 2 | Type System | HIGH | `type-` |
-| 3 | Immutability & Safety | HIGH | `safe-` |
-| 4 | Null & Optionality | MEDIUM | `nullability-` |
-| 5 | Control Flow | MEDIUM | `control-` |
-| 6 | Async Patterns | MEDIUM | `async-` |
-| 7 | Module Organization | MEDIUM | `module-` |
-| 8 | Style & Naming | LOW | `style-` |
+| Priority | Category              | Impact   | Prefix         |
+| -------- | --------------------- | -------- | -------------- |
+| 1        | Function Declarations | CRITICAL | `function-`    |
+| 2        | Type System           | HIGH     | `type-`        |
+| 3        | Immutability & Safety | HIGH     | `safe-`        |
+| 4        | Null & Optionality    | MEDIUM   | `nullability-` |
+| 5        | Control Flow          | MEDIUM   | `control-`     |
+| 6        | Async Patterns        | MEDIUM   | `async-`       |
+| 7        | Module Organization   | MEDIUM   | `module-`      |
+| 8        | Style & Naming        | LOW      | `style-`       |
 
 ## Quick Reference
 
@@ -148,6 +149,7 @@ rules/safe-never-mutate-arguments.md
 ```
 
 Each rule file contains:
+
 - Brief explanation of why it matters
 - Incorrect code example
 - Correct code example

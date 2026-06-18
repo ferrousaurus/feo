@@ -1,9 +1,10 @@
-import configQueryOptions from "#/data/configQueryOptions";
+import { useSuspenseQuery } from "@tanstack/react-query";
+
 import Application from "#/components/applications/Application";
 import NewApplicationInput from "#/components/applications/NewApplicationInput";
 import Keybinds from "#/components/keybinds/Keybinds";
+import configQueryOptions from "#/data/configQueryOptions";
 import keys from "#/lib/object/keys";
-import { useSuspenseQuery } from "@tanstack/react-query";
 
 export type ApplicationsPanelProps = {
   active: boolean;
@@ -64,12 +65,7 @@ export default function ApplicationsPanel({
         />
       )}
       {active && !creating && (
-        <Keybinds
-          configPath={configPath}
-          onNew={handleNew}
-          onUp={handlePrevious}
-          onDown={handleNext}
-        />
+        <Keybinds configPath={configPath} onNew={handleNew} onUp={handlePrevious} onDown={handleNext} />
       )}
     </>
   );

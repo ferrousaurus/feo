@@ -24,22 +24,21 @@ function updateConfig(config: Config, updates: Partial<Config>) {
 **Correct (creating new object with spread):**
 
 ```typescript
-const updateConfig = (config: Config, updates: Partial<Config>): Config =>
-  ({ ...config, ...updates });
+const updateConfig = (config: Config, updates: Partial<Config>): Config => ({ ...config, ...updates });
 ```
 
 **Correct (nested updates with deep spread):**
 
 ```typescript
-const updateUser = (user: User, name: string, email: string): User =>
-  ({
-    ...user,
-    profile: { ...user.profile, name },
-    contact: { ...user.contact, email },
-  });
+const updateUser = (user: User, name: string, email: string): User => ({
+  ...user,
+  profile: { ...user.profile, name },
+  contact: { ...user.contact, email },
+});
 ```
 
 Spread creates a new reference, which is essential for:
+
 - React state updates (which rely on reference equality)
 - Change detection in any mutable-data-averse system
 - Predictable data flow in general

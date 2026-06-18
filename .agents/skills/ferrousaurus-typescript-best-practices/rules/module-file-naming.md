@@ -29,5 +29,6 @@ saveToDatabase.ts
 ```
 
 Exceptions:
+
 - Directive files that require specific names (e.g., `next.config.ts`, `tsconfig.json`)
 - Test files that follow a framework convention (e.g., `user.test.ts`)

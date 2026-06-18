@@ -38,8 +38,7 @@ export default async function deleteUser(id: string) {
 **Correct (pure — const arrow exported as default):**
 
 ```typescript
-const calculateTotal = (items: Item[]) =>
-  items.reduce((sum, item) => sum + item.price, 0);
+const calculateTotal = (items: Item[]) => items.reduce((sum, item) => sum + item.price, 0);
 
 export default calculateTotal;
 ```

@@ -59,7 +59,7 @@ function useAuth() {
       const user = await authenticate(credentials);
       setUser(user);
     } catch (err) {
-      setError(err instanceof Error ? err : new Error('Login failed'));
+      setError(err instanceof Error ? err : new Error("Login failed"));
     } finally {
       setIsLoading(false);
     }

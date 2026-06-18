@@ -12,10 +12,7 @@ export default function resolveAbsolutePath(path: string): string {
         return value !== undefined ? value : fallback;
       },
     )
-    .replace(
-      /\$\{([A-Za-z_][A-Za-z0-9_]*)\}/g,
-      (_match, varName: string) => {
-        return process.env[varName] ?? "";
-      },
-    );
+    .replace(/\$\{([A-Za-z_][A-Za-z0-9_]*)\}/g, (_match, varName: string) => {
+      return process.env[varName] ?? "";
+    });
 }

@@ -118,11 +118,13 @@ The foundational convention that distinguishes pure functions from side-effectin
 The syntax of a function declaration communicates its behavior. Arrow functions (`const fn = () => ...`) signal purity — no side effects, no I/O, deterministisch output for given input. Function declarations (`function fn() { ... }`) signal side effects — I/O, mutation, network calls, non-deterministic behavior.
 
 A pure function:
+
 - Returns the same output for the same inputs
 - Has no side effects (no I/O, no mutation of external state)
 - Is referentially transparent (can be replaced by its return value)
 
 A side-effecting function:
+
 - Performs I/O (network, filesystem, database)
 - Mutates external state
 - Has non-deterministic behavior (randomness, timestamps)
@@ -147,8 +149,7 @@ function calculateTotal(items: Item[]) {
 **Correct (arrow for pure, declaration for side effects):**
 
 ```typescript
-const calculateTotal = (items: Item[]) =>
-  items.reduce((sum, item) => sum + item.price, 0);
+const calculateTotal = (items: Item[]) => items.reduce((sum, item) => sum + item.price, 0);
 
 async function saveToDatabase(record: Record) {
   await db.insert(record);
@@ -229,7 +230,7 @@ When defining callbacks — whether passed as arguments, stored in variables, or
 
 ```typescript
 function isActive(user: User) {
-  return user.status === 'active';
+  return user.status === "active";
 }
 const activeUsers = users.filter(isActive);
 ```
@@ -237,16 +238,16 @@ const activeUsers = users.filter(isActive);
 **Incorrect (arrow function for side-effecting callback):**
 
 ```typescript
-button.addEventListener('click', (event: MouseEvent) => {
+button.addEventListener("click", (event: MouseEvent) => {
   await saveData(formData);
-  logEvent('form-submitted', { timestamp: Date.now() });
+  logEvent("form-submitted", { timestamp: Date.now() });
 });
 ```
 
 **Correct (arrow for pure callback):**
 
 ```typescript
-const isActive = (user: User) => user.status === 'active';
+const isActive = (user: User) => user.status === "active";
 const activeUsers = users.filter(isActive);
 ```
 
@@ -255,9 +256,9 @@ const activeUsers = users.filter(isActive);
 ```typescript
 function handleSubmit(event: MouseEvent) {
   await saveData(formData);
-  logEvent('form-submitted', { timestamp: Date.now() });
+  logEvent("form-submitted", { timestamp: Date.now() });
 }
-button.addEventListener('click', handleSubmit);
+button.addEventListener("click", handleSubmit);
 ```
 
 This applies to all callback contexts: array methods, event handlers, Promise chains, and custom higher-order functions.
@@ -293,17 +294,13 @@ items.filter((item: Item) => item.active);
 **Correct (explicit types on standalone functions):**
 
 ```typescript
-const process = (data: Data[]) =>
-  data.map((x: Data) => x.value);
+const process = (data: Data[]) => data.map((x: Data) => x.value);
 ```
 
 **Correct (generic with descriptive names):**
 
 ```typescript
-const mapItems = <TInput, TOutput>(
-  items: TInput[],
-  transform: (item: TInput) => TOutput,
-) => items.map(transform);
+const mapItems = <TInput, TOutput>(items: TInput[], transform: (item: TInput) => TOutput) => items.map(transform);
 ```
 
 ### 1.5 Never Use Classes — Prefer Functions and Closures
@@ -325,7 +322,7 @@ class UserRepository {
 
 const repo = new UserRepository(db);
 const find = repo.findById;
-find('123'); // TypeError: cannot read properties of undefined
+find("123"); // TypeError: cannot read properties of undefined
 ```
 
 **Correct (closure — no `this`, no binding issues):**
@@ -337,7 +334,7 @@ const createUserRepository = (db: Database) => ({
 
 const repo = createUserRepository(db);
 const find = repo.findById;
-find('123'); // works correctly
+find("123"); // works correctly
 ```
 
 Closures also make the pure/side-effect distinction clear. Pure factory functions return objects of pure functions. Side-effecting factory functions (like one that connects to a database) use `function` declarations:
@@ -366,16 +363,13 @@ function saveToDatabase(record: Record, options: SaveOptions, userId: string) {
   // ...
 }
 
-saveToDatabase(record, { upsert: true }, 'user-123');
+saveToDatabase(record, { upsert: true }, "user-123");
 ```
 
 **Incorrect (inlined options type):**
 
 ```typescript
-const saveToDatabase = (
-  record: Record,
-  params: { options: SaveOptions; userId: string },
-) => {
+const saveToDatabase = (record: Record, params: { options: SaveOptions; userId: string }) => {
   // ...
 };
 ```
@@ -392,7 +386,7 @@ async function saveToDatabase(record: Record, params: SaveToDatabaseParams) {
   // ...
 }
 
-saveToDatabase(record, { options: { upsert: true }, userId: 'user-123' });
+saveToDatabase(record, { options: { upsert: true }, userId: "user-123" });
 ```
 
 This pattern scales well. Adding a new optional parameter only requires updating the type and the implementation, not every call site.
@@ -430,8 +424,7 @@ export default async function deleteUser(id: string) {
 **Correct (pure — const arrow exported as default):**
 
 ```typescript
-const calculateTotal = (items: Item[]) =>
-  items.reduce((sum, item) => sum + item.price, 0);
+const calculateTotal = (items: Item[]) => items.reduce((sum, item) => sum + item.price, 0);
 
 export default calculateTotal;
 ```
@@ -468,8 +461,7 @@ items.filter((item: Item) => item.active);
 **Correct (extract when braces are needed or logic is complex):**
 
 ```typescript
-const calculateDiscount = (order: Order) =>
-  order.items.reduce((sum: number, item: Item) => sum + item.price, 0) * 0.1;
+const calculateDiscount = (order: Order) => order.items.reduce((sum: number, item: Item) => sum + item.price, 0) * 0.1;
 
 const discountedTotal = orders.map(calculateDiscount);
 ```
@@ -495,7 +487,7 @@ Never use type assertions (`as Type`). They override TypeScript's type checker, 
 ```typescript
 const user = data as User;
 const value = result as string;
-const element = document.querySelector('.box') as HTMLElement;
+const element = document.querySelector(".box") as HTMLElement;
 ```
 
 **Correct alternatives:**
@@ -503,8 +495,7 @@ const element = document.querySelector('.box') as HTMLElement;
 Use user-defined type guards for narrowing from `unknown`:
 
 ```typescript
-const isUser = (value: unknown): value is User =>
-  typeof value === 'object' && value !== null && 'name' in value;
+const isUser = (value: unknown): value is User => typeof value === "object" && value !== null && "name" in value;
 
 const user = isUser(data) ? data : undefined;
 ```
@@ -519,7 +510,7 @@ const user = UserSchema.parse(data);
 Use `satisfies` to verify a value conforms to a type without widening:
 
 ```typescript
-const config = { port: 3000, host: 'localhost' } satisfies Config;
+const config = { port: 3000, host: "localhost" } satisfies Config;
 ```
 
 Non-null assertion (`!`) is also a type assertion and is equally banned. Use optional chaining and nullish coalescing instead:
@@ -529,7 +520,7 @@ Non-null assertion (`!`) is also a type assertion and is equally banned. Use opt
 const name = user!.name;
 
 // Correct
-const name = user?.name ?? 'Unknown';
+const name = user?.name ?? "Unknown";
 ```
 
 There are no exceptions. If TypeScript can't infer the type, fix the types — don't override them.
@@ -544,23 +535,22 @@ The non-null assertion operator (`!`) is a type assertion. It tells TypeScript t
 
 ```typescript
 const name = user!.name;
-const element = document.querySelector('.box')! as HTMLElement;
+const element = document.querySelector(".box")! as HTMLElement;
 const items = data!.items;
 ```
 
 **Correct (optional chaining + nullish coalescing):**
 
 ```typescript
-const name = user?.name ?? 'Unknown';
+const name = user?.name ?? "Unknown";
 ```
 
 **Correct (type guard):**
 
 ```typescript
-const isHTMLElement = (el: Element | null): el is HTMLElement =>
-  el !== null && el instanceof HTMLElement;
+const isHTMLElement = (el: Element | null): el is HTMLElement => el !== null && el instanceof HTMLElement;
 
-const element = document.querySelector('.box');
+const element = document.querySelector(".box");
 if (isHTMLElement(element)) {
   // element is now HTMLElement
 }
@@ -570,7 +560,7 @@ if (isHTMLElement(element)) {
 
 ```typescript
 if (data === null || data === undefined) {
-  throw new NotFoundError('Data not found');
+  throw new NotFoundError("Data not found");
 }
 // data is now non-null, TypeScript narrows automatically
 const items = data.items;
@@ -605,8 +595,8 @@ type User = {
 `type` handles everything `interface` does, plus unions, intersections, and advanced type operations:
 
 ```typescript
-type Status = 'active' | 'inactive' | 'pending';
-type Admin = User & { role: 'admin'; permissions: string[] };
+type Status = "active" | "inactive" | "pending";
+type Admin = User & { role: "admin"; permissions: string[] };
 type Result<T> = { ok: true; value: T } | { ok: false; error: string };
 ```
 
@@ -622,26 +612,27 @@ Never use TypeScript `enum`. Enums generate unnecessary runtime code, have surpr
 
 ```typescript
 enum Status {
-  Active = 'active',
-  Inactive = 'inactive',
-  Pending = 'pending',
+  Active = "active",
+  Inactive = "inactive",
+  Pending = "pending",
 }
 ```
 
 **Correct (union type for simple cases):**
 
 ```typescript
-type Status = 'active' | 'inactive' | 'pending';
+type Status = "active" | "inactive" | "pending";
 ```
 
 **Correct (const array + derived type when you need both values and type):**
 
 ```typescript
-const STATUSES = ['active', 'inactive', 'pending'] as const;
+const STATUSES = ["active", "inactive", "pending"] as const;
 type Status = (typeof STATUSES)[number];
 ```
 
 The const array pattern gives you:
+
 - Runtime iteration: `STATUSES.forEach(...)`
 - Type safety: `Status` is `'active' | 'inactive' | 'pending'`
 - Lookup: `STATUSES.includes(value)`
@@ -663,10 +654,7 @@ const user = data as User;
 
 ```typescript
 const isUser = (value: unknown): value is User =>
-  typeof value === 'object' &&
-  value !== null &&
-  'name' in value &&
-  'email' in value;
+  typeof value === "object" && value !== null && "name" in value && "email" in value;
 
 if (isUser(data)) {
   // data is now narrowed to User
@@ -677,17 +665,12 @@ if (isUser(data)) {
 **Common type guards:**
 
 ```typescript
-const isString = (value: unknown): value is string =>
-  typeof value === 'string';
+const isString = (value: unknown): value is string => typeof value === "string";
 
-const isNonNullable = <T,>(value: T): value is NonNullable<T> =>
-  value !== null && value !== undefined;
+const isNonNullable = <T>(value: T): value is NonNullable<T> => value !== null && value !== undefined;
 
-const hasProperty = <K extends string>(
-  value: unknown,
-  key: K,
-): value is Record<K, unknown> =>
-  typeof value === 'object' && value !== null && key in value;
+const hasProperty = <K extends string>(value: unknown, key: K): value is Record<K, unknown> =>
+  typeof value === "object" && value !== null && key in value;
 ```
 
 For complex validation at API boundaries, use a runtime validation library (Zod, valibot) instead of manual type guards. Type guards are appropriate for narrowing within your application where the runtime check is simple.
@@ -702,9 +685,9 @@ When you need both the runtime values (for iteration, lookup, mapping) and the t
 
 ```typescript
 enum Role {
-  Admin = 'admin',
-  Editor = 'editor',
-  Viewer = 'viewer',
+  Admin = "admin",
+  Editor = "editor",
+  Viewer = "viewer",
 }
 
 // Need runtime iteration
@@ -714,14 +697,14 @@ const roles = Object.values(Role);
 **Incorrect (duplicated values and type):**
 
 ```typescript
-const roles = ['admin', 'editor', 'viewer'];
-type Role = 'admin' | 'editor' | 'viewer';
+const roles = ["admin", "editor", "viewer"];
+type Role = "admin" | "editor" | "viewer";
 ```
 
 **Correct (const array + derived type, single source of truth):**
 
 ```typescript
-const ROLES = ['admin', 'editor', 'viewer'] as const;
+const ROLES = ["admin", "editor", "viewer"] as const;
 type Role = (typeof ROLES)[number];
 
 // Runtime iteration
@@ -730,8 +713,7 @@ ROLES.forEach((role) => {
 });
 
 // Type checking
-const hasRole = (value: string): value is Role =>
-  ROLES.includes(value as Role);
+const hasRole = (value: string): value is Role => ROLES.includes(value as Role);
 ```
 
 This pattern keeps values and types in sync automatically. Add a value to `ROLES` and the `Role` type updates immediately.
@@ -746,7 +728,7 @@ Use intersection (`&`) to compose types from existing ones. This is the TypeScri
 
 ```typescript
 interface Admin extends User {
-  role: 'admin';
+  role: "admin";
   permissions: string[];
 }
 ```
@@ -754,17 +736,18 @@ interface Admin extends User {
 **Correct (intersection composition):**
 
 ```typescript
-type Admin = User & { role: 'admin'; permissions: string[] };
+type Admin = User & { role: "admin"; permissions: string[] };
 ```
 
 **Correct (composing with utility types):**
 
 ```typescript
-type AdminWithPermissions = User & { role: 'admin'; permissions: string[] };
-type AdminPreview = Pick<Admin, 'id' | 'name' | 'role'>;
+type AdminWithPermissions = User & { role: "admin"; permissions: string[] };
+type AdminPreview = Pick<Admin, "id" | "name" | "role">;
 ```
 
 Intersection is more flexible than `extends`:
+
 - Works with any type (not just object shapes)
 - Can compose unions
 - Can be used inline without a separate declaration
@@ -772,10 +755,10 @@ Intersection is more flexible than `extends`:
 
 ```typescript
 // Composing with unions
-type ActiveAdmin = Admin & { status: 'active' };
+type ActiveAdmin = Admin & { status: "active" };
 
 // Composing with Omit
-type AdminWithoutRole = Omit<Admin, 'role'> & { role: 'superadmin' };
+type AdminWithoutRole = Omit<Admin, "role"> & { role: "superadmin" };
 ```
 
 ### 2.8 Use Readonly for Unmutated Parameters
@@ -828,10 +811,7 @@ When a function takes an options/parameter object, extract the object type to a 
 **Incorrect (inline object type):**
 
 ```typescript
-async function saveToDatabase(
-  record: Record,
-  params: { options: SaveOptions; userId: string; validate: boolean },
-) {
+async function saveToDatabase(record: Record, params: { options: SaveOptions; userId: string; validate: boolean }) {
   // ...
 }
 ```
@@ -851,6 +831,7 @@ async function saveToDatabase(record: Record, params: SaveToDatabaseParams) {
 ```
 
 Named types can be:
+
 - Exported for use in other modules
 - Referenced in JSDoc
 - Composed with other types via intersection or union
@@ -865,27 +846,28 @@ Use `as const` when you need TypeScript to infer the narrowest possible literal 
 **Incorrect (TypeScript widens to broad types):**
 
 ```typescript
-const roles = ['admin', 'editor', 'viewer'];
+const roles = ["admin", "editor", "viewer"];
 // typeof roles = string[] — too wide
 
-const config = { port: 3000, host: 'localhost' };
+const config = { port: 3000, host: "localhost" };
 // typeof config = { port: number; host: string } — too wide
 ```
 
 **Correct (as const narrows to literal types):**
 
 ```typescript
-const roles = ['admin', 'editor', 'viewer'] as const;
+const roles = ["admin", "editor", "viewer"] as const;
 // typeof roles = readonly ['admin', 'editor', 'viewer']
 
 type Role = (typeof roles)[number];
 // type Role = 'admin' | 'editor' | 'viewer'
 
-const config = { port: 3000, host: 'localhost' } as const;
+const config = { port: 3000, host: "localhost" } as const;
 // typeof config = { readonly port: 3000; readonly host: 'localhost' }
 ```
 
 Use `as const` for:
+
 - Const arrays that serve as the source for derived union types
 - Configuration objects that should be immutable
 - Tuple types where order matters
@@ -895,10 +877,10 @@ Do not use `as const` for simple variable assignments where the type is not used
 
 ```typescript
 // Unnecessary — the type is already correct
-const name = 'Alice' as const;
+const name = "Alice" as const;
 
 // Necessary — the type needs to be narrow
-const ROLES = ['admin', 'editor', 'viewer'] as const;
+const ROLES = ["admin", "editor", "viewer"] as const;
 type Role = (typeof ROLES)[number];
 ```
 
@@ -911,14 +893,14 @@ type Role = (typeof ROLES)[number];
 **Incorrect (using satisfies when you need immutability):**
 
 ```typescript
-const config = { port: 3000, host: 'localhost' } satisfies Config;
+const config = { port: 3000, host: "localhost" } satisfies Config;
 // typeof config = { port: number; host: string } — widened, mutable
 ```
 
 **Correct (as const for immutability and narrow types):**
 
 ```typescript
-const config = { port: 3000, host: 'localhost' } as const;
+const config = { port: 3000, host: "localhost" } as const;
 // typeof config = { readonly port: 3000; readonly host: 'localhost' }
 ```
 
@@ -932,9 +914,9 @@ type ThemeColors = {
 };
 
 const colors = {
-  primary: '#007bff',
-  secondary: '#6c757d',
-  accent: '#28a745',
+  primary: "#007bff",
+  secondary: "#6c757d",
+  accent: "#28a745",
 } satisfies ThemeColors;
 // typeof colors = { primary: '#007bff'; secondary: '#6c757d'; accent: '#28a745' }
 // Narrow types preserved, but verified against ThemeColors
@@ -958,10 +940,7 @@ const map: Mapper<number, string> = (items, fn) => items.map(fn);
 **Correct (generic on function, inferred at call site):**
 
 ```typescript
-const mapItems = <TInput, TOutput>(
-  items: TInput[],
-  fn: (item: TInput) => TOutput,
-) => items.map(fn);
+const mapItems = <TInput, TOutput>(items: TInput[], fn: (item: TInput) => TOutput) => items.map(fn);
 
 // TypeScript infers TInput=number, TOutput=string automatically
 const result = mapItems([1, 2, 3], (n) => `Item ${n}`);
@@ -971,10 +950,10 @@ Generic type parameters should use descriptive names: `TInput`, `TOutput`, `TKey
 
 ```typescript
 // Incorrect — single letter generics
-const first = <T,>(items: T[]) => items[0];
+const first = <T>(items: T[]) => items[0];
 
 // Correct — descriptive generic names
-const first = <TItem,>(items: TItem[]) => items[0];
+const first = <TItem>(items: TItem[]) => items[0];
 ```
 
 ### 2.13 Use Descriptive Generic Names (TInput, Not T)
@@ -988,18 +967,15 @@ Generic type parameters should use descriptive names prefixed with `T`: `TInput`
 ```typescript
 const mapItems = <A, B>(items: A[], fn: (item: A) => B) => items.map(fn);
 
-const first = <T,>(items: T[]) => items[0];
+const first = <T>(items: T[]) => items[0];
 ```
 
 **Correct (descriptive generic names):**
 
 ```typescript
-const mapItems = <TInput, TOutput>(
-  items: TInput[],
-  fn: (item: TInput) => TOutput,
-) => items.map(fn);
+const mapItems = <TInput, TOutput>(items: TInput[], fn: (item: TInput) => TOutput) => items.map(fn);
 
-const first = <TItem,>(items: TItem[]) => items[0];
+const first = <TItem>(items: TItem[]) => items[0];
 ```
 
 Descriptive names make it immediately clear what role each generic plays in the function's contract, especially in functions with multiple type parameters.
@@ -1023,7 +999,7 @@ type UserUpdate = {
 **Correct (using built-in utility types):**
 
 ```typescript
-type UserUpdate = Partial<Pick<User, 'name' | 'email' | 'avatar'>>;
+type UserUpdate = Partial<Pick<User, "name" | "email" | "avatar">>;
 ```
 
 **More examples:**
@@ -1033,10 +1009,10 @@ type UserUpdate = Partial<Pick<User, 'name' | 'email' | 'avatar'>>;
 type FrozenConfig = Readonly<Config>;
 
 // Pick specific properties
-type UserPreview = Pick<User, 'id' | 'name' | 'avatar'>;
+type UserPreview = Pick<User, "id" | "name" | "avatar">;
 
 // Omit specific properties
-type UserWithoutPassword = Omit<User, 'password'>;
+type UserWithoutPassword = Omit<User, "password">;
 
 // Function return type
 type ApiResponse = ReturnType<typeof fetchUser>;
@@ -1078,11 +1054,9 @@ const updateName = (user: User, name: string) => {
 **Correct (returning new values):**
 
 ```typescript
-const sortUsers = (users: readonly User[]) =>
-  users.toSorted((a, b) => a.name.localeCompare(b.name));
+const sortUsers = (users: readonly User[]) => users.toSorted((a, b) => a.name.localeCompare(b.name));
 
-const updateName = (user: User, name: string): User =>
-  ({ ...user, name });
+const updateName = (user: User, name: string): User => ({ ...user, name });
 ```
 
 Mutation causes bugs that are hard to trace because the caller's data changes unexpectedly. Immutable patterns make data flow explicit and predictable.
@@ -1182,22 +1156,21 @@ function updateConfig(config: Config, updates: Partial<Config>) {
 **Correct (creating new object with spread):**
 
 ```typescript
-const updateConfig = (config: Config, updates: Partial<Config>): Config =>
-  ({ ...config, ...updates });
+const updateConfig = (config: Config, updates: Partial<Config>): Config => ({ ...config, ...updates });
 ```
 
 **Correct (nested updates with deep spread):**
 
 ```typescript
-const updateUser = (user: User, name: string, email: string): User =>
-  ({
-    ...user,
-    profile: { ...user.profile, name },
-    contact: { ...user.contact, email },
-  });
+const updateUser = (user: User, name: string, email: string): User => ({
+  ...user,
+  profile: { ...user.profile, name },
+  contact: { ...user.contact, email },
+});
 ```
 
 Spread creates a new reference, which is essential for:
+
 - React state updates (which rely on reference equality)
 - Change detection in any mutable-data-averse system
 - Predictable data flow in general
@@ -1224,7 +1197,7 @@ const data = JSON.parse(rawString) as ApiResult;
 **Correct (Zod schema validation):**
 
 ```typescript
-import { z } from 'zod';
+import { z } from "zod";
 
 const UserSchema = z.object({
   name: z.string(),
@@ -1240,7 +1213,7 @@ const user = UserSchema.parse(response.data);
 **Correct (Valibot validation):**
 
 ```typescript
-import * as v from 'valibot';
+import * as v from "valibot";
 
 const UserSchema = v.object({
   name: v.string(),
@@ -1254,6 +1227,7 @@ const user = v.parse(UserSchema, response.data);
 ```
 
 Key boundaries that need validation:
+
 - API responses
 - Form submissions
 - URL parameters and search params
@@ -1315,26 +1289,26 @@ function findUser(id: string): User {
 **Correct (returning undefined for expected "not found"):**
 
 ```typescript
-const findUser = (id: string): User | undefined =>
-  db.find(id);
+const findUser = (id: string): User | undefined => db.find(id);
 ```
 
 **When to throw vs return undefined:**
 
 Return `T | undefined` when:
+
 - The function is a lookup/query that may not find a result
 - The failure is an expected, normal outcome
 - The caller should decide how to handle the absence
 
 Throw an exception when:
+
 - The failure is truly exceptional and unexpected
 - The function is performing a mutation that failed
 - The failure should bubble up and be caught at a boundary
 
 ```typescript
 // Return undefined — "not found" is normal
-const findUser = (id: string): User | undefined =>
-  db.find(id);
+const findUser = (id: string): User | undefined => db.find(id);
 
 // Throw — "already exists" is exceptional
 async function createUser(data: CreateUserDTO): Promise<User> {
@@ -1356,7 +1330,7 @@ Always use `??` (nullish coalescing) for default values, not `||` (logical OR). 
 
 ```typescript
 const count = items.length || 10;
-const name = user.name || 'Unknown';
+const name = user.name || "Unknown";
 const isEnabled = config.enabled || false;
 ```
 
@@ -1366,7 +1340,7 @@ When `items.length` is `0`, `user.name` is `""`, or `config.enabled` is `false`,
 
 ```typescript
 const count = items.length ?? 10;
-const name = user.name ?? 'Unknown';
+const name = user.name ?? "Unknown";
 const isEnabled = config.enabled ?? false;
 ```
 
@@ -1384,13 +1358,13 @@ Use `?.` (optional chaining) whenever accessing a property on a value that might
 if (user && user.address && user.address.city) {
   return user.address.city;
 }
-return 'Unknown';
+return "Unknown";
 ```
 
 **Correct (optional chaining):**
 
 ```typescript
-return user?.address?.city ?? 'Unknown';
+return user?.address?.city ?? "Unknown";
 ```
 
 **Incorrect (manual array access check):**
@@ -1423,8 +1397,7 @@ function greet(name: string, title: string | undefined) {
   // ...
 }
 
-const add = (a: number, b: number, offset: number | undefined) =>
-  offset ? a + b + offset : a + b;
+const add = (a: number, b: number, offset: number | undefined) => (offset ? a + b + offset : a + b);
 ```
 
 **Correct (optional parameter with ?):**
@@ -1434,8 +1407,7 @@ function greet(name: string, title?: string) {
   // ...
 }
 
-const add = (a: number, b: number, offset?: number) =>
-  offset ? a + b + offset : a + b;
+const add = (a: number, b: number, offset?: number) => (offset ? a + b + offset : a + b);
 ```
 
 The `?` syntax is equivalent to `| undefined` in the parameter type, but it's more readable and makes the intent explicit: the parameter is meant to be omitted, not passed as `undefined`.
@@ -1467,11 +1439,12 @@ function findUser(id: string): User | undefined {
 }
 
 // null = "explicitly does not exist" (rare, intentional)
-type ConnectionState = 'connecting' | 'connected' | 'disconnected' | null;
+type ConnectionState = "connecting" | "connected" | "disconnected" | null;
 // null here means "explicitly no connection", not "connection unknown"
 ```
 
 `undefined` is the natural choice because:
+
 - Optional parameters default to `undefined`
 - Missing object properties are `undefined`
 - `??` (nullish coalescing) treats both `null` and `undefined`, so it works either way
@@ -1531,26 +1504,27 @@ Never nest ternary expressions. They are difficult to read, hard to debug, and f
 **Incorrect (nested ternary):**
 
 ```typescript
-const label = role === 'admin' ? 'Admin' : role === 'mod' ? 'Moderator' : 'User';
+const label = role === "admin" ? "Admin" : role === "mod" ? "Moderator" : "User";
 ```
 
 **Correct (extracted function with early returns):**
 
 ```typescript
-const getLabel = (role: 'admin' | 'mod' | 'user') => {
-  if (role === 'admin') {
-    return 'Admin';
+const getLabel = (role: "admin" | "mod" | "user") => {
+  if (role === "admin") {
+    return "Admin";
   }
-  if (role === 'mod') {
-    return 'Moderator';
+  if (role === "mod") {
+    return "Moderator";
   }
-  return 'User';
+  return "User";
 };
 
 const label = getLabel(role);
 ```
 
 The extracted function is:
+
 - Testable — you can unit test `getLabel` independently
 - Debuggable — you can set breakpoints on each branch
 - Readable — each condition gets its own line
@@ -1566,14 +1540,14 @@ When mapping a set of known keys to values (with no complex logic per branch), u
 
 ```typescript
 switch (status) {
-  case 'active':
-    return 'green';
-  case 'inactive':
-    return 'red';
-  case 'pending':
-    return 'yellow';
+  case "active":
+    return "green";
+  case "inactive":
+    return "red";
+  case "pending":
+    return "yellow";
   default:
-    return 'gray';
+    return "gray";
 }
 ```
 
@@ -1581,20 +1555,22 @@ switch (status) {
 
 ```typescript
 const STATUS_COLORS: Record<Status, string> = {
-  active: 'green',
-  inactive: 'red',
-  pending: 'yellow',
+  active: "green",
+  inactive: "red",
+  pending: "yellow",
 };
 
-const color = STATUS_COLORS[status] ?? 'gray';
+const color = STATUS_COLORS[status] ?? "gray";
 ```
 
 Use object maps when:
+
 - Each branch maps a key to a static value
 - No complex logic per branch
 - The key set is known and finite
 
 Use `switch` with braces when:
+
 - Each branch has complex logic (side effects, multiple statements)
 - The mapping depends on more than a simple key
 
@@ -1608,12 +1584,12 @@ When logic per branch is too complex for an object map, use a `switch` statement
 
 ```typescript
 switch (status) {
-  case 'active':
-    const message = 'Account active';
+  case "active":
+    const message = "Account active";
     sendNotification(message);
     break;
-  case 'pending':
-    const message = 'Pending verification'; // Error: Cannot redeclare block-scoped variable
+  case "pending":
+    const message = "Pending verification"; // Error: Cannot redeclare block-scoped variable
     sendNotification(message);
     break;
 }
@@ -1623,18 +1599,18 @@ switch (status) {
 
 ```typescript
 switch (status) {
-  case 'active': {
-    const message = 'Account active';
+  case "active": {
+    const message = "Account active";
     sendNotification(message);
     break;
   }
-  case 'pending': {
-    const message = 'Pending verification';
+  case "pending": {
+    const message = "Pending verification";
     sendNotification(message);
     break;
   }
   default: {
-    const message = 'Unknown status';
+    const message = "Unknown status";
     logWarning(message);
   }
 }
@@ -1653,16 +1629,16 @@ Use ternary expressions (`?:`) for conditional assignments and return values. Te
 ```typescript
 let label: string;
 if (isActive) {
-  label = 'Active';
+  label = "Active";
 } else {
-  label = 'Inactive';
+  label = "Inactive";
 }
 ```
 
 **Correct (ternary for assignment):**
 
 ```typescript
-const label = isActive ? 'Active' : 'Inactive';
+const label = isActive ? "Active" : "Inactive";
 ```
 
 **Correct (ternary in return):**
@@ -1702,11 +1678,7 @@ async function loadData(userId: string) {
 
 ```typescript
 async function loadData(userId: string) {
-  const [user, config, permissions] = await Promise.all([
-    fetchUser(userId),
-    fetchConfig(),
-    fetchPermissions(userId),
-  ]);
+  const [user, config, permissions] = await Promise.all([fetchUser(userId), fetchConfig(), fetchPermissions(userId)]);
   return { user, config, permissions };
 }
 ```
@@ -1748,6 +1720,7 @@ async function fetchUserData(id: string) {
 ```
 
 Async/await benefits:
+
 - Linear control flow — reads top to bottom
 - `try/catch` or `.catch()` for error handling (see `async-catch-over-trycatch`)
 - Easier to set breakpoints and debug
@@ -1835,6 +1808,7 @@ const sortedActiveNames = users
 ```
 
 Use `for...of` only when:
+
 - Iterating with side effects (see `async-iteration-side-effects`)
 - Breaking early from a loop (no `break` in `forEach`)
 - Sequential async operations that depend on previous results
@@ -1857,7 +1831,7 @@ users.forEach((user: User) => {
 
 ```typescript
 users.map((user: User) => {
-  sendEmail(user.email, 'Welcome');
+  sendEmail(user.email, "Welcome");
   return user;
 });
 ```
@@ -1874,7 +1848,7 @@ for (const user of users) {
 
 ```typescript
 for (const user of users) {
-  await sendEmail(user.email, 'Welcome');
+  await sendEmail(user.email, "Welcome");
 }
 ```
 
@@ -1892,8 +1866,8 @@ When running multiple side-effecting async operations in parallel (logging, anal
 
 ```typescript
 await Promise.all([
-  sendEmail(user.email, 'Welcome'),
-  logEvent('user_created', { userId: user.id }),
+  sendEmail(user.email, "Welcome"),
+  logEvent("user_created", { userId: user.id }),
   updateSearchIndex(user.id),
 ]);
 // If sendEmail fails, logEvent and updateSearchIndex are never awaited
@@ -1903,24 +1877,26 @@ await Promise.all([
 
 ```typescript
 const results = await Promise.allSettled([
-  sendEmail(user.email, 'Welcome'),
-  logEvent('user_created', { userId: user.id }),
+  sendEmail(user.email, "Welcome"),
+  logEvent("user_created", { userId: user.id }),
   updateSearchIndex(user.id),
 ]);
 
 for (const result of results) {
-  if (result.status === 'rejected') {
+  if (result.status === "rejected") {
     logError(result.reason);
   }
 }
 ```
 
 Use `Promise.all()` when:
+
 - All operations are pure data fetches
 - A single failure means the whole batch is invalid
 - You want to fail fast
 
 Use `Promise.allSettled()` when:
+
 - Operations are independent side effects
 - Each should complete regardless of others
 - You need to collect all results, including failures
@@ -1944,27 +1920,28 @@ Never create barrel files (index.ts files that re-export from other modules). Im
 
 ```typescript
 // utils/index.ts
-export { formatName } from './formatName';
-export { validateEmail } from './validateEmail';
-export { saveUser } from './saveUser';
-export type { User } from './types';
-export type { FormattedName } from './formatName';
+export { formatName } from "./formatName";
+export { validateEmail } from "./validateEmail";
+export { saveUser } from "./saveUser";
+export type { User } from "./types";
+export type { FormattedName } from "./formatName";
 ```
 
 ```typescript
 // consumer.ts
-import { formatName, User } from './utils';
+import { formatName, User } from "./utils";
 ```
 
 **Correct (direct imports):**
 
 ```typescript
 // consumer.ts
-import formatName from './formatName';
-import type { User } from './types';
+import formatName from "./formatName";
+import type { User } from "./types";
 ```
 
 Barrel files cause:
+
 - Bundlers to include all re-exported modules even if only one is used
 - Slower type-checking (TypeScript must resolve the entire barrel)
 - Increased module graph complexity
@@ -1995,8 +1972,7 @@ export const validateEmail = (email: string) => ...;
 // formatName.ts
 export type FormattedName = { full: string; display: string };
 
-export const formatName = (user: User): FormattedName =>
-  ({ full: `${user.first} ${user.last}`, display: user.first });
+export const formatName = (user: User): FormattedName => ({ full: `${user.first} ${user.last}`, display: user.first });
 
 export default formatName;
 ```
@@ -2056,6 +2032,7 @@ src/
 ```
 
 Flat-by-feature means:
+
 - All files related to a feature live in one directory
 - No more than 1-2 levels of nesting
 - Easy to find: the feature name tells you the directory
@@ -2109,8 +2086,7 @@ Organize files with type definitions at the top, followed by function declaratio
 **Incorrect (functions before types they depend on):**
 
 ```typescript
-export const formatName = (user: User): FormattedName =>
-  ({ full: `${user.first} ${user.last}`, display: user.first });
+export const formatName = (user: User): FormattedName => ({ full: `${user.first} ${user.last}`, display: user.first });
 
 export type FormattedName = { full: string; display: string };
 export type User = { first: string; last: string };
@@ -2122,8 +2098,7 @@ export type User = { first: string; last: string };
 export type User = { first: string; last: string };
 export type FormattedName = { full: string; display: string };
 
-export const formatName = (user: User): FormattedName =>
-  ({ full: `${user.first} ${user.last}`, display: user.first });
+export const formatName = (user: User): FormattedName => ({ full: `${user.first} ${user.last}`, display: user.first });
 
 export default formatName;
 ```
@@ -2139,22 +2114,22 @@ Group imports with external/third-party packages first, then a blank line, then 
 **Incorrect (mixed import order):**
 
 ```typescript
-import formatName from './formatName';
-import { useState } from 'react';
-import type { User } from './types';
-import { z } from 'zod';
-import { validateEmail } from './validateEmail';
+import formatName from "./formatName";
+import { useState } from "react";
+import type { User } from "./types";
+import { z } from "zod";
+import { validateEmail } from "./validateEmail";
 ```
 
 **Correct (external first, then internal):**
 
 ```typescript
-import { useState } from 'react';
-import { z } from 'zod';
+import { useState } from "react";
+import { z } from "zod";
 
-import formatName from './formatName';
-import type { User } from './types';
-import { validateEmail } from './validateEmail';
+import formatName from "./formatName";
+import type { User } from "./types";
+import { validateEmail } from "./validateEmail";
 ```
 
 Some teams also separate type imports, but the minimum convention is: external packages first, then internal modules. Within each group, alphabetize or group by related functionality.
@@ -2168,19 +2143,20 @@ Use named imports for utilities and types. Use default imports for the primary e
 **Incorrect (namespace import):**
 
 ```typescript
-import * as Utils from './utils';
-import * as React from 'react';
+import * as Utils from "./utils";
+import * as React from "react";
 ```
 
 **Correct (named and default imports):**
 
 ```typescript
-import formatName from './formatName';
-import type { User } from './types';
-import { useState, useEffect } from 'react';
+import formatName from "./formatName";
+import type { User } from "./types";
+import { useState, useEffect } from "react";
 ```
 
 Namespace imports:
+
 - Make it unclear what's actually used
 - Prevent tree-shaking for the entire module
 - Add noise at every usage site (`Utils.formatName` vs `formatName`)
@@ -2210,6 +2186,7 @@ saveToDatabase.ts
 ```
 
 Exceptions:
+
 - Directive files that require specific names (e.g., `next.config.ts`, `tsconfig.json`)
 - Test files that follow a framework convention (e.g., `user.test.ts`)
 
@@ -2246,6 +2223,7 @@ const hasPermission = true;
 ```
 
 Prefix guidelines:
+
 - `is` for state/condition: `isActive`, `isVisible`, `isLoading`
 - `has` for possession/containment: `hasPermission`, `hasChildren`, `hasError`
 - `should` for intent/behavior: `shouldRetry`, `shouldValidate`, `shouldRedirect`
@@ -2332,7 +2310,10 @@ class NotFoundError extends Error {
 }
 
 class ValidationError extends Error {
-  constructor(message: string, public readonly fields: string[]) {
+  constructor(
+    message: string,
+    public readonly fields: string[],
+  ) {
     super(message);
     this.name = `ValidationError`;
   }
@@ -2397,10 +2378,10 @@ When chaining method calls across multiple lines, place the dot at the beginning
 **Incorrect (trailing dot):**
 
 ```typescript
-const result = items.
-  filter((item: Item) => item.active).
-  map((item: Item) => item.name).
-  toSorted();
+const result = items
+  .filter((item: Item) => item.active)
+  .map((item: Item) => item.name)
+  .toSorted();
 ```
 
 **Correct (leading dot on new line):**
@@ -2443,6 +2424,7 @@ const updated = { ...user, name: `New` };
 ```
 
 Object spread:
+
 - Always returns a new object (immutable)
 - Is more readable and concise
 - Has clearer TypeScript inference
@@ -2474,13 +2456,13 @@ const userEmail = `alice@example.com`;
 
 Convention summary:
 
-| Kind | Convention | Example |
-|------|-----------|---------|
-| Variables | camelCase | `userName`, `isActive` |
-| Functions | camelCase | `fetchProfile`, `calculateTotal` |
-| Types | PascalCase | `UserAccount`, `ApiResponse` |
-| Constants | camelCase | `maxRetries`, `apiBaseUrl` |
-| Files | camelCase | `userRepository.ts` |
+| Kind      | Convention | Example                          |
+| --------- | ---------- | -------------------------------- |
+| Variables | camelCase  | `userName`, `isActive`           |
+| Functions | camelCase  | `fetchProfile`, `calculateTotal` |
+| Types     | PascalCase | `UserAccount`, `ApiResponse`     |
+| Constants | camelCase  | `maxRetries`, `apiBaseUrl`       |
+| Files     | camelCase  | `userRepository.ts`              |
 
 ### 8.8 Comments Explain Why, Not What
 
@@ -2505,10 +2487,11 @@ if (user.isActive) {
 const TAX_RATE = 0.0875;
 
 // Fall back to cached data when API is rate-limited (happens every ~1000 req/min)
-const data = cached ?? await fetchFreshData();
+const data = cached ?? (await fetchFreshData());
 ```
 
 Good comments explain:
+
 - Why a seemingly wrong approach is correct
 - Business rules that aren't obvious from variable names
 - Edge cases and non-intuitive behavior
@@ -2524,8 +2507,8 @@ Use backtick strings (template literals) for all strings, including plain string
 **Incorrect (single or double quotes):**
 
 ```typescript
-const name = 'Alice';
-const greeting = 'Hello, ' + name + '!';
+const name = "Alice";
+const greeting = "Hello, " + name + "!";
 const path = "/api/users/" + id;
 ```
 
@@ -2538,6 +2521,7 @@ const path = `/api/users/${id}`;
 ```
 
 Backtick strings are always correct:
+
 - Plain strings: `` `Hello` ``
 - Interpolated strings: `` `Hello, ${name}!` ``
 - Multi-line strings: `` `line 1\nline 2` ``
@@ -2585,18 +2569,12 @@ Always include trailing commas in multiline structures: arrays, objects, functio
 ```typescript
 const user = {
   name: `Alice`,
-  email: `alice@example.com`
+  email: `alice@example.com`,
 };
 
-const items = [
-  `first`,
-  `second`
-];
+const items = [`first`, `second`];
 
-const add = (
-  a: number,
-  b: number
-) => a + b;
+const add = (a: number, b: number) => a + b;
 ```
 
 **Correct (trailing commas everywhere):**
@@ -2607,18 +2585,13 @@ const user = {
   email: `alice@example.com`,
 };
 
-const items = [
-  `first`,
-  `second`,
-];
+const items = [`first`, `second`];
 
-const add = (
-  a: number,
-  b: number,
-) => a + b;
+const add = (a: number, b: number) => a + b;
 ```
 
 This applies to:
+
 - Array literals
 - Object literals
 - Function parameter lists
@@ -2658,6 +2631,7 @@ const calculateTax = (amount: number, jurisdiction: Jurisdiction) =>
 ```
 
 Write JSDoc when:
+
 - The function has non-obvious side effects
 - The function throws errors (use `@throws`)
 - Parameter meanings are not clear from names alone
@@ -2665,6 +2639,7 @@ Write JSDoc when:
 - Behavior differs from what a developer might expect
 
 Don't write JSDoc when:
+
 - The function name and types fully describe the behavior
 - The comment would just repeat the function signature
 
@@ -2705,6 +2680,7 @@ async function deleteUser(id: string) {
 ```
 
 `@throws` makes errors discoverable:
+
 - IDE hover shows what errors a function can throw
 - Callers know what to handle without reading the implementation
 - Error handling can be systematic rather than reactive
@@ -2747,10 +2723,11 @@ const processOrder = (order: Order) => {
 For multi-line expressions, start the expression on the same line as `=>`:
 
 ```typescript
-const result = (items: Item[]) => items
-  .filter((item: Item) => item.active)
-  .map((item: Item) => item.name)
-  .toSorted();
+const result = (items: Item[]) =>
+  items
+    .filter((item: Item) => item.active)
+    .map((item: Item) => item.name)
+    .toSorted();
 ```
 
 ### 8.15 Multiline Objects When 2 or More Properties
@@ -2836,6 +2813,7 @@ const value = user[field];
 ```
 
 Dot notation is:
+
 - More readable and concise
 - Type-checked by TypeScript (bracket access with string literals can fall through)
 - Easier for IDEs to provide autocomplete and refactoring support
@@ -2878,8 +2856,7 @@ When a function receives an object, destructure its properties directly in the p
 **Incorrect (accessing properties via dot notation):**
 
 ```typescript
-const formatName = (user: User) =>
-  `${user.first} ${user.last}`;
+const formatName = (user: User) => `${user.first} ${user.last}`;
 
 function saveToDatabase(params: SaveParams) {
   await db.insert({ name: params.name, email: params.email });
@@ -2889,8 +2866,7 @@ function saveToDatabase(params: SaveParams) {
 **Correct (destructuring in parameters):**
 
 ```typescript
-const formatName = ({ first, last }: User) =>
-  `${first} ${last}`;
+const formatName = ({ first, last }: User) => `${first} ${last}`;
 
 function saveToDatabase({ name, email }: SaveParams) {
   await db.insert({ name, email });
@@ -2898,6 +2874,7 @@ function saveToDatabase({ name, email }: SaveParams) {
 ```
 
 Destructuring in parameters:
+
 - Makes required properties visible in the signature
 - Eliminates the `user.` prefix throughout the function body
 - Works naturally with the option object pattern (see `function-option-object-pattern`)
@@ -2921,10 +2898,7 @@ for (const key of Object.keys(source)) {
 
 ```typescript
 const config = Object.fromEntries(
-  Object.entries(source).map(([key, value]: [string, string]) => [
-    key.toUpperCase(),
-    value,
-  ]),
+  Object.entries(source).map(([key, value]: [string, string]) => [key.toUpperCase(), value]),
 );
 ```
 
@@ -2984,6 +2958,7 @@ b = temp;
 ```
 
 The temporary variable approach:
+
 - Is immediately obvious to any reader
 - Doesn't require understanding destructuring assignment
 - Works in all languages (not a JS-specific trick)

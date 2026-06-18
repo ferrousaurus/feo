@@ -49,6 +49,7 @@ src/
 ```
 
 Flat-by-feature means:
+
 - All files related to a feature live in one directory
 - No more than 1-2 levels of nesting
 - Easy to find: the feature name tells you the directory

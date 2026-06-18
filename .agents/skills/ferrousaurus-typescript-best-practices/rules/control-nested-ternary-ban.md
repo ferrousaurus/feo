@@ -14,26 +14,27 @@ Never nest ternary expressions. They are difficult to read, hard to debug, and f
 **Incorrect (nested ternary):**
 
 ```typescript
-const label = role === 'admin' ? 'Admin' : role === 'mod' ? 'Moderator' : 'User';
+const label = role === "admin" ? "Admin" : role === "mod" ? "Moderator" : "User";
 ```
 
 **Correct (extracted function with early returns):**
 
 ```typescript
-const getLabel = (role: 'admin' | 'mod' | 'user') => {
-  if (role === 'admin') {
-    return 'Admin';
+const getLabel = (role: "admin" | "mod" | "user") => {
+  if (role === "admin") {
+    return "Admin";
   }
-  if (role === 'mod') {
-    return 'Moderator';
+  if (role === "mod") {
+    return "Moderator";
   }
-  return 'User';
+  return "User";
 };
 
 const label = getLabel(role);
 ```
 
 The extracted function is:
+
 - Testable — you can unit test `getLabel` independently
 - Debuggable — you can set breakpoints on each branch
 - Readable — each condition gets its own line

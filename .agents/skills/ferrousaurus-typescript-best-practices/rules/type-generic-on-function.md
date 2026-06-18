@@ -21,10 +21,7 @@ const map: Mapper<number, string> = (items, fn) => items.map(fn);
 **Correct (generic on function, inferred at call site):**
 
 ```typescript
-const mapItems = <TInput, TOutput>(
-  items: TInput[],
-  fn: (item: TInput) => TOutput,
-) => items.map(fn);
+const mapItems = <TInput, TOutput>(items: TInput[], fn: (item: TInput) => TOutput) => items.map(fn);
 
 // TypeScript infers TInput=number, TOutput=string automatically
 const result = mapItems([1, 2, 3], (n) => `Item ${n}`);
@@ -34,8 +31,8 @@ Generic type parameters should use descriptive names: `TInput`, `TOutput`, `TKey
 
 ```typescript
 // Incorrect — single letter generics
-const first = <T,>(items: T[]) => items[0];
+const first = <T>(items: T[]) => items[0];
 
 // Correct — descriptive generic names
-const first = <TItem,>(items: TItem[]) => items[0];
+const first = <TItem>(items: TItem[]) => items[0];
 ```

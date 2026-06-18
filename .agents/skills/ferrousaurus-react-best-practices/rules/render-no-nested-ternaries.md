@@ -16,8 +16,8 @@ Never nest ternary expressions in JSX. They are difficult to read, hard to debug
 ```tsx
 function StatusBadge({ status }: StatusBadgeProps) {
   return (
-    <span className={status === 'active' ? 'badge-green' : status === 'pending' ? 'badge-yellow' : 'badge-red'}>
-      {status === 'active' ? 'Active' : status === 'pending' ? 'Pending' : 'Inactive'}
+    <span className={status === "active" ? "badge-green" : status === "pending" ? "badge-yellow" : "badge-red"}>
+      {status === "active" ? "Active" : status === "pending" ? "Pending" : "Inactive"}
     </span>
   );
 }
@@ -27,15 +27,15 @@ function StatusBadge({ status }: StatusBadgeProps) {
 
 ```tsx
 const getBadgeLabel = (status: Status) => {
-  if (status === 'active') return 'Active';
-  if (status === 'pending') return 'Pending';
-  return 'Inactive';
+  if (status === "active") return "Active";
+  if (status === "pending") return "Pending";
+  return "Inactive";
 };
 
 const getBadgeClassName = (status: Status) => {
-  if (status === 'active') return 'badge-green';
-  if (status === 'pending') return 'badge-yellow';
-  return 'badge-red';
+  if (status === "active") return "badge-green";
+  if (status === "pending") return "badge-yellow";
+  return "badge-red";
 };
 
 const StatusBadge = ({ status }: StatusBadgeProps) => (
@@ -47,15 +47,15 @@ const StatusBadge = ({ status }: StatusBadgeProps) => (
 
 ```tsx
 const BADGE_STYLES: Record<Status, string> = {
-  active: 'badge-green',
-  pending: 'badge-yellow',
-  inactive: 'badge-red',
+  active: "badge-green",
+  pending: "badge-yellow",
+  inactive: "badge-red",
 };
 
 const BADGE_LABELS: Record<Status, string> = {
-  active: 'Active',
-  pending: 'Pending',
-  inactive: 'Inactive',
+  active: "Active",
+  pending: "Pending",
+  inactive: "Inactive",
 };
 
 const StatusBadge = ({ status }: StatusBadgeProps) => (

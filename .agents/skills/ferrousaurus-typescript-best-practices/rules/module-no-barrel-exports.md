@@ -15,27 +15,28 @@ Never create barrel files (index.ts files that re-export from other modules). Im
 
 ```typescript
 // utils/index.ts
-export { formatName } from './formatName';
-export { validateEmail } from './validateEmail';
-export { saveUser } from './saveUser';
-export type { User } from './types';
-export type { FormattedName } from './formatName';
+export { formatName } from "./formatName";
+export { validateEmail } from "./validateEmail";
+export { saveUser } from "./saveUser";
+export type { User } from "./types";
+export type { FormattedName } from "./formatName";
 ```
 
 ```typescript
 // consumer.ts
-import { formatName, User } from './utils';
+import { formatName, User } from "./utils";
 ```
 
 **Correct (direct imports):**
 
 ```typescript
 // consumer.ts
-import formatName from './formatName';
-import type { User } from './types';
+import formatName from "./formatName";
+import type { User } from "./types";
 ```
 
 Barrel files cause:
+
 - Bundlers to include all re-exported modules even if only one is used
 - Slower type-checking (TypeScript must resolve the entire barrel)
 - Increased module graph complexity

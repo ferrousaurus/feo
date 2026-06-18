@@ -14,19 +14,20 @@ Use named imports for utilities and types. Use default imports for the primary e
 **Incorrect (namespace import):**
 
 ```typescript
-import * as Utils from './utils';
-import * as React from 'react';
+import * as Utils from "./utils";
+import * as React from "react";
 ```
 
 **Correct (named and default imports):**
 
 ```typescript
-import formatName from './formatName';
-import type { User } from './types';
-import { useState, useEffect } from 'react';
+import formatName from "./formatName";
+import type { User } from "./types";
+import { useState, useEffect } from "react";
 ```
 
 Namespace imports:
+
 - Make it unclear what's actually used
 - Prevent tree-shaking for the entire module
 - Add noise at every usage site (`Utils.formatName` vs `formatName`)

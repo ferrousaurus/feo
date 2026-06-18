@@ -20,16 +20,13 @@ function saveToDatabase(record: Record, options: SaveOptions, userId: string) {
   // ...
 }
 
-saveToDatabase(record, { upsert: true }, 'user-123');
+saveToDatabase(record, { upsert: true }, "user-123");
 ```
 
 **Incorrect (inlined options type):**
 
 ```typescript
-const saveToDatabase = (
-  record: Record,
-  params: { options: SaveOptions; userId: string },
-) => {
+const saveToDatabase = (record: Record, params: { options: SaveOptions; userId: string }) => {
   // ...
 };
 ```
@@ -46,7 +43,7 @@ async function saveToDatabase(record: Record, params: SaveToDatabaseParams) {
   // ...
 }
 
-saveToDatabase(record, { options: { upsert: true }, userId: 'user-123' });
+saveToDatabase(record, { options: { upsert: true }, userId: "user-123" });
 ```
 
 This pattern scales well. Adding a new optional parameter only requires updating the type and the implementation, not every call site.

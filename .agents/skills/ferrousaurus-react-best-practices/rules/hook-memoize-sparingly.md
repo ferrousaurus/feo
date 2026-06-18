@@ -24,7 +24,13 @@ Use `useMemo` when a computation is demonstrably expensive (measured, not assume
 function UserList({ users }: UserListProps) {
   // Not expensive — filtering 100 items is fast
   const activeUsers = useMemo(() => users.filter((u) => u.isActive), [users]);
-  return <ul>{activeUsers.map((u) => <li key={u.id}>{u.name}</li>)}</ul>;
+  return (
+    <ul>
+      {activeUsers.map((u) => (
+        <li key={u.id}>{u.name}</li>
+      ))}
+    </ul>
+  );
 }
 ```
 
@@ -33,7 +39,13 @@ function UserList({ users }: UserListProps) {
 ```tsx
 function UserList({ users }: UserListProps) {
   const activeUsers = users.filter((u) => u.isActive);
-  return <ul>{activeUsers.map((u) => <li key={u.id}>{u.name}</li>)}</ul>;
+  return (
+    <ul>
+      {activeUsers.map((u) => (
+        <li key={u.id}>{u.name}</li>
+      ))}
+    </ul>
+  );
 }
 ```
 
@@ -87,7 +99,7 @@ Often, the best solution isn't memoization but splitting the component so the ex
 ```tsx
 // ✅ Better: Extract the static part so it doesn't re-render
 function Parent() {
-  const [text, setText] = useState('');
+  const [text, setText] = useState("");
   return (
     <div>
       <StaticHeader />

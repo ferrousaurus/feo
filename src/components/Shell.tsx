@@ -1,3 +1,9 @@
+import npath from "node:path";
+
+import { useKeyboard, useRenderer } from "@opentui/react";
+import { useQueryClient } from "@tanstack/react-query";
+import { Suspense, useState } from "react";
+
 import configQueryOptions from "#/data/configQueryOptions";
 import type { FeoSource } from "#/data/feoConfig";
 import feoConfigValidator from "#/data/feoConfig";
@@ -12,10 +18,7 @@ import Legend from "#/panels/LegendPanel";
 import PreviewPanel from "#/panels/PreviewPanel";
 import SourcesPanel from "#/panels/SourcesPanel";
 import TargetsPanel from "#/panels/TargetsPanel";
-import { useKeyboard, useRenderer } from "@opentui/react";
-import { useQueryClient } from "@tanstack/react-query";
-import npath from "node:path";
-import { Suspense, use, useState } from "react";
+
 import Panel from "./Panel";
 
 export const panels = ["apps", "targets", "sources", "preview"] as const;

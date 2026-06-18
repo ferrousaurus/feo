@@ -25,8 +25,12 @@ Pass components or JSX as named props. Data flow is explicit and traceable.
   }
   panels={
     <Tabs.Panels>
-      <TabPanel><Profile /></TabPanel>
-      <TabPanel><Settings /></TabPanel>
+      <TabPanel>
+        <Profile />
+      </TabPanel>
+      <TabPanel>
+        <Settings />
+      </TabPanel>
     </Tabs.Panels>
   }
 />
@@ -44,8 +48,12 @@ The parent `Tabs` component is responsible for managing active tab state, but th
     <Tab>Settings</Tab>
   </TabList>
   <TabPanels>
-    <TabPanel><Profile /></TabPanel>
-    <TabPanel><Settings /></TabPanel>
+    <TabPanel>
+      <Profile />
+    </TabPanel>
+    <TabPanel>
+      <Settings />
+    </TabPanel>
   </TabPanels>
 </Tabs>
 ```

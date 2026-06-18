@@ -1,5 +1,7 @@
-import readFile from "#/lib/io/readFile";
 import { queryOptions } from "@tanstack/react-query";
+
+import readFile from "#/lib/io/readFile";
+
 import type { FeoSource } from "./feoConfig";
 
 const sourceContentQueryOptions = (source: FeoSource) =>

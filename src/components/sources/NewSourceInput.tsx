@@ -1,7 +1,8 @@
-import addSourceMutationOptions from "#/data/addSourceMutationOptions";
 import { useKeyboard } from "@opentui/react";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
+
+import addSourceMutationOptions from "#/data/addSourceMutationOptions";
 
 export type NewSourceInputProps = {
   app: string;

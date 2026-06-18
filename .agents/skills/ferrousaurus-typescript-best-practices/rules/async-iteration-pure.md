@@ -45,6 +45,7 @@ const sortedActiveNames = users
 ```
 
 Use `for...of` only when:
+
 - Iterating with side effects (see `async-iteration-side-effects`)
 - Breaking early from a loop (no `break` in `forEach`)
 - Sequential async operations that depend on previous results

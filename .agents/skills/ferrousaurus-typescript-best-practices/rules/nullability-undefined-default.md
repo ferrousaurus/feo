@@ -32,11 +32,12 @@ function findUser(id: string): User | undefined {
 }
 
 // null = "explicitly does not exist" (rare, intentional)
-type ConnectionState = 'connecting' | 'connected' | 'disconnected' | null;
+type ConnectionState = "connecting" | "connected" | "disconnected" | null;
 // null here means "explicitly no connection", not "connection unknown"
 ```
 
 `undefined` is the natural choice because:
+
 - Optional parameters default to `undefined`
 - Missing object properties are `undefined`
 - `??` (nullish coalescing) treats both `null` and `undefined`, so it works either way

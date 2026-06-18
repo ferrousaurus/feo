@@ -17,13 +17,13 @@ Use `?.` (optional chaining) whenever accessing a property on a value that might
 if (user && user.address && user.address.city) {
   return user.address.city;
 }
-return 'Unknown';
+return "Unknown";
 ```
 
 **Correct (optional chaining):**
 
 ```typescript
-return user?.address?.city ?? 'Unknown';
+return user?.address?.city ?? "Unknown";
 ```
 
 **Incorrect (manual array access check):**

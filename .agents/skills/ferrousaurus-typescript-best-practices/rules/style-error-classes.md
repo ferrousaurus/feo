@@ -29,7 +29,10 @@ class NotFoundError extends Error {
 }
 
 class ValidationError extends Error {
-  constructor(message: string, public readonly fields: string[]) {
+  constructor(
+    message: string,
+    public readonly fields: string[],
+  ) {
     super(message);
     this.name = `ValidationError`;
   }

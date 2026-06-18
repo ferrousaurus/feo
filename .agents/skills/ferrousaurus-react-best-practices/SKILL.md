@@ -14,6 +14,7 @@ React writing conventions, designed for AI agents and LLMs. Contains 27 rules ac
 ## When to Apply
 
 Reference these guidelines when:
+
 - Writing new React components or hooks
 - Reviewing React code for pattern consistency
 - Refactoring React code
@@ -26,16 +27,16 @@ The central convention is **`useEffect` only for synchronizing with external sys
 
 ## Rule Categories by Priority
 
-| Priority | Category | Impact | Prefix |
-|----------|----------|--------|--------|
-| 1 | Component Definition | CRITICAL | `component-` |
-| 2 | State Management | HIGH | `state-` |
-| 3 | Effects & Lifecycle | HIGH | `effect-` |
-| 4 | Data Fetching | HIGH | `data-` |
-| 5 | Composition & Props | MEDIUM | `composition-` |
-| 6 | Hooks | MEDIUM | `hook-` |
-| 7 | Conditional Rendering | MEDIUM | `render-` |
-| 8 | File Organization | LOW | `file-` |
+| Priority | Category              | Impact   | Prefix         |
+| -------- | --------------------- | -------- | -------------- |
+| 1        | Component Definition  | CRITICAL | `component-`   |
+| 2        | State Management      | HIGH     | `state-`       |
+| 3        | Effects & Lifecycle   | HIGH     | `effect-`      |
+| 4        | Data Fetching         | HIGH     | `data-`        |
+| 5        | Composition & Props   | MEDIUM   | `composition-` |
+| 6        | Hooks                 | MEDIUM   | `hook-`        |
+| 7        | Conditional Rendering | MEDIUM   | `render-`      |
+| 8        | File Organization     | LOW      | `file-`        |
 
 ## Quick Reference
 
@@ -102,6 +103,7 @@ rules/effect-external-systems-only.md
 ```
 
 Each rule file contains:
+
 - Impact level and description
 - Incorrect code example
 - Correct code example

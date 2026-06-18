@@ -42,6 +42,7 @@ async function deleteUser(id: string) {
 ```
 
 `@throws` makes errors discoverable:
+
 - IDE hover shows what errors a function can throw
 - Callers know what to handle without reading the implementation
 - Error handling can be systematic rather than reactive

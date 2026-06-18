@@ -28,7 +28,13 @@ function TodoList({ todos, filter }: TodoListProps) {
     setVisibleTodos(todos.filter((todo) => !todo.completed && todo.text.includes(filter)));
   }, [todos, filter]);
 
-  return <ul>{visibleTodos.map((todo) => <li key={todo.id}>{todo.text}</li>)}</ul>;
+  return (
+    <ul>
+      {visibleTodos.map((todo) => (
+        <li key={todo.id}>{todo.text}</li>
+      ))}
+    </ul>
+  );
 }
 ```
 
@@ -39,7 +45,13 @@ This renders twice: once with stale `visibleTodos`, then again after the Effect 
 ```tsx
 function TodoList({ todos, filter }: TodoListProps) {
   const visibleTodos = todos.filter((todo) => !todo.completed && todo.text.includes(filter));
-  return <ul>{visibleTodos.map((todo) => <li key={todo.id}>{todo.text}</li>)}</ul>;
+  return (
+    <ul>
+      {visibleTodos.map((todo) => (
+        <li key={todo.id}>{todo.text}</li>
+      ))}
+    </ul>
+  );
 }
 ```
 
@@ -51,18 +63,24 @@ function TodoList({ todos, filter }: TodoListProps) {
     () => todos.filter((todo) => !todo.completed && todo.text.includes(filter)),
     [todos, filter],
   );
-  return <ul>{visibleTodos.map((todo) => <li key={todo.id}>{todo.text}</li>)}</ul>;
+  return (
+    <ul>
+      {visibleTodos.map((todo) => (
+        <li key={todo.id}>{todo.text}</li>
+      ))}
+    </ul>
+  );
 }
 ```
 
 ### Common patterns and their correct alternatives
 
-| Pattern | Incorrect | Correct |
-|---------|-----------|---------|
-| Combine first/last name | `useEffect(() => setFullName(first + ' ' + last))` | `const fullName = first + ' ' + last` |
-| Filter a list | `useEffect(() => setFiltered(items.filter(...)))` | `const filtered = items.filter(...)` |
-| Compute total | `useEffect(() => setTotal(items.reduce(...)))` | `const total = items.reduce(...)` |
-| Expensive computation | `useEffect(() => setResult(expensive(data)))` | `const result = useMemo(() => expensive(data), [data])` |
+| Pattern                 | Incorrect                                          | Correct                                                 |
+| ----------------------- | -------------------------------------------------- | ------------------------------------------------------- |
+| Combine first/last name | `useEffect(() => setFullName(first + ' ' + last))` | `const fullName = first + ' ' + last`                   |
+| Filter a list           | `useEffect(() => setFiltered(items.filter(...)))`  | `const filtered = items.filter(...)`                    |
+| Compute total           | `useEffect(() => setTotal(items.reduce(...)))`     | `const total = items.reduce(...)`                       |
+| Expensive computation   | `useEffect(() => setResult(expensive(data)))`      | `const result = useMemo(() => expensive(data), [data])` |
 
 ### Cross-References
 

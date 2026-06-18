@@ -9,7 +9,7 @@ A structured repository for creating and maintaining React writing conventions o
   - `_template.md` - Template for creating new rules
   - `area-description.md` - Individual rule files
 - `metadata.json` - Document metadata (version, organization, abstract)
-- __`AGENTS.md`__ - Compiled output with all rules expanded
+- **`AGENTS.md`** - Compiled output with all rules expanded
 - `SKILL.md` - Skill definition for OpenCode integration
 
 ## Creating a New Rule
@@ -32,7 +32,7 @@ A structured repository for creating and maintaining React writing conventions o
 
 Each rule file should follow this structure:
 
-```markdown
+````markdown
 ---
 title: Rule Title Here
 impact: MEDIUM
@@ -57,7 +57,7 @@ Brief explanation of the rule and why it matters.
 \```tsx
 // Good code example
 \```
-```
+````
 
 ## File Naming Convention
 

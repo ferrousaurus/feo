@@ -77,7 +77,11 @@ function Stopwatch() {
     if (intervalRef.current) clearInterval(intervalRef.current);
   }
 
-  return <div>{elapsed}s <button onClick={handleStart}>Start</button> <button onClick={handleStop}>Stop</button></div>;
+  return (
+    <div>
+      {elapsed}s <button onClick={handleStart}>Start</button> <button onClick={handleStop}>Stop</button>
+    </div>
+  );
 }
 ```
 

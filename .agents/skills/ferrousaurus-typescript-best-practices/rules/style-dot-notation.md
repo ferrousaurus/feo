@@ -33,6 +33,7 @@ const value = user[field];
 ```
 
 Dot notation is:
+
 - More readable and concise
 - Type-checked by TypeScript (bracket access with string literals can fall through)
 - Easier for IDEs to provide autocomplete and refactoring support

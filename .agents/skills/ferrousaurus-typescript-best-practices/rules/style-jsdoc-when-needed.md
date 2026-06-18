@@ -37,6 +37,7 @@ const calculateTax = (amount: number, jurisdiction: Jurisdiction) =>
 ```
 
 Write JSDoc when:
+
 - The function has non-obvious side effects
 - The function throws errors (use `@throws`)
 - Parameter meanings are not clear from names alone
@@ -44,5 +45,6 @@ Write JSDoc when:
 - Behavior differs from what a developer might expect
 
 Don't write JSDoc when:
+
 - The function name and types fully describe the behavior
 - The comment would just repeat the function signature

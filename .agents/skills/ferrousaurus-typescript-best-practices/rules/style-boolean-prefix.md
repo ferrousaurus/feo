@@ -30,6 +30,7 @@ const hasPermission = true;
 ```
 
 Prefix guidelines:
+
 - `is` for state/condition: `isActive`, `isVisible`, `isLoading`
 - `has` for possession/containment: `hasPermission`, `hasChildren`, `hasError`
 - `should` for intent/behavior: `shouldRetry`, `shouldValidate`, `shouldRedirect`

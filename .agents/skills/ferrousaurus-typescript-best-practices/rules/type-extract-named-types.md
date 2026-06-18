@@ -14,10 +14,7 @@ When a function takes an options/parameter object, extract the object type to a 
 **Incorrect (inline object type):**
 
 ```typescript
-async function saveToDatabase(
-  record: Record,
-  params: { options: SaveOptions; userId: string; validate: boolean },
-) {
+async function saveToDatabase(record: Record, params: { options: SaveOptions; userId: string; validate: boolean }) {
   // ...
 }
 ```
@@ -37,6 +34,7 @@ async function saveToDatabase(record: Record, params: SaveToDatabaseParams) {
 ```
 
 Named types can be:
+
 - Exported for use in other modules
 - Referenced in JSDoc
 - Composed with other types via intersection or union

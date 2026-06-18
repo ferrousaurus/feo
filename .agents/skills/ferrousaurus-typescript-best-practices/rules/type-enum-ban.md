@@ -15,26 +15,27 @@ Never use TypeScript `enum`. Enums generate unnecessary runtime code, have surpr
 
 ```typescript
 enum Status {
-  Active = 'active',
-  Inactive = 'inactive',
-  Pending = 'pending',
+  Active = "active",
+  Inactive = "inactive",
+  Pending = "pending",
 }
 ```
 
 **Correct (union type for simple cases):**
 
 ```typescript
-type Status = 'active' | 'inactive' | 'pending';
+type Status = "active" | "inactive" | "pending";
 ```
 
 **Correct (const array + derived type when you need both values and type):**
 
 ```typescript
-const STATUSES = ['active', 'inactive', 'pending'] as const;
+const STATUSES = ["active", "inactive", "pending"] as const;
 type Status = (typeof STATUSES)[number];
 ```
 
 The const array pattern gives you:
+
 - Runtime iteration: `STATUSES.forEach(...)`
 - Type safety: `Status` is `'active' | 'inactive' | 'pending'`
 - Lookup: `STATUSES.includes(value)`

@@ -23,7 +23,7 @@ users.forEach((user: User) => {
 
 ```typescript
 users.map((user: User) => {
-  sendEmail(user.email, 'Welcome');
+  sendEmail(user.email, "Welcome");
   return user;
 });
 ```
@@ -40,7 +40,7 @@ for (const user of users) {
 
 ```typescript
 for (const user of users) {
-  await sendEmail(user.email, 'Welcome');
+  await sendEmail(user.email, "Welcome");
 }
 ```
 

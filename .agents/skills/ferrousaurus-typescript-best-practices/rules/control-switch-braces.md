@@ -15,12 +15,12 @@ When logic per branch is too complex for an object map, use a `switch` statement
 
 ```typescript
 switch (status) {
-  case 'active':
-    const message = 'Account active';
+  case "active":
+    const message = "Account active";
     sendNotification(message);
     break;
-  case 'pending':
-    const message = 'Pending verification'; // Error: Cannot redeclare block-scoped variable
+  case "pending":
+    const message = "Pending verification"; // Error: Cannot redeclare block-scoped variable
     sendNotification(message);
     break;
 }
@@ -30,18 +30,18 @@ switch (status) {
 
 ```typescript
 switch (status) {
-  case 'active': {
-    const message = 'Account active';
+  case "active": {
+    const message = "Account active";
     sendNotification(message);
     break;
   }
-  case 'pending': {
-    const message = 'Pending verification';
+  case "pending": {
+    const message = "Pending verification";
     sendNotification(message);
     break;
   }
   default: {
-    const message = 'Unknown status';
+    const message = "Unknown status";
     logWarning(message);
   }
 }

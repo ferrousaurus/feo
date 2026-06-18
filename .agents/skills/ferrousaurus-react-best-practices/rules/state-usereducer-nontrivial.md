@@ -41,7 +41,7 @@ function CheckoutForm() {
       await submitOrder();
       setStep(2);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
+      setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
       setIsSubmitting(false);
     }
@@ -60,20 +60,20 @@ type CheckoutState = {
 };
 
 type CheckoutAction =
-  | { type: 'SUBMIT' }
-  | { type: 'SUBMIT_SUCCESS' }
-  | { type: 'SUBMIT_ERROR'; error: string }
-  | { type: 'SET_FORM_VALID'; isValid: boolean };
+  | { type: "SUBMIT" }
+  | { type: "SUBMIT_SUCCESS" }
+  | { type: "SUBMIT_ERROR"; error: string }
+  | { type: "SET_FORM_VALID"; isValid: boolean };
 
 const checkoutReducer = (state: CheckoutState, action: CheckoutAction): CheckoutState => {
   switch (action.type) {
-    case 'SUBMIT':
+    case "SUBMIT":
       return { ...state, isSubmitting: true, error: undefined };
-    case 'SUBMIT_SUCCESS':
+    case "SUBMIT_SUCCESS":
       return { ...state, isSubmitting: false, step: 2 };
-    case 'SUBMIT_ERROR':
+    case "SUBMIT_ERROR":
       return { ...state, isSubmitting: false, error: action.error };
-    case 'SET_FORM_VALID':
+    case "SET_FORM_VALID":
       return { ...state, isFormValid: action.isValid };
     default:
       return state;
@@ -94,7 +94,7 @@ function CheckoutForm() {
 
 ```tsx
 const [isModalOpen, setIsModalOpen] = useState(false);
-const [searchQuery, setSearchQuery] = useState('');
+const [searchQuery, setSearchQuery] = useState("");
 const [selectedId, setSelectedId] = useState<string | undefined>(undefined);
 ```
 

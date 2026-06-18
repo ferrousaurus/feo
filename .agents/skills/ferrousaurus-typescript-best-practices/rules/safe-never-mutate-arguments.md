@@ -28,11 +28,9 @@ const updateName = (user: User, name: string) => {
 **Correct (returning new values):**
 
 ```typescript
-const sortUsers = (users: readonly User[]) =>
-  users.toSorted((a, b) => a.name.localeCompare(b.name));
+const sortUsers = (users: readonly User[]) => users.toSorted((a, b) => a.name.localeCompare(b.name));
 
-const updateName = (user: User, name: string): User =>
-  ({ ...user, name });
+const updateName = (user: User, name: string): User => ({ ...user, name });
 ```
 
 Mutation causes bugs that are hard to trace because the caller's data changes unexpectedly. Immutable patterns make data flow explicit and predictable.

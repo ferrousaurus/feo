@@ -1,12 +1,14 @@
+import npath from "node:path";
+
+import { deepMerge } from "@std/collections";
+import { mutationOptions } from "@tanstack/react-query";
+import { z } from "zod/mini";
+
 import type { FeoConfig } from "#/data/feoConfig";
 import feoConfigValidator from "#/data/feoConfig";
 import filetypes, { supportedExtensionSchema } from "#/lib/config/filetypes";
 import resolveAbsolutePath from "#/lib/fs/resolveAbsolutePath";
 import writeFile from "#/lib/io/writeFile";
-import { deepMerge } from "@std/collections";
-import { mutationOptions } from "@tanstack/react-query";
-import npath from "node:path";
-import { z } from "zod/mini";
 
 function moveSourceUp(config: FeoConfig, vars: { app: string; target: string; source: string }) {
   const app = config.configs[vars.app];

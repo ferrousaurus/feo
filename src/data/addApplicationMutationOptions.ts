@@ -1,12 +1,14 @@
+import npath from "node:path";
+
+import { deepMerge } from "@std/collections";
+import { mutationOptions } from "@tanstack/react-query";
+import { z } from "zod/mini";
+
 import feoConfigValidator from "#/data/feoConfig";
 import filetypes, { supportedExtensionSchema } from "#/lib/config/filetypes";
 import resolveAbsolutePath from "#/lib/fs/resolveAbsolutePath";
 import writeFile from "#/lib/io/writeFile";
 import keys from "#/lib/object/keys";
-import { deepMerge } from "@std/collections";
-import { mutationOptions } from "@tanstack/react-query";
-import npath from "node:path";
-import { z } from "zod/mini";
 
 const addApplicationMutationOptions = (configPath: string) => {
   const filetype = filetypes[supportedExtensionSchema.parse(npath.parse(configPath).ext)];

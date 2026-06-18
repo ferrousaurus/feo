@@ -1,6 +1,7 @@
-import configQueryOptions from "#/data/configQueryOptions";
 import { useKeyboard } from "@opentui/react";
 import { useSuspenseQuery } from "@tanstack/react-query";
+
+import configQueryOptions from "#/data/configQueryOptions";
 
 export type KeybindsProps = {
   configPath: string;

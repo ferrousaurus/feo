@@ -22,6 +22,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId }) => {
 ```
 
 Problems with `React.FC`:
+
 - Adds `children` to props implicitly (before React 18), creating confusion
 - Makes generic components awkward: `const List: React.FC<ListProps<T>>` doesn't work cleanly
 - Prevents flexible return types (e.g., `React.ReactNode` that includes `string | null`)

@@ -16,7 +16,7 @@ Never use type assertions (`as Type`). They override TypeScript's type checker, 
 ```typescript
 const user = data as User;
 const value = result as string;
-const element = document.querySelector('.box') as HTMLElement;
+const element = document.querySelector(".box") as HTMLElement;
 ```
 
 **Correct alternatives:**
@@ -24,8 +24,7 @@ const element = document.querySelector('.box') as HTMLElement;
 Use user-defined type guards for narrowing from `unknown`:
 
 ```typescript
-const isUser = (value: unknown): value is User =>
-  typeof value === 'object' && value !== null && 'name' in value;
+const isUser = (value: unknown): value is User => typeof value === "object" && value !== null && "name" in value;
 
 const user = isUser(data) ? data : undefined;
 ```
@@ -40,7 +39,7 @@ const user = UserSchema.parse(data);
 Use `satisfies` to verify a value conforms to a type without widening:
 
 ```typescript
-const config = { port: 3000, host: 'localhost' } satisfies Config;
+const config = { port: 3000, host: "localhost" } satisfies Config;
 ```
 
 Non-null assertion (`!`) is also a type assertion and is equally banned. Use optional chaining and nullish coalescing instead:
@@ -50,7 +49,7 @@ Non-null assertion (`!`) is also a type assertion and is equally banned. Use opt
 const name = user!.name;
 
 // Correct
-const name = user?.name ?? 'Unknown';
+const name = user?.name ?? "Unknown";
 ```
 
 There are no exceptions. If TypeScript can't infer the type, fix the types — don't override them.

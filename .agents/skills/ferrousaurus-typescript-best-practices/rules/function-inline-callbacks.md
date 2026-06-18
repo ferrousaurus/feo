@@ -27,8 +27,7 @@ items.filter((item: Item) => item.active);
 **Correct (extract when braces are needed or logic is complex):**
 
 ```typescript
-const calculateDiscount = (order: Order) =>
-  order.items.reduce((sum: number, item: Item) => sum + item.price, 0) * 0.1;
+const calculateDiscount = (order: Order) => order.items.reduce((sum: number, item: Item) => sum + item.price, 0) * 0.1;
 
 const discountedTotal = orders.map(calculateDiscount);
 ```

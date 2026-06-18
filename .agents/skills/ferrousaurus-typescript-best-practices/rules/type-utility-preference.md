@@ -24,7 +24,7 @@ type UserUpdate = {
 **Correct (using built-in utility types):**
 
 ```typescript
-type UserUpdate = Partial<Pick<User, 'name' | 'email' | 'avatar'>>;
+type UserUpdate = Partial<Pick<User, "name" | "email" | "avatar">>;
 ```
 
 **More examples:**
@@ -34,10 +34,10 @@ type UserUpdate = Partial<Pick<User, 'name' | 'email' | 'avatar'>>;
 type FrozenConfig = Readonly<Config>;
 
 // Pick specific properties
-type UserPreview = Pick<User, 'id' | 'name' | 'avatar'>;
+type UserPreview = Pick<User, "id" | "name" | "avatar">;
 
 // Omit specific properties
-type UserWithoutPassword = Omit<User, 'password'>;
+type UserWithoutPassword = Omit<User, "password">;
 
 // Function return type
 type ApiResponse = ReturnType<typeof fetchUser>;

@@ -15,12 +15,12 @@ Brief explanation of the rule and why it matters.
 
 ```typescript
 // Bad code example here
-const bad = example()
+const bad = example();
 ```
 
 **Correct (description of what's right):**
 
 ```typescript
 // Good code example here
-const good = example()
+const good = example();
 ```

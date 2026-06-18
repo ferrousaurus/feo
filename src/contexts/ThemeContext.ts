@@ -1,5 +1,6 @@
-import type { FeoConfig } from "#/data/feoConfig";
 import { createContext } from "react";
+
+import type { FeoConfig } from "#/data/feoConfig";
 
 type ThemeContext = FeoConfig["settings"]["theme"];
 

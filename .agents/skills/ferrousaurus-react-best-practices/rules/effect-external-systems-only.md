@@ -17,7 +17,7 @@ tags: react, effect, useEffect, lifecycle
 - Synchronizing with a third-party imperative library (e.g., a map widget, chart library)
 - Measuring DOM layout (e.g., `getBoundingClientRect`)
 - Sending analytics on mount (component was displayed to the user)
-- Any side effect that runs *because the component was displayed*, not because of a user action
+- Any side effect that runs _because the component was displayed_, not because of a user action
 
 ### When useEffect is NOT appropriate
 

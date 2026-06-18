@@ -12,11 +12,13 @@ tags: function, pure, side-effect, arrow, declaration, convention
 The syntax of a function declaration communicates its behavior. Arrow functions (`const fn = () => ...`) signal purity — no side effects, no I/O, deterministisch output for given input. Function declarations (`function fn() { ... }`) signal side effects — I/O, mutation, network calls, non-deterministic behavior.
 
 A pure function:
+
 - Returns the same output for the same inputs
 - Has no side effects (no I/O, no mutation of external state)
 - Is referentially transparent (can be replaced by its return value)
 
 A side-effecting function:
+
 - Performs I/O (network, filesystem, database)
 - Mutates external state
 - Has non-deterministic behavior (randomness, timestamps)
@@ -41,8 +43,7 @@ function calculateTotal(items: Item[]) {
 **Correct (arrow for pure, declaration for side effects):**
 
 ```typescript
-const calculateTotal = (items: Item[]) =>
-  items.reduce((sum, item) => sum + item.price, 0);
+const calculateTotal = (items: Item[]) => items.reduce((sum, item) => sum + item.price, 0);
 
 async function saveToDatabase(record: Record) {
   await db.insert(record);

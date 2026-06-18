@@ -14,10 +14,10 @@ When chaining method calls across multiple lines, place the dot at the beginning
 **Incorrect (trailing dot):**
 
 ```typescript
-const result = items.
-  filter((item: Item) => item.active).
-  map((item: Item) => item.name).
-  toSorted();
+const result = items
+  .filter((item: Item) => item.active)
+  .map((item: Item) => item.name)
+  .toSorted();
 ```
 
 **Correct (leading dot on new line):**

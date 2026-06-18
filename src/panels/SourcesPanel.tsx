@@ -1,13 +1,13 @@
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
+import { useState } from "react";
+
+import Keybinds from "#/components/keybinds/Keybinds";
+import NewSourceInput from "#/components/sources/NewSourceInput";
+import Source from "#/components/sources/Source";
 import configQueryOptions from "#/data/configQueryOptions";
 import type { FeoSource } from "#/data/feoConfig";
 import moveSourceDownMutationOptions from "#/data/moveSourceDownMutationOptions";
 import moveSourceUpMutationOptions from "#/data/moveSourceUpMutationOptions";
-import Source from "#/components/sources/Source";
-import NewSourceInput from "#/components/sources/NewSourceInput";
-import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
-import { useState } from "react";
-import Keybinds from "#/components/keybinds/Keybinds";
-import addSourceMutationOptions from "#/data/addSourceMutationOptions";
 
 export type SourcesPanelProps = {
   active: boolean;
@@ -39,7 +39,6 @@ export default function SourcesPanel({
   const { data: config } = useSuspenseQuery(configQueryOptions(configPath));
   const sources = config.configs[application]?.targets[target]?.sources ?? [];
 
-  const { mutateAsync: addSourceAsync } = useMutation(addSourceMutationOptions(configPath));
   const { mutateAsync: moveSourceUpAsync } = useMutation(moveSourceUpMutationOptions(configPath));
   const { mutateAsync: moveSourceDownAsync } = useMutation(moveSourceDownMutationOptions(configPath));
 

@@ -15,14 +15,14 @@ When mapping a set of known keys to values (with no complex logic per branch), u
 
 ```typescript
 switch (status) {
-  case 'active':
-    return 'green';
-  case 'inactive':
-    return 'red';
-  case 'pending':
-    return 'yellow';
+  case "active":
+    return "green";
+  case "inactive":
+    return "red";
+  case "pending":
+    return "yellow";
   default:
-    return 'gray';
+    return "gray";
 }
 ```
 
@@ -30,19 +30,21 @@ switch (status) {
 
 ```typescript
 const STATUS_COLORS: Record<Status, string> = {
-  active: 'green',
-  inactive: 'red',
-  pending: 'yellow',
+  active: "green",
+  inactive: "red",
+  pending: "yellow",
 };
 
-const color = STATUS_COLORS[status] ?? 'gray';
+const color = STATUS_COLORS[status] ?? "gray";
 ```
 
 Use object maps when:
+
 - Each branch maps a key to a static value
 - No complex logic per branch
 - The key set is known and finite
 
 Use `switch` with braces when:
+
 - Each branch has complex logic (side effects, multiple statements)
 - The mapping depends on more than a simple key

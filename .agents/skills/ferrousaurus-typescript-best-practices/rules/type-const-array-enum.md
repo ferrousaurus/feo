@@ -15,9 +15,9 @@ When you need both the runtime values (for iteration, lookup, mapping) and the t
 
 ```typescript
 enum Role {
-  Admin = 'admin',
-  Editor = 'editor',
-  Viewer = 'viewer',
+  Admin = "admin",
+  Editor = "editor",
+  Viewer = "viewer",
 }
 
 // Need runtime iteration
@@ -27,14 +27,14 @@ const roles = Object.values(Role);
 **Incorrect (duplicated values and type):**
 
 ```typescript
-const roles = ['admin', 'editor', 'viewer'];
-type Role = 'admin' | 'editor' | 'viewer';
+const roles = ["admin", "editor", "viewer"];
+type Role = "admin" | "editor" | "viewer";
 ```
 
 **Correct (const array + derived type, single source of truth):**
 
 ```typescript
-const ROLES = ['admin', 'editor', 'viewer'] as const;
+const ROLES = ["admin", "editor", "viewer"] as const;
 type Role = (typeof ROLES)[number];
 
 // Runtime iteration
@@ -43,8 +43,7 @@ ROLES.forEach((role) => {
 });
 
 // Type checking
-const hasRole = (value: string): value is Role =>
-  ROLES.includes(value as Role);
+const hasRole = (value: string): value is Role => ROLES.includes(value as Role);
 ```
 
 This pattern keeps values and types in sync automatically. Add a value to `ROLES` and the `Role` type updates immediately.

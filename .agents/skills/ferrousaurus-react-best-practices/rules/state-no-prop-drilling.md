@@ -17,7 +17,7 @@ The threshold is intentionally low: if a component receives a prop only to pass 
 
 ```tsx
 function App() {
-  const [theme, setTheme] = useState('dark');
+  const [theme, setTheme] = useState("dark");
   return <Layout theme={theme} setTheme={setTheme} />;
 }
 
@@ -33,7 +33,7 @@ function Sidebar({ theme, setTheme }: SidebarProps) {
 
 function ThemeToggle({ theme, setTheme }: ThemeToggleProps) {
   // Only ThemeToggle actually uses theme
-  return <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>Toggle</button>;
+  return <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>Toggle</button>;
 }
 ```
 
@@ -41,7 +41,7 @@ function ThemeToggle({ theme, setTheme }: ThemeToggleProps) {
 
 ```tsx
 const useThemeStore = create<ThemeState>((set) => ({
-  theme: 'dark',
+  theme: "dark",
   setTheme: (theme) => set({ theme }),
 }));
 
@@ -55,18 +55,18 @@ function Layout() {
 
 function ThemeToggle() {
   const { theme, setTheme } = useThemeStore();
-  return <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>Toggle</button>;
+  return <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>Toggle</button>;
 }
 ```
 
 Use Jotai (per ferrousaurus-stack-preferences — acceptable when many independent instances of state are needed) when the state is fine-grained and per-component:
 
 ```tsx
-const themeAtom = atom('dark');
+const themeAtom = atom("dark");
 
 function ThemeToggle() {
   const [theme, setTheme] = useAtom(themeAtom);
-  return <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>Toggle</button>;
+  return <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>Toggle</button>;
 }
 ```
 

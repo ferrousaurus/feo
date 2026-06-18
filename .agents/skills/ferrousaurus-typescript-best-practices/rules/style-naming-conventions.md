@@ -31,10 +31,10 @@ const userEmail = `alice@example.com`;
 
 Convention summary:
 
-| Kind | Convention | Example |
-|------|-----------|---------|
-| Variables | camelCase | `userName`, `isActive` |
-| Functions | camelCase | `fetchProfile`, `calculateTotal` |
-| Types | PascalCase | `UserAccount`, `ApiResponse` |
-| Constants | camelCase | `maxRetries`, `apiBaseUrl` |
-| Files | camelCase | `userRepository.ts` |
+| Kind      | Convention | Example                          |
+| --------- | ---------- | -------------------------------- |
+| Variables | camelCase  | `userName`, `isActive`           |
+| Functions | camelCase  | `fetchProfile`, `calculateTotal` |
+| Types     | PascalCase | `UserAccount`, `ApiResponse`     |
+| Constants | camelCase  | `maxRetries`, `apiBaseUrl`       |
+| Files     | camelCase  | `userRepository.ts`              |

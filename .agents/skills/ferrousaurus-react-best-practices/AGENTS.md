@@ -83,7 +83,7 @@ class UserProfile extends React.Component<UserProfileProps, UserProfileState> {
   }
 
   render() {
-    return <button onClick={this.handleClick}>{this.state.isLoading ? 'Loading' : 'Done'}</button>;
+    return <button onClick={this.handleClick}>{this.state.isLoading ? "Loading" : "Done"}</button>;
   }
 }
 ```
@@ -100,7 +100,7 @@ function UserProfile({ userId }: UserProfileProps) {
 
   const handleClick = () => setIsLoading(false);
 
-  return <button onClick={handleClick}>{isLoading ? 'Loading' : 'Done'}</button>;
+  return <button onClick={handleClick}>{isLoading ? "Loading" : "Done"}</button>;
 }
 ```
 
@@ -164,6 +164,7 @@ const Badge: React.FC<BadgeProps> = ({ label }) => <span>{label}</span>;
 ```
 
 Problems with `React.FC`:
+
 - Adds `children` to props implicitly (before React 18), creating confusion
 - Makes generic components awkward
 - Prevents flexible return types
@@ -280,7 +281,7 @@ function CheckoutForm() {
       await submitOrder();
       setStep(2);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
+      setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
       setIsSubmitting(false);
     }
@@ -299,20 +300,20 @@ type CheckoutState = {
 };
 
 type CheckoutAction =
-  | { type: 'SUBMIT' }
-  | { type: 'SUBMIT_SUCCESS' }
-  | { type: 'SUBMIT_ERROR'; error: string }
-  | { type: 'SET_FORM_VALID'; isValid: boolean };
+  | { type: "SUBMIT" }
+  | { type: "SUBMIT_SUCCESS" }
+  | { type: "SUBMIT_ERROR"; error: string }
+  | { type: "SET_FORM_VALID"; isValid: boolean };
 
 const checkoutReducer = (state: CheckoutState, action: CheckoutAction): CheckoutState => {
   switch (action.type) {
-    case 'SUBMIT':
+    case "SUBMIT":
       return { ...state, isSubmitting: true, error: undefined };
-    case 'SUBMIT_SUCCESS':
+    case "SUBMIT_SUCCESS":
       return { ...state, isSubmitting: false, step: 2 };
-    case 'SUBMIT_ERROR':
+    case "SUBMIT_ERROR":
       return { ...state, isSubmitting: false, error: action.error };
-    case 'SET_FORM_VALID':
+    case "SET_FORM_VALID":
       return { ...state, isFormValid: action.isValid };
     default:
       return state;
@@ -333,7 +334,7 @@ function CheckoutForm() {
 
 ```tsx
 const [isModalOpen, setIsModalOpen] = useState(false);
-const [searchQuery, setSearchQuery] = useState('');
+const [searchQuery, setSearchQuery] = useState("");
 const [selectedId, setSelectedId] = useState<string | undefined>(undefined);
 ```
 
@@ -390,7 +391,7 @@ When a prop passes through more than 1-2 intermediate components that don't use 
 
 ```tsx
 function App() {
-  const [theme, setTheme] = useState('dark');
+  const [theme, setTheme] = useState("dark");
   return <Layout theme={theme} setTheme={setTheme} />;
 }
 
@@ -400,7 +401,7 @@ function Layout({ theme, setTheme }: LayoutProps) {
 }
 
 function ThemeToggle({ theme, setTheme }: ThemeToggleProps) {
-  return <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>Toggle</button>;
+  return <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>Toggle</button>;
 }
 ```
 
@@ -408,13 +409,13 @@ function ThemeToggle({ theme, setTheme }: ThemeToggleProps) {
 
 ```tsx
 const useThemeStore = create<ThemeState>((set) => ({
-  theme: 'dark',
+  theme: "dark",
   setTheme: (theme) => set({ theme }),
 }));
 
 function ThemeToggle() {
   const { theme, setTheme } = useThemeStore();
-  return <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>Toggle</button>;
+  return <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>Toggle</button>;
 }
 ```
 
@@ -428,11 +429,11 @@ When a component's state needs to reset in response to a prop change (e.g., swit
 
 ```tsx
 function ProfileEditor({ userId }: ProfileEditorProps) {
-  const [draft, setDraft] = useState('');
+  const [draft, setDraft] = useState("");
 
   // 🔴 Avoid: Resetting state in an Effect on prop change
   useEffect(() => {
-    setDraft('');
+    setDraft("");
   }, [userId]);
 
   return <textarea value={draft} onChange={(e) => setDraft(e.target.value)} />;
@@ -447,7 +448,7 @@ function ProfilePage({ userId }: ProfilePageProps) {
 }
 
 function ProfileEditor({ userId }: ProfileEditorProps) {
-  const [draft, setDraft] = useState('');
+  const [draft, setDraft] = useState("");
   // When userId changes, the key change unmounts and remounts, resetting all state
   return <textarea value={draft} onChange={(e) => setDraft(e.target.value)} />;
 }
@@ -513,7 +514,7 @@ Restricting useEffect to its intended purpose: synchronizing with external syste
 
 `useEffect` is an escape hatch for synchronizing React components with external systems: third-party widgets, browser APIs, network subscriptions, DOM measurements. It is not a general-purpose lifecycle hook.
 
-**When useEffect IS appropriate:** Subscribing to a WebSocket or event source. Synchronizing with a third-party imperative library. Measuring DOM layout. Sending analytics on mount. Any side effect that runs *because the component was displayed*.
+**When useEffect IS appropriate:** Subscribing to a WebSocket or event source. Synchronizing with a third-party imperative library. Measuring DOM layout. Sending analytics on mount. Any side effect that runs _because the component was displayed_.
 
 **When useEffect is NOT appropriate:** Deriving state from props or state (calculate during render). Caching expensive computations (use `useMemo`). Resetting state on prop change (use `key`). Fetching data (use TanStack Query). Responding to user events (use event handlers). Notifying parent of state changes (call callback in same handler).
 
@@ -586,7 +587,13 @@ function TodoList({ todos, filter }: TodoListProps) {
     setVisibleTodos(todos.filter((todo) => !todo.completed && todo.text.includes(filter)));
   }, [todos, filter]);
 
-  return <ul>{visibleTodos.map((todo) => <li key={todo.id}>{todo.text}</li>)}</ul>;
+  return (
+    <ul>
+      {visibleTodos.map((todo) => (
+        <li key={todo.id}>{todo.text}</li>
+      ))}
+    </ul>
+  );
 }
 ```
 
@@ -595,7 +602,13 @@ function TodoList({ todos, filter }: TodoListProps) {
 ```tsx
 function TodoList({ todos, filter }: TodoListProps) {
   const visibleTodos = todos.filter((todo) => !todo.completed && todo.text.includes(filter));
-  return <ul>{visibleTodos.map((todo) => <li key={todo.id}>{todo.text}</li>)}</ul>;
+  return (
+    <ul>
+      {visibleTodos.map((todo) => (
+        <li key={todo.id}>{todo.text}</li>
+      ))}
+    </ul>
+  );
 }
 ```
 
@@ -607,15 +620,21 @@ function TodoList({ todos, filter }: TodoListProps) {
     () => todos.filter((todo) => !todo.completed && todo.text.includes(filter)),
     [todos, filter],
   );
-  return <ul>{visibleTodos.map((todo) => <li key={todo.id}>{todo.text}</li>)}</ul>;
+  return (
+    <ul>
+      {visibleTodos.map((todo) => (
+        <li key={todo.id}>{todo.text}</li>
+      ))}
+    </ul>
+  );
 }
 ```
 
-| Pattern | Incorrect | Correct |
-|---------|-----------|---------|
-| Combine first/last name | `useEffect(() => setFullName(first + ' ' + last))` | `const fullName = first + ' ' + last` |
-| Filter a list | `useEffect(() => setFiltered(items.filter(...)))` | `const filtered = items.filter(...)` |
-| Expensive computation | `useEffect(() => setResult(expensive(data)))` | `const result = useMemo(() => expensive(data), [data])` |
+| Pattern                 | Incorrect                                          | Correct                                                 |
+| ----------------------- | -------------------------------------------------- | ------------------------------------------------------- |
+| Combine first/last name | `useEffect(() => setFullName(first + ' ' + last))` | `const fullName = first + ' ' + last`                   |
+| Filter a list           | `useEffect(() => setFiltered(items.filter(...)))`  | `const filtered = items.filter(...)`                    |
+| Expensive computation   | `useEffect(() => setResult(expensive(data)))`      | `const result = useMemo(() => expensive(data), [data])` |
 
 ### 3.3 Always Use TanStack Query for Server State
 
@@ -635,9 +654,21 @@ function UserProfile({ userId }: UserProfileProps) {
     let ignore = false;
     setIsLoading(true);
     fetchUser(userId)
-      .then((data) => { if (!ignore) { setUser(data); setIsLoading(false); } })
-      .catch((err) => { if (!ignore) { setError(err); setIsLoading(false); } });
-    return () => { ignore = true; };
+      .then((data) => {
+        if (!ignore) {
+          setUser(data);
+          setIsLoading(false);
+        }
+      })
+      .catch((err) => {
+        if (!ignore) {
+          setError(err);
+          setIsLoading(false);
+        }
+      });
+    return () => {
+      ignore = true;
+    };
   }, [userId]);
 
   if (isLoading) return <Spinner />;
@@ -650,8 +681,12 @@ function UserProfile({ userId }: UserProfileProps) {
 
 ```tsx
 function UserProfile({ userId }: UserProfileProps) {
-  const { data: user, isLoading, error } = useQuery({
-    queryKey: ['user', userId],
+  const {
+    data: user,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["user", userId],
     queryFn: () => fetchUser(userId),
   });
 
@@ -674,13 +709,15 @@ function useOnlineStatus() {
   const [isOnline, setIsOnline] = useState(true);
 
   useEffect(() => {
-    function updateState() { setIsOnline(navigator.onLine); }
+    function updateState() {
+      setIsOnline(navigator.onLine);
+    }
     updateState();
-    window.addEventListener('online', updateState);
-    window.addEventListener('offline', updateState);
+    window.addEventListener("online", updateState);
+    window.addEventListener("offline", updateState);
     return () => {
-      window.removeEventListener('online', updateState);
-      window.removeEventListener('offline', updateState);
+      window.removeEventListener("online", updateState);
+      window.removeEventListener("offline", updateState);
     };
   }, []);
 
@@ -692,16 +729,20 @@ function useOnlineStatus() {
 
 ```tsx
 function subscribe(callback: () => void) {
-  window.addEventListener('online', callback);
-  window.addEventListener('offline', callback);
+  window.addEventListener("online", callback);
+  window.addEventListener("offline", callback);
   return () => {
-    window.removeEventListener('online', callback);
-    window.removeEventListener('offline', callback);
+    window.removeEventListener("online", callback);
+    window.removeEventListener("offline", callback);
   };
 }
 
 function useOnlineStatus() {
-  return useSyncExternalStore(subscribe, () => navigator.onLine, () => true);
+  return useSyncExternalStore(
+    subscribe,
+    () => navigator.onLine,
+    () => true,
+  );
 }
 ```
 
@@ -729,8 +770,8 @@ Call data-fetching hooks directly in the component that needs the data. Do not h
 
 ```tsx
 function Dashboard() {
-  const { data: user } = useQuery({ queryKey: ['user', userId], queryFn: () => fetchUser(userId) });
-  const { data: notifications } = useQuery({ queryKey: ['notifications'], queryFn: fetchNotifications });
+  const { data: user } = useQuery({ queryKey: ["user", userId], queryFn: () => fetchUser(userId) });
+  const { data: notifications } = useQuery({ queryKey: ["notifications"], queryFn: fetchNotifications });
 
   return (
     <div>
@@ -754,13 +795,19 @@ function Dashboard() {
 }
 
 function UserProfile({ userId }: UserProfileProps) {
-  const { data: user } = useQuery({ queryKey: ['user', userId], queryFn: () => fetchUser(userId) });
+  const { data: user } = useQuery({ queryKey: ["user", userId], queryFn: () => fetchUser(userId) });
   return <div>{user?.name}</div>;
 }
 
 function NotificationList() {
-  const { data: notifications } = useQuery({ queryKey: ['notifications'], queryFn: fetchNotifications });
-  return <ul>{notifications?.map((n) => <li key={n.id}>{n.text}</li>)}</ul>;
+  const { data: notifications } = useQuery({ queryKey: ["notifications"], queryFn: fetchNotifications });
+  return (
+    <ul>
+      {notifications?.map((n) => (
+        <li key={n.id}>{n.text}</li>
+      ))}
+    </ul>
+  );
 }
 ```
 
@@ -790,8 +837,12 @@ Prefer explicit slot props for component composition. Compound component pattern
   }
   panels={
     <Tabs.Panels>
-      <TabPanel><Profile /></TabPanel>
-      <TabPanel><Settings /></TabPanel>
+      <TabPanel>
+        <Profile />
+      </TabPanel>
+      <TabPanel>
+        <Settings />
+      </TabPanel>
     </Tabs.Panels>
   }
 />
@@ -809,8 +860,12 @@ The parent `Tabs` component manages active tab state, but the consumer controls 
     <Tab>Settings</Tab>
   </TabList>
   <TabPanels>
-    <TabPanel><Profile /></TabPanel>
-    <TabPanel><Settings /></TabPanel>
+    <TabPanel>
+      <Profile />
+    </TabPanel>
+    <TabPanel>
+      <Settings />
+    </TabPanel>
   </TabPanels>
 </Tabs>
 ```
@@ -884,15 +939,17 @@ Use `<></>` for unkeyed fragments. Only use `<Fragment key={...}>` when keyed fr
 <>
   <h2>{title}</h2>
   <p>{description}</p>
-</>
+</>;
 
 // Keyed — use Fragment with key
-{items.map((item) => (
-  <Fragment key={item.id}>
-    <dt>{item.term}</dt>
-    <dd>{item.description}</dd>
-  </Fragment>
-))}
+{
+  items.map((item) => (
+    <Fragment key={item.id}>
+      <dt>{item.term}</dt>
+      <dd>{item.description}</dd>
+    </Fragment>
+  ));
+}
 ```
 
 ---
@@ -932,8 +989,12 @@ function useAuth() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-  async function login(credentials: Credentials) { /* ... */ }
-  function logout() { setUser(null); }
+  async function login(credentials: Credentials) {
+    /* ... */
+  }
+  function logout() {
+    setUser(null);
+  }
 
   return { user, isLoading, error, login, logout };
 }
@@ -950,6 +1011,7 @@ function useToggle(initialValue = false): [boolean, () => void] {
 **Impact: MEDIUM (premature memoization adds complexity without proven benefit)**
 
 Do not use `useMemo`, `useCallback`, or `React.memo` by default. Reach for memoization only when:
+
 1. You've measured a performance problem
 2. You're passing callbacks to a memoized child component
 
@@ -964,7 +1026,7 @@ A better strategy than memoization is often component extraction — splitting t
 ```tsx
 // ✅ Better: Extract the static part so it doesn't re-render
 function Parent() {
-  const [text, setText] = useState('');
+  const [text, setText] = useState("");
   return (
     <div>
       <StaticHeader />
@@ -992,15 +1054,24 @@ Use early returns for null checks, loading states, and error states before the m
 
 ```tsx
 function UserProfile({ userId }: UserProfileProps) {
-  const { data: user, isLoading, error } = useQuery({
-    queryKey: ['user', userId],
+  const {
+    data: user,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["user", userId],
     queryFn: () => fetchUser(userId),
   });
 
   if (!isLoading) {
     if (!error) {
       if (user) {
-        return <div><h1>{user.name}</h1><p>{user.email}</p></div>;
+        return (
+          <div>
+            <h1>{user.name}</h1>
+            <p>{user.email}</p>
+          </div>
+        );
       }
       return <EmptyState />;
     }
@@ -1014,8 +1085,12 @@ function UserProfile({ userId }: UserProfileProps) {
 
 ```tsx
 function UserProfile({ userId }: UserProfileProps) {
-  const { data: user, isLoading, error } = useQuery({
-    queryKey: ['user', userId],
+  const {
+    data: user,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["user", userId],
     queryFn: () => fetchUser(userId),
   });
 
@@ -1023,7 +1098,12 @@ function UserProfile({ userId }: UserProfileProps) {
   if (error) return <ErrorMessage error={error} />;
   if (!user) return <EmptyState />;
 
-  return <div><h1>{user.name}</h1><p>{user.email}</p></div>;
+  return (
+    <div>
+      <h1>{user.name}</h1>
+      <p>{user.email}</p>
+    </div>
+  );
 }
 ```
 
@@ -1040,8 +1120,8 @@ Never nest ternary expressions in JSX. Extract to a function with early returns 
 ```tsx
 function StatusBadge({ status }: StatusBadgeProps) {
   return (
-    <span className={status === 'active' ? 'badge-green' : status === 'pending' ? 'badge-yellow' : 'badge-red'}>
-      {status === 'active' ? 'Active' : status === 'pending' ? 'Pending' : 'Inactive'}
+    <span className={status === "active" ? "badge-green" : status === "pending" ? "badge-yellow" : "badge-red"}>
+      {status === "active" ? "Active" : status === "pending" ? "Pending" : "Inactive"}
     </span>
   );
 }
@@ -1051,15 +1131,15 @@ function StatusBadge({ status }: StatusBadgeProps) {
 
 ```tsx
 const BADGE_STYLES: Record<Status, string> = {
-  active: 'badge-green',
-  pending: 'badge-yellow',
-  inactive: 'badge-red',
+  active: "badge-green",
+  pending: "badge-yellow",
+  inactive: "badge-red",
 };
 
 const BADGE_LABELS: Record<Status, string> = {
-  active: 'Active',
-  pending: 'Pending',
-  inactive: 'Inactive',
+  active: "Active",
+  pending: "Pending",
+  inactive: "Inactive",
 };
 
 const StatusBadge = ({ status }: StatusBadgeProps) => (
@@ -1079,8 +1159,12 @@ Use `&&` for conditional rendering when something is either shown or hidden. Use
 
 ```tsx
 // && for show/hide
-{isLoggedIn && <UserMenu />}
-{items.length > 0 && <ItemList items={items} />}
+{
+  isLoggedIn && <UserMenu />;
+}
+{
+  items.length > 0 && <ItemList items={items} />;
+}
 
 // Ternary for either/or
 return isLoading ? <Spinner /> : <UserList users={users} />;
@@ -1090,19 +1174,23 @@ return isLoading ? <Spinner /> : <UserList users={users} />;
 
 ```tsx
 // ❌ Renders "0" when items.length is 0
-{items.length && <ItemList items={items} />}
+{
+  items.length && <ItemList items={items} />;
+}
 
 // ✅ Correct: boolean on the left side
-{items.length > 0 && <ItemList items={items} />}
+{
+  items.length > 0 && <ItemList items={items} />;
+}
 ```
 
-| Pattern | Use When |
-|---------|----------|
-| `condition && <Element />` | Show or hide a single element |
-| `condition ? <A /> : <B />` | Render one of two different elements |
-| Early return | Guard clauses, loading/error/empty states |
-| Extracted function | Complex conditional logic, multiple branches |
-| Object map | Static mapping from value to element/class |
+| Pattern                     | Use When                                     |
+| --------------------------- | -------------------------------------------- |
+| `condition && <Element />`  | Show or hide a single element                |
+| `condition ? <A /> : <B />` | Render one of two different elements         |
+| Early return                | Guard clauses, loading/error/empty states    |
+| Extracted function          | Complex conditional logic, multiple branches |
+| Object map                  | Static mapping from value to element/class   |
 
 ---
 

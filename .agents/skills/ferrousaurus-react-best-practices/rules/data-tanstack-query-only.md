@@ -51,8 +51,12 @@ function UserProfile({ userId }: UserProfileProps) {
 
 ```tsx
 function UserProfile({ userId }: UserProfileProps) {
-  const { data: user, isLoading, error } = useQuery({
-    queryKey: ['user', userId],
+  const {
+    data: user,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["user", userId],
     queryFn: () => fetchUser(userId),
   });
 
@@ -63,6 +67,7 @@ function UserProfile({ userId }: UserProfileProps) {
 ```
 
 TanStack Query provides:
+
 - Automatic caching and deduplication by queryKey
 - Background refetching and stale-while-revalidate
 - Built-in loading and error states
@@ -81,7 +86,7 @@ function useUpdateUser() {
   return useMutation({
     mutationFn: (data: UpdateUserDTO) => updateUser(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['users'] });
+      queryClient.invalidateQueries({ queryKey: ["users"] });
     },
   });
 }

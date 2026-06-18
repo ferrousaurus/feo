@@ -50,7 +50,7 @@ export default function UserProfile({ userId }: UserProfileProps) {
 ```
 
 ```tsx
-'use client';
+"use client";
 
 // Only this interactive leaf is a client component
 export default function UserActions({ userId }: UserActionsProps) {

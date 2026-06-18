@@ -15,7 +15,7 @@ Use intersection (`&`) to compose types from existing ones. This is the TypeScri
 
 ```typescript
 interface Admin extends User {
-  role: 'admin';
+  role: "admin";
   permissions: string[];
 }
 ```
@@ -23,17 +23,18 @@ interface Admin extends User {
 **Correct (intersection composition):**
 
 ```typescript
-type Admin = User & { role: 'admin'; permissions: string[] };
+type Admin = User & { role: "admin"; permissions: string[] };
 ```
 
 **Correct (composing with utility types):**
 
 ```typescript
-type AdminWithPermissions = User & { role: 'admin'; permissions: string[] };
-type AdminPreview = Pick<Admin, 'id' | 'name' | 'role'>;
+type AdminWithPermissions = User & { role: "admin"; permissions: string[] };
+type AdminPreview = Pick<Admin, "id" | "name" | "role">;
 ```
 
 Intersection is more flexible than `extends`:
+
 - Works with any type (not just object shapes)
 - Can compose unions
 - Can be used inline without a separate declaration
@@ -41,8 +42,8 @@ Intersection is more flexible than `extends`:
 
 ```typescript
 // Composing with unions
-type ActiveAdmin = Admin & { status: 'active' };
+type ActiveAdmin = Admin & { status: "active" };
 
 // Composing with Omit
-type AdminWithoutRole = Omit<Admin, 'role'> & { role: 'superadmin' };
+type AdminWithoutRole = Omit<Admin, "role"> & { role: "superadmin" };
 ```

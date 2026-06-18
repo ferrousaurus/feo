@@ -27,8 +27,7 @@ export const validateEmail = (email: string) => ...;
 // formatName.ts
 export type FormattedName = { full: string; display: string };
 
-export const formatName = (user: User): FormattedName =>
-  ({ full: `${user.first} ${user.last}`, display: user.first });
+export const formatName = (user: User): FormattedName => ({ full: `${user.first} ${user.last}`, display: user.first });
 
 export default formatName;
 ```

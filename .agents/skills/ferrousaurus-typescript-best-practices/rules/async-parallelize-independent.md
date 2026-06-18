@@ -26,11 +26,7 @@ async function loadData(userId: string) {
 
 ```typescript
 async function loadData(userId: string) {
-  const [user, config, permissions] = await Promise.all([
-    fetchUser(userId),
-    fetchConfig(),
-    fetchPermissions(userId),
-  ]);
+  const [user, config, permissions] = await Promise.all([fetchUser(userId), fetchConfig(), fetchPermissions(userId)]);
   return { user, config, permissions };
 }
 ```

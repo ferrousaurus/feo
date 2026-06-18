@@ -1,5 +1,7 @@
-import type { FeoSource } from "#/data/feoConfig";
 import { deepMerge } from "@std/collections";
+
+import type { FeoSource } from "#/data/feoConfig";
+
 import readConfigFile from "./config/readConfigFile";
 
 export type GetMergedConfigProps = {

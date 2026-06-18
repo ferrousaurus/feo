@@ -24,7 +24,7 @@ class UserRepository {
 
 const repo = new UserRepository(db);
 const find = repo.findById;
-find('123'); // TypeError: cannot read properties of undefined
+find("123"); // TypeError: cannot read properties of undefined
 ```
 
 **Correct (closure — no `this`, no binding issues):**
@@ -36,7 +36,7 @@ const createUserRepository = (db: Database) => ({
 
 const repo = createUserRepository(db);
 const find = repo.findById;
-find('123'); // works correctly
+find("123"); // works correctly
 ```
 
 Closures also make the pure/side-effect distinction clear. Pure factory functions return objects of pure functions. Side-effecting factory functions (like one that connects to a database) use `function` declarations:

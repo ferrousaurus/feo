@@ -16,18 +16,12 @@ Always include trailing commas in multiline structures: arrays, objects, functio
 ```typescript
 const user = {
   name: `Alice`,
-  email: `alice@example.com`
+  email: `alice@example.com`,
 };
 
-const items = [
-  `first`,
-  `second`
-];
+const items = [`first`, `second`];
 
-const add = (
-  a: number,
-  b: number
-) => a + b;
+const add = (a: number, b: number) => a + b;
 ```
 
 **Correct (trailing commas everywhere):**
@@ -38,18 +32,13 @@ const user = {
   email: `alice@example.com`,
 };
 
-const items = [
-  `first`,
-  `second`,
-];
+const items = [`first`, `second`];
 
-const add = (
-  a: number,
-  b: number,
-) => a + b;
+const add = (a: number, b: number) => a + b;
 ```
 
 This applies to:
+
 - Array literals
 - Object literals
 - Function parameter lists

@@ -1,12 +1,14 @@
+import path from "node:path";
+
+import { ScrollBoxRenderable } from "@opentui/core";
+import { queryOptions, useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { useRef } from "react";
+
 import Keybinds from "#/components/keybinds/Keybinds";
 import configQueryOptions from "#/data/configQueryOptions";
 import filetypes, { supportedExtensionSchema } from "#/lib/config/filetypes";
 import getMergedConfig from "#/lib/getMergedConfig";
 import syntaxStyle from "#/lib/syntaxStyle";
-import { ScrollBoxRenderable } from "@opentui/core";
-import { queryOptions, useQuery, useSuspenseQuery } from "@tanstack/react-query";
-import path from "node:path";
-import { useRef } from "react";
 
 export type PreviewPanelProps = {
   application?: string;
@@ -79,9 +81,19 @@ export default function PreviewPanel({
         <Keybinds
           configPath={configPath}
           onCancel={onCancelWrite}
-          onScrollUp={() => { ref.current?.scrollBy(-1); }}
-          onScrollDown={() => { ref.current?.scrollBy(1); }}
-          onWrite={target !== undefined && target !== "" ? () => { onWrite?.({ path: target, contents: stringify(data) }); } : undefined}
+          onScrollUp={() => {
+            ref.current?.scrollBy(-1);
+          }}
+          onScrollDown={() => {
+            ref.current?.scrollBy(1);
+          }}
+          onWrite={
+            target !== undefined && target !== ""
+              ? () => {
+                  onWrite?.({ path: target, contents: stringify(data) });
+                }
+              : undefined
+          }
         />
       )}
     </>

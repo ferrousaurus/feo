@@ -34,6 +34,7 @@ const updated = { ...user, name: `New` };
 ```
 
 Object spread:
+
 - Always returns a new object (immutable)
 - Is more readable and concise
 - Has clearer TypeScript inference

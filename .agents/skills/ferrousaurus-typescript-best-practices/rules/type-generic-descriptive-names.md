@@ -16,18 +16,15 @@ Generic type parameters should use descriptive names prefixed with `T`: `TInput`
 ```typescript
 const mapItems = <A, B>(items: A[], fn: (item: A) => B) => items.map(fn);
 
-const first = <T,>(items: T[]) => items[0];
+const first = <T>(items: T[]) => items[0];
 ```
 
 **Correct (descriptive generic names):**
 
 ```typescript
-const mapItems = <TInput, TOutput>(
-  items: TInput[],
-  fn: (item: TInput) => TOutput,
-) => items.map(fn);
+const mapItems = <TInput, TOutput>(items: TInput[], fn: (item: TInput) => TOutput) => items.map(fn);
 
-const first = <TItem,>(items: TItem[]) => items[0];
+const first = <TItem>(items: TItem[]) => items[0];
 ```
 
 Descriptive names make it immediately clear what role each generic plays in the function's contract, especially in functions with multiple type parameters.

@@ -14,8 +14,7 @@ Organize files with type definitions at the top, followed by function declaratio
 **Incorrect (functions before types they depend on):**
 
 ```typescript
-export const formatName = (user: User): FormattedName =>
-  ({ full: `${user.first} ${user.last}`, display: user.first });
+export const formatName = (user: User): FormattedName => ({ full: `${user.first} ${user.last}`, display: user.first });
 
 export type FormattedName = { full: string; display: string };
 export type User = { first: string; last: string };
@@ -27,8 +26,7 @@ export type User = { first: string; last: string };
 export type User = { first: string; last: string };
 export type FormattedName = { full: string; display: string };
 
-export const formatName = (user: User): FormattedName =>
-  ({ full: `${user.first} ${user.last}`, display: user.first });
+export const formatName = (user: User): FormattedName => ({ full: `${user.first} ${user.last}`, display: user.first });
 
 export default formatName;
 ```

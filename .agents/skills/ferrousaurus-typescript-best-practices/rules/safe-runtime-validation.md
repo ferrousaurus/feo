@@ -26,7 +26,7 @@ const data = JSON.parse(rawString) as ApiResult;
 **Correct (Zod schema validation):**
 
 ```typescript
-import { z } from 'zod';
+import { z } from "zod";
 
 const UserSchema = z.object({
   name: z.string(),
@@ -42,7 +42,7 @@ const user = UserSchema.parse(response.data);
 **Correct (Valibot validation):**
 
 ```typescript
-import * as v from 'valibot';
+import * as v from "valibot";
 
 const UserSchema = v.object({
   name: v.string(),
@@ -56,6 +56,7 @@ const user = v.parse(UserSchema, response.data);
 ```
 
 Key boundaries that need validation:
+
 - API responses
 - Form submissions
 - URL parameters and search params

@@ -28,10 +28,11 @@ if (user.isActive) {
 const TAX_RATE = 0.0875;
 
 // Fall back to cached data when API is rate-limited (happens every ~1000 req/min)
-const data = cached ?? await fetchFreshData();
+const data = cached ?? (await fetchFreshData());
 ```
 
 Good comments explain:
+
 - Why a seemingly wrong approach is correct
 - Business rules that aren't obvious from variable names
 - Edge cases and non-intuitive behavior

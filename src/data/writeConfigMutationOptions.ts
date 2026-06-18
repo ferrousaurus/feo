@@ -1,9 +1,11 @@
+import npath from "node:path";
+
+import { mutationOptions } from "@tanstack/react-query";
+
 import type { FeoConfig } from "#/data/feoConfig";
 import filetypes, { supportedExtensionSchema } from "#/lib/config/filetypes";
 import resolveAbsolutePath from "#/lib/fs/resolveAbsolutePath";
 import writeFile from "#/lib/io/writeFile";
-import { mutationOptions } from "@tanstack/react-query";
-import npath from "node:path";
 
 const configMutationOptions = (configPath: string) => {
   const filetype = filetypes[supportedExtensionSchema.parse(npath.parse(configPath).ext)];

@@ -43,8 +43,9 @@ const processOrder = (order: Order) => {
 For multi-line expressions, start the expression on the same line as `=>`:
 
 ```typescript
-const result = (items: Item[]) => items
-  .filter((item: Item) => item.active)
-  .map((item: Item) => item.name)
-  .toSorted();
+const result = (items: Item[]) =>
+  items
+    .filter((item: Item) => item.active)
+    .map((item: Item) => item.name)
+    .toSorted();
 ```

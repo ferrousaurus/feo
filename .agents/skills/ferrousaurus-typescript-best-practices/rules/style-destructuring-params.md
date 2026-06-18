@@ -14,8 +14,7 @@ When a function receives an object, destructure its properties directly in the p
 **Incorrect (accessing properties via dot notation):**
 
 ```typescript
-const formatName = (user: User) =>
-  `${user.first} ${user.last}`;
+const formatName = (user: User) => `${user.first} ${user.last}`;
 
 function saveToDatabase(params: SaveParams) {
   await db.insert({ name: params.name, email: params.email });
@@ -25,8 +24,7 @@ function saveToDatabase(params: SaveParams) {
 **Correct (destructuring in parameters):**
 
 ```typescript
-const formatName = ({ first, last }: User) =>
-  `${first} ${last}`;
+const formatName = ({ first, last }: User) => `${first} ${last}`;
 
 function saveToDatabase({ name, email }: SaveParams) {
   await db.insert({ name, email });
@@ -34,6 +32,7 @@ function saveToDatabase({ name, email }: SaveParams) {
 ```
 
 Destructuring in parameters:
+
 - Makes required properties visible in the signature
 - Eliminates the `user.` prefix throughout the function body
 - Works naturally with the option object pattern (see `function-option-object-pattern`)
