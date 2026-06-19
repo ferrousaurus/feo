@@ -1,62 +1,52 @@
 import keys from "#/lib/object/keys";
-import { parseIni } from "#/lib/serialization/parseIni";
-import { parseJson } from "#/lib/serialization/parseJson";
-import { parseMd } from "#/lib/serialization/parseMd";
-import { parseToml } from "#/lib/serialization/parseToml";
-import { parseYaml } from "#/lib/serialization/parseYaml";
-import { stringifyIni } from "#/lib/serialization/stringifyIni";
-import { stringifyJson } from "#/lib/serialization/stringifyJson";
-import { stringifyMd } from "#/lib/serialization/stringifyMd";
-import { stringifyToml } from "#/lib/serialization/stringifyToml";
-import { stringifyYaml } from "#/lib/serialization/stringifyYaml";
+import json from "#/lib/serialization/json";
+import md from "#/lib/serialization/md";
+import toml from "#/lib/serialization/toml";
+import yaml from "#/lib/serialization/yaml";
 import { z } from "zod/mini";
+import type { Serializable } from "../serialization/util";
 
 export type Filetype = {
   filetype: string;
-  parse: (str: string) => Record<string, unknown>;
-  stringify: (obj: Record<string, unknown>) => string;
+  parse: (str: string) => Serializable;
+  stringify: (obj: Serializable) => string;
 };
 
 const filetypes = {
-  ".ini": {
-    filetype: "ini",
-    parse: parseIni,
-    stringify: stringifyIni,
-  } satisfies Filetype,
   ".jsonc": {
     filetype: "json",
-    parse: parseJson,
-    stringify: stringifyJson,
+    parse: json.parse,
+    stringify: json.stringify,
   } satisfies Filetype,
   ".json": {
     filetype: "json",
-    parse: parseJson,
-    stringify: stringifyJson,
+    parse: json.parse,
+    stringify: json.stringify,
   } satisfies Filetype,
   ".yaml": {
     filetype: "yaml",
-    parse: parseYaml,
-    stringify: stringifyYaml,
+    parse: yaml.parse,
+    stringify: yaml.stringify,
   } satisfies Filetype,
   ".yml": {
     filetype: "yaml",
-    parse: parseYaml,
-    stringify: stringifyYaml,
+    parse: yaml.parse,
+    stringify: yaml.stringify,
   } satisfies Filetype,
   ".toml": {
     filetype: "toml",
-    parse: parseToml,
-    stringify: stringifyToml,
+    parse: toml.parse,
+    stringify: toml.stringify,
   } satisfies Filetype,
   ".md": {
     filetype: "md",
-    parse: parseMd,
-    stringify: stringifyMd,
+    parse: md.parse,
+    stringify: md.stringify,
   } satisfies Filetype,
   ".mdx": {
     filetype: "md",
-    parse: parseMd,
-    stringify: stringifyMd,
+    parse: md.parse,
+    stringify: md.stringify,
   } satisfies Filetype,
 } as const;
 

@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import { $ZodError } from "zod/v4/core";
-import { parseJson } from "./parseJson";
+import json from "./json";
 
 const successCases = [
   { input: "{}", expected: {} },
@@ -46,23 +46,30 @@ const unparsableCases = [
   { input: "undefined" },
 ] as const;
 
-describe("parseJson", () => {
+const stringifyCases = [
+  { input: {}, expected: "{}" },
+  { input: { a: 1 }, expected: '{\n  "a": 1\n}' },
+  { input: { a: 1, b: "two" }, expected: '{\n  "a": 1,\n  "b": "two"\n}' },
+  { input: { a: { b: [1, 2] } }, expected: '{\n  "a": {\n    "b": [\n      1,\n      2\n    ]\n  }\n}' },
+] as const;
+
+describe("parse", () => {
   for (const { input, expected } of successCases) {
-    test(`parseJson('${input}') returns the expected object`, () => {
-      const parsed = parseJson(input);
+    test(`parse('${input}') returns the expected object`, () => {
+      const parsed = json.parse(input);
       expect(parsed).toEqual(expected);
     });
   }
 
   for (const { input } of nonRecordCases) {
-    test(`parseJson('${input}') throws a $ZodError (not a record)`, () => {
-      expect(() => parseJson(input)).toThrow($ZodError);
+    test(`parse('${input}') throws a $ZodError (not a record)`, () => {
+      expect(() => json.parse(input)).toThrow($ZodError);
     });
   }
 
   for (const { input } of unparsableCases) {
-    test(`parseJson('${input}') throws a SyntaxError`, () => {
-      expect(() => parseJson(input)).toThrow(SyntaxError);
+    test(`parse('${input}') throws a SyntaxError`, () => {
+      expect(() => json.parse(input)).toThrow(SyntaxError);
     });
   }
 });

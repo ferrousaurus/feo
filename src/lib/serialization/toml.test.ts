@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { parseToml } from "./parseToml";
+import toml from "./toml";
 
 const successCases = [
   { input: "", expected: {} },
@@ -30,17 +30,24 @@ const unparsableCases = [
   { input: "no equals" },
 ] as const;
 
-describe("parseToml", () => {
+const stringifyCases = [
+  { input: {}, expected: "" },
+  { input: { a: 1 }, expected: "a = 1\n" },
+  { input: { a: 1, b: 2 }, expected: "a = 1\nb = 2\n" },
+  { input: { section: { key: "value" } }, expected: '\n[section]\nkey = "value"\n' },
+] as const;
+
+describe("parse", () => {
   for (const { input, expected } of successCases) {
-    test(`parseToml('${input.replace(/\n/g, "\\n")}') returns the expected object`, () => {
-      const parsed = parseToml(input);
+    test(`parse('${input.replace(/\n/g, "\\n")}') returns the expected object`, () => {
+      const parsed = toml.parse(input);
       expect(parsed).toEqual(expected);
     });
   }
 
   for (const { input } of unparsableCases) {
-    test(`parseToml('${input.replace(/\n/g, "\\n")}') throws a SyntaxError`, () => {
-      expect(() => parseToml(input)).toThrow(SyntaxError);
+    test(`parse('${input.replace(/\n/g, "\\n")}') throws a SyntaxError`, () => {
+      expect(() => toml.parse(input)).toThrow(SyntaxError);
     });
   }
 });
