@@ -9,22 +9,14 @@ const successCases = [
     input: "# Title\n\nSome paragraph.",
     expected: { content: "# Title\n\nSome paragraph." },
   },
-  { input: "---\nkey: value\n---\nbody", expected: { key: "value", content: "body" } },
+  { input: "---\nkey: value\n---\nbody", expected: { frontmatter: { key: "value" }, content: "body" } },
   {
     input: "---\ntitle: Hello\ntags:\n  - a\n  - b\n---\n# Body",
-    expected: { title: "Hello", tags: ["a", "b"], content: "# Body" },
+    expected: { frontmatter: { title: "Hello", tags: ["a", "b"] }, content: "# Body" },
   },
   {
     input: "---\nkey: value\n---\n",
-    expected: { key: "value", content: "" },
-  },
-  {
-    input: "---\ncontent: from frontmatter\n---\nthis markdown is overwritten",
-    expected: { content: "from frontmatter" },
-  },
-  {
-    input: "---\ntitle: Greeting\ncontent: frontmatter wins\n---\n# Markdown body\n\nignored",
-    expected: { title: "Greeting", content: "frontmatter wins" },
+    expected: { frontmatter: { key: "value" }, content: "" },
   },
 ] as const;
 

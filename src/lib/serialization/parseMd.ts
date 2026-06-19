@@ -10,5 +10,5 @@ export const parseMd = (str: string) => {
   if (frontmatter === undefined) {
     return { content: content ?? "" };
   }
-  return { content: content ?? "", ...serializableValidator.parse(YAML.parse(frontmatter)) };
+  return { content: content ?? "", frontmatter: serializableValidator.parse(YAML.parse(frontmatter)) };
 };
