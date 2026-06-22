@@ -58,7 +58,8 @@ export default function PreviewPanel({
     return <text>{target} is not defined</text>;
   }
 
-  const { ext } = path.parse(config.applications[application]?.targets[target]?.path ?? "");
+  const targetPath = config.applications[application]?.targets[target]?.path ?? "";
+  const { ext } = path.parse(targetPath);
 
   const validatedExt = supportedExtensionSchema.safeParse(ext);
 
@@ -91,7 +92,7 @@ export default function PreviewPanel({
           onWrite={
             target !== undefined && target !== ""
               ? () => {
-                  onWrite?.({ path: target, contents: stringify(data) });
+                  onWrite?.({ path: targetPath, contents: stringify(data) });
                 }
               : undefined
           }

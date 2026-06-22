@@ -48,15 +48,15 @@ await new Command()
             .map((a) => config.applications[a])
             .filter((a) => a !== undefined);
     for (const application of applications) {
-      for (const [target, { sources: sourcePaths }] of entries(application.targets)) {
-        const { dir, ext, name } = npath.parse(target);
+      for (const [, { path: targetPath, sources: sourcePaths }] of entries(application.targets)) {
+        const { dir, ext, name } = npath.parse(targetPath);
         const validatedExt = supportedExtensionSchema.parse(ext);
         const sources = (await Promise.allSettled(sourcePaths.map(async (s) => loadSourceContent(s))))
           .filter((r) => r.status === "fulfilled")
           .map((r) => r.value);
         const resolved = sources.reduce((p, c) => deepMerge(c, p), {} as Serializable);
         const contents = filetypes[validatedExt].stringify(resolved);
-        const currentFile = await readFile(resolveAbsolutePath(target));
+        const currentFile = await readFile(resolveAbsolutePath(targetPath));
 
         if (currentFile.ok) {
           const currentFileContents = await currentFile.text();
@@ -64,7 +64,7 @@ await new Command()
           const currentFileData =
             currentFileContents === null
               ? null
-              : filetypes[supportedExtensionSchema.parse(npath.parse(target).ext)].parse(currentFileContents);
+              : filetypes[supportedExtensionSchema.parse(npath.parse(targetPath).ext)].parse(currentFileContents);
 
           if (!isDeepStrictEqual(currentFileData, resolved)) {
             await writeFile(
