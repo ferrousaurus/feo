@@ -1,28 +1,14 @@
-import { Command } from "@cliffy/command";
-
-import configOption from "#/commands/options/config";
 import feoConfigValidator from "#/data/feoConfig";
 import filetypes, { supportedExtensionSchema } from "#/lib/config/filetypes";
 import readFile from "#/lib/io/readFile";
 import entries from "#/lib/object/entries";
 import values from "#/lib/object/values";
 import type { Serializable } from "#/lib/serialization/util";
-import VERSION from "#/lib/version";
-import tui from "#/tui";
+import { Command } from "@cliffy/command";
 import { deepMerge } from "@std/collections";
 import npath from "node:path";
-import sha from "./lib/crypto/hash";
-import writeFile from "./lib/io/writeFile";
 
-await new Command()
-  .name("feo")
-  .version(VERSION)
-  .description("A configuration file manager")
-  .globalOption(configOption.flags, configOption.desc, configOption.opts)
-  .action(async (options) => {
-    await tui({ configPath: options.config });
-  })
-  .command("write", "Write configurations")
+const writeCommand = new Command()
   .option("-a, --all", "Write all targets")
   .arguments("[applications:string]")
   .action(async ({ all, ...options }, ...applicationNames) => {
@@ -43,30 +29,22 @@ await new Command()
             .map((a) => config.configs[a])
             .filter((a) => a !== undefined);
     for (const application of applications) {
-      for (const [target, { sources: sourcePaths }] of entries(application.targets)) {
+      for (const [target, { sources }] of entries(application.targets)) {
         const { dir, ext, name } = npath.parse(target);
         const validatedExt = supportedExtensionSchema.parse(ext);
-        const sources = (
-          await Promise.allSettled(
-            sourcePaths.map(async ({ path }) => {
-              const { ext: sourceExt } = npath.parse(path);
-              const validatedSourceExt = supportedExtensionSchema.parse(sourceExt);
-              const text = await readFile(path).then((r) => r.text());
-              return filetypes[validatedSourceExt].parse(text);
-            }),
-          )
-        )
-          .filter((r) => r.status === "fulfilled")
-          .map((r) => r.value);
         const resolved = sources.reduce((p, c) => deepMerge(c, p), {} as Serializable);
         const contents = filetypes[validatedExt].stringify(resolved);
         const currentFileContents = await readFile(target).then((r) => r.text());
-
+        console.log(currentFileContents);
+        console.log(contents);
+        /*
         if (currentFileContents !== null) {
           await writeFile(`${dir}/${name}.${sha(currentFileContents)}.feo-bkup${validatedExt}`, currentFileContents);
         }
         await writeFile(`${dir}/${name}${validatedExt}`, contents);
+        */
       }
     }
-  })
-  .parse();
+  });
+
+export default writeCommand;
