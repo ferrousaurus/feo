@@ -12,6 +12,7 @@ import tui from "#/tui";
 import { deepMerge } from "@std/collections";
 import npath from "node:path";
 import sha from "./lib/crypto/hash";
+import resolveAbsolutePath from "./lib/fs/resolveAbsolutePath";
 import writeFile from "./lib/io/writeFile";
 
 await new Command()
@@ -60,12 +61,15 @@ await new Command()
           .map((r) => r.value);
         const resolved = sources.reduce((p, c) => deepMerge(c, p), {} as Serializable);
         const contents = filetypes[validatedExt].stringify(resolved);
-        const currentFileContents = await readFile(target).then((r) => r.text());
+        const currentFileContents = await readFile(resolveAbsolutePath(target)).then((r) => r.text());
 
         if (currentFileContents !== null) {
-          await writeFile(`${dir}/${name}.${sha(currentFileContents)}.feo-bkup${validatedExt}`, currentFileContents);
+          await writeFile(
+            resolveAbsolutePath(`${dir}/${name}.${sha(currentFileContents)}.feo-bkup${validatedExt}`),
+            currentFileContents,
+          );
         }
-        await writeFile(`${dir}/${name}${validatedExt}`, contents);
+        await writeFile(resolveAbsolutePath(`${dir}/${name}${validatedExt}`), contents);
       }
     }
   })
