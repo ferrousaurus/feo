@@ -11,7 +11,6 @@ export type KeybindsProps = {
   onDown?: () => void;
   onMove?: () => void;
   onNew?: () => void;
-  onRefresh?: () => void;
   onScrollDown?: () => void;
   onScrollUp?: () => void;
   onUp?: () => void;
@@ -26,7 +25,6 @@ export default function Keybinds({
   onDown,
   onMove,
   onNew,
-  onRefresh,
   onScrollDown,
   onScrollUp,
   onUp,
@@ -41,7 +39,6 @@ export default function Keybinds({
     down: onDown,
     move: onMove,
     new: onNew,
-    refresh: onRefresh,
     scrollDown: onScrollDown,
     scrollUp: onScrollUp,
     up: onUp,

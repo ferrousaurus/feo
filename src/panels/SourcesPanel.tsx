@@ -2,13 +2,13 @@ import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
 import Keybinds from "#/components/Keybinds";
-
 import NewSourceInput from "#/components/sources/NewSourceInput";
 import Source from "#/components/sources/Source";
 import configQueryOptions from "#/data/configQueryOptions";
 import type { FeoSource } from "#/data/feoConfig";
 import moveSourceDownMutationOptions from "#/data/moveSourceDownMutationOptions";
 import moveSourceUpMutationOptions from "#/data/moveSourceUpMutationOptions";
+import { sourceId } from "#/lib/source/identity";
 
 export type SourcesPanelProps = {
   active: boolean;
@@ -38,7 +38,7 @@ export default function SourcesPanel({
   const [moving, setMoving] = useState<string | undefined>(undefined);
 
   const { data: config } = useSuspenseQuery(configQueryOptions(configPath));
-  const sources = config.configs[application]?.targets[target]?.sources ?? [];
+  const sources = config.applications[application]?.targets[target]?.sources ?? [];
 
   const { mutateAsync: moveSourceUpAsync } = useMutation(moveSourceUpMutationOptions(configPath));
   const { mutateAsync: moveSourceDownAsync } = useMutation(moveSourceDownMutationOptions(configPath));
@@ -47,14 +47,14 @@ export default function SourcesPanel({
     <>
       {sources.map((s) => (
         <Source
-          key={s.path}
+          key={sourceId(s)}
           configPath={configPath}
           application={application}
           target={target}
           source={s}
-          active={source?.path === s.path}
-          enableKeybinds={active && source?.path === s.path && !creating}
-          moving={moving === s.path}
+          active={source !== undefined && sourceId(source) === sourceId(s)}
+          enableKeybinds={active && source !== undefined && sourceId(source) === sourceId(s) && !creating}
+          moving={moving === sourceId(s)}
         />
       ))}
       {creating && (
@@ -79,7 +79,7 @@ export default function SourcesPanel({
             }
           }}
           onMove={() => {
-            setMoving((m) => (m === undefined ? source?.path : undefined));
+            setMoving((m) => (m === undefined ? (source !== undefined ? sourceId(source) : undefined) : undefined));
           }}
           onUp={() => {
             if (moving !== undefined) {

@@ -1,5 +1,3 @@
-import npath from "node:path";
-
 import { addDefaultParsers, createCliRenderer } from "@opentui/core";
 import { createRoot } from "@opentui/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -13,7 +11,6 @@ import resolveAbsolutePath from "#/lib/fs/resolveAbsolutePath";
 import keys from "#/lib/object/keys";
 
 import sourceContentQueryOptions from "./data/sourceContentQueryOptions";
-import filetypes, { supportedExtensionSchema } from "./lib/config/filetypes";
 import values from "./lib/object/values";
 
 export type TuiProps = { configPath: string };
@@ -58,12 +55,10 @@ const tui = async ({ configPath }: Readonly<TuiProps>) => {
 
   const queryClient = new QueryClient();
 
-  const ext = supportedExtensionSchema.parse(npath.parse(configPath).ext);
-
-  queryClient.setQueryData(configQueryOptions(configPath).queryKey, filetypes[ext].stringify(config.data));
+  queryClient.setQueryData(configQueryOptions(configPath).queryKey, config.data);
 
   await Promise.allSettled(
-    values(config.data.configs)
+    values(config.data.applications)
       .flatMap((c) => values(c.targets))
       .flatMap((t) => t.sources)
       .map((s) => {
@@ -71,8 +66,8 @@ const tui = async ({ configPath }: Readonly<TuiProps>) => {
       }),
   );
 
-  const application = keys(config.data.configs)[0];
-  const appConfig = application !== undefined ? config.data.configs[application] : undefined;
+  const application = keys(config.data.applications)[0];
+  const appConfig = application !== undefined ? config.data.applications[application] : undefined;
   const targets = appConfig !== undefined ? keys(appConfig.targets) : undefined;
   const target = targets !== undefined ? targets[0] : undefined;
   const sources = application !== undefined && target !== undefined ? appConfig?.targets[target]?.sources : undefined;

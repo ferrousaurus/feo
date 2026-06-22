@@ -16,7 +16,7 @@ const configMutationOptions = (configPath: string) => {
       await writeFile(resolveAbsolutePath(configPath), filetype.stringify(config));
     },
     onMutate: async (vars, context) => {
-      await context.client.setQueryData([{ path: configPath }], filetype.stringify(vars));
+      await context.client.setQueryData([{ path: configPath }], vars);
     },
   });
 };

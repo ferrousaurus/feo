@@ -1,7 +1,6 @@
 import npath from "node:path";
 
 import { mutationOptions } from "@tanstack/react-query";
-import { z } from "zod/mini";
 
 import feoConfigValidator from "#/data/feoConfig";
 import filetypes, { supportedExtensionSchema } from "#/lib/config/filetypes";
@@ -14,19 +13,21 @@ const deleteTargetMutationOptions = (configPath: string) => {
   return mutationOptions({
     mutationKey: ["deleteTarget", configPath],
     mutationFn: async (vars: { app: string; target: string; source: string }, context) => {
-      const queryData = z.string().parse(context.client.getQueryData([{ path: configPath }]));
-      const parsed = filetype.parse(queryData);
-      const config = feoConfigValidator.safeParse(parsed);
+      const cached = context.client.getQueryData([{ path: configPath }]);
+      if (cached === undefined) {
+        throw new Error("Configuration not loaded.");
+      }
+      const config = feoConfigValidator.safeParse(cached);
       if (!config.success) {
         throw config.error;
       }
-      delete config.data.configs[vars.app]?.targets[vars.target];
+      delete config.data.applications[vars.app]?.targets[vars.target];
       await writeFile(resolveAbsolutePath(configPath), filetype.stringify(config.data));
 
       return config.data;
     },
     onSuccess: async (data, _vars, _onMutateResult, context) => {
-      await context.client.setQueryData([{ path: configPath }], filetype.stringify(data));
+      await context.client.setQueryData([{ path: configPath }], data);
     },
   });
 };

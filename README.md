@@ -35,7 +35,7 @@ The TUI has four panels, switchable by their shortcut key:
 | --- | ------------ | ----------------------------------------------------------------------- |
 | `a` | Applications | List of apps. `n` to create, `d` to delete.                             |
 | `t` | Targets      | Targets for the selected app. `n` to create, `d` to delete.             |
-| `s` | Sources      | Source files for the selected target. `m` to reorder, `r` to refresh.   |
+| `s` | Sources      | Source files for the selected target. `m` to reorder.                   |
 | `p` | Preview      | Merged config for the selected target. `w` to write to the target path. |
 
 Navigate within lists with `j`/`k` or `↑`/`↓`. Scroll content with `[`/`]`. Press `q` to quit.
@@ -56,7 +56,7 @@ Default config location: `~/.config/feo/config.jsonc`
       // customizable colors
     },
   },
-  "configs": {
+  "applications": {
     "starship": {
       "targets": {
         "~/.config/starship.toml": {
@@ -91,7 +91,6 @@ Paths support `~`, `${VAR}`, and `${VAR:-fallback}` expansion. Remote sources vi
 | delete      | `d`                      |
 | move        | `m`                      |
 | new         | `n`                      |
-| refresh     | `r`                      |
 | scroll up   | `[`                      |
 | scroll down | `]`                      |
 | write       | `w`                      |

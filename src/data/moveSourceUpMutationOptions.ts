@@ -2,16 +2,16 @@ import npath from "node:path";
 
 import { deepMerge } from "@std/collections";
 import { mutationOptions } from "@tanstack/react-query";
-import { z } from "zod/mini";
 
 import type { FeoConfig } from "#/data/feoConfig";
 import feoConfigValidator from "#/data/feoConfig";
 import filetypes, { supportedExtensionSchema } from "#/lib/config/filetypes";
 import resolveAbsolutePath from "#/lib/fs/resolveAbsolutePath";
 import writeFile from "#/lib/io/writeFile";
+import { sourceId } from "#/lib/source/identity";
 
 function moveSourceUp(config: FeoConfig, vars: { app: string; target: string; source: string }) {
-  const app = config.configs[vars.app];
+  const app = config.applications[vars.app];
   if (app === undefined) {
     throw new Error("The specified App does not exist");
   }
@@ -20,10 +20,10 @@ function moveSourceUp(config: FeoConfig, vars: { app: string; target: string; so
     throw new Error("The App does not include the specified Target");
   }
   const sources = target.sources;
-  if (!sources.some((s) => s.path === vars.source)) {
+  if (!sources.some((s) => sourceId(s) === vars.source)) {
     throw new Error("The App's Target's Sources does not include the specified source");
   }
-  const index = sources.findIndex((s) => s.path === vars.source);
+  const index = sources.findIndex((s) => sourceId(s) === vars.source);
   if (index === 0) {
     throw new Error("The specified Source is already the App's Target's first source.");
   }
@@ -36,9 +36,11 @@ const moveSourceUpMutationOptions = (configPath: string) => {
   return mutationOptions({
     mutationKey: ["moveSourceUp", configPath],
     mutationFn: async (vars: { app: string; target: string; source: string }, context) => {
-      const queryData = z.string().parse(context.client.getQueryData([{ path: configPath }]));
-      const parsed = filetype.parse(queryData);
-      const config = feoConfigValidator.safeParse(parsed);
+      const cached = context.client.getQueryData([{ path: configPath }]);
+      if (cached === undefined) {
+        throw new Error("Configuration not loaded.");
+      }
+      const config = feoConfigValidator.safeParse(cached);
       if (!config.success) {
         throw config.error;
       }
@@ -48,7 +50,7 @@ const moveSourceUpMutationOptions = (configPath: string) => {
           deepMerge(
             config.data,
             {
-              configs: {
+              applications: {
                 [vars.app]: {
                   targets: {
                     [vars.target]: {
@@ -71,7 +73,7 @@ const moveSourceUpMutationOptions = (configPath: string) => {
       }
     },
     onSuccess: async (data, _vars, _onMutateResult, context) => {
-      await context.client.setQueryData([{ path: configPath }], filetype.stringify(data));
+      await context.client.setQueryData([{ path: configPath }], data);
     },
   });
 };

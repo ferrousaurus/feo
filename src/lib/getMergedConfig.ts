@@ -1,15 +1,14 @@
 import { deepMerge } from "@std/collections";
 
 import type { FeoSource } from "#/data/feoConfig";
-
-import readConfigFile from "./config/readConfigFile";
+import loadSourceContent from "#/lib/source/loadSourceContent";
 
 export type GetMergedConfigProps = {
   sources: FeoSource[];
 };
 
 export default async function getMergedConfig({ sources }: Readonly<GetMergedConfigProps>) {
-  const objs = await Promise.allSettled(sources.map(async (s) => await readConfigFile(s.path)));
+  const objs = await Promise.allSettled(sources.map(async (s) => loadSourceContent(s)));
 
   const errors = objs.filter((o) => o.status === "rejected").map((o) => o.reason);
 

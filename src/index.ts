@@ -1,4 +1,8 @@
+import npath from "node:path";
+import { isDeepStrictEqual } from "node:util";
+
 import { Command } from "@cliffy/command";
+import { deepMerge } from "@std/collections";
 
 import configOption from "#/commands/options/config";
 import feoConfigValidator from "#/data/feoConfig";
@@ -7,11 +11,10 @@ import readFile from "#/lib/io/readFile";
 import entries from "#/lib/object/entries";
 import values from "#/lib/object/values";
 import type { Serializable } from "#/lib/serialization/util";
+import loadSourceContent from "#/lib/source/loadSourceContent";
 import VERSION from "#/lib/version";
 import tui from "#/tui";
-import { deepMerge } from "@std/collections";
-import npath from "node:path";
-import { isDeepStrictEqual } from "node:util";
+
 import sha from "./lib/crypto/hash";
 import resolveAbsolutePath from "./lib/fs/resolveAbsolutePath";
 import writeFile from "./lib/io/writeFile";
@@ -39,25 +42,16 @@ await new Command()
     const config = feoConfigValidator.parse(data);
     const applications =
       all === true
-        ? values(config.configs)
+        ? values(config.applications)
         : applicationNames
             .filter((an) => an !== undefined)
-            .map((a) => config.configs[a])
+            .map((a) => config.applications[a])
             .filter((a) => a !== undefined);
     for (const application of applications) {
       for (const [target, { sources: sourcePaths }] of entries(application.targets)) {
         const { dir, ext, name } = npath.parse(target);
         const validatedExt = supportedExtensionSchema.parse(ext);
-        const sources = (
-          await Promise.allSettled(
-            sourcePaths.map(async ({ path }) => {
-              const { ext: sourceExt } = npath.parse(path);
-              const validatedSourceExt = supportedExtensionSchema.parse(sourceExt);
-              const text = await readFile(path).then((r) => r.text());
-              return filetypes[validatedSourceExt].parse(text);
-            }),
-          )
-        )
+        const sources = (await Promise.allSettled(sourcePaths.map(async (s) => loadSourceContent(s))))
           .filter((r) => r.status === "fulfilled")
           .map((r) => r.value);
         const resolved = sources.reduce((p, c) => deepMerge(c, p), {} as Serializable);

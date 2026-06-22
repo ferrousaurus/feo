@@ -29,7 +29,7 @@ export default function ApplicationsPanel({
   onDisableCreate,
 }: Readonly<ApplicationsPanelProps>) {
   const { data: config } = useSuspenseQuery(configQueryOptions(configPath));
-  const applications = keys(config.configs);
+  const applications = keys(config.applications);
 
   const handleNext = () => {
     onNext?.();

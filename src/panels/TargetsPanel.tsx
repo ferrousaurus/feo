@@ -31,7 +31,7 @@ export default function TargetsPanel({
   onDisableCreate,
 }: Readonly<TargetFilesProps>) {
   const { data: config } = useSuspenseQuery(configQueryOptions(configPath));
-  const targetsData = config.configs[application]?.targets;
+  const targetsData = config.applications[application]?.targets;
   const targets = targetsData === undefined ? [] : keys(targetsData);
 
   return (

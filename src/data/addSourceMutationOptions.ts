@@ -2,8 +2,8 @@ import npath from "node:path";
 
 import { deepMerge } from "@std/collections";
 import { mutationOptions } from "@tanstack/react-query";
-import { z } from "zod/mini";
 
+import type { FeoSource } from "#/data/feoConfig";
 import feoConfigValidator from "#/data/feoConfig";
 import filetypes, { supportedExtensionSchema } from "#/lib/config/filetypes";
 import resolveAbsolutePath from "#/lib/fs/resolveAbsolutePath";
@@ -15,18 +15,27 @@ const addSourceMutationOptions = (configPath: string) => {
   return mutationOptions({
     mutationKey: ["addSource", configPath],
     mutationFn: async (vars: { application: string; target: string; source: string }, context) => {
-      const queryData = z.string().parse(context.client.getQueryData([{ path: configPath }]));
-      const data = filetype.parse(queryData);
-      const config = feoConfigValidator.safeParse(data);
+      const cached = context.client.getQueryData([{ path: configPath }]);
+      if (cached === undefined) {
+        throw new Error("Configuration not loaded.");
+      }
+      const config = feoConfigValidator.safeParse(cached);
       if (!config.success) {
         throw config.error;
       }
+      let source: FeoSource;
+      try {
+        const { protocol } = new URL(vars.source);
+        source = protocol === "http:" || protocol === "https:" ? { url: vars.source } : { path: vars.source };
+      } catch {
+        source = { path: vars.source };
+      }
       const newConfig = feoConfigValidator.safeParse(
         deepMerge(config.data, {
-          configs: {
+          applications: {
             [vars.application]: {
               targets: {
-                [vars.target]: { sources: [vars.source] },
+                [vars.target]: { sources: [source] },
               },
             },
           },
@@ -39,7 +48,7 @@ const addSourceMutationOptions = (configPath: string) => {
       return newConfig.data;
     },
     onSuccess: async (data, _vars, _onMutateResult, context) => {
-      await context.client.setQueryData([{ path: configPath }], filetype.stringify(data));
+      await context.client.setQueryData([{ path: configPath }], data);
     },
   });
 };

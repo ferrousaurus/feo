@@ -2,7 +2,6 @@ import npath from "node:path";
 
 import { deepMerge } from "@std/collections";
 import { mutationOptions } from "@tanstack/react-query";
-import { z } from "zod/mini";
 
 import feoConfigValidator from "#/data/feoConfig";
 import filetypes, { supportedExtensionSchema } from "#/lib/config/filetypes";
@@ -16,18 +15,20 @@ const addApplicationMutationOptions = (configPath: string) => {
   return mutationOptions({
     mutationKey: ["addApplication", configPath],
     mutationFn: async (vars: { name: string }, context) => {
-      const queryData = z.string().parse(context.client.getQueryData([{ path: configPath }]));
-      const data = filetype.parse(queryData);
-      const config = feoConfigValidator.safeParse(data);
+      const cached = context.client.getQueryData([{ path: configPath }]);
+      if (cached === undefined) {
+        throw new Error("Configuration not loaded.");
+      }
+      const config = feoConfigValidator.safeParse(cached);
       if (!config.success) {
         throw config.error;
       }
-      if (keys(config.data.configs).includes(vars.name)) {
+      if (keys(config.data.applications).includes(vars.name)) {
         throw new Error("The specified application already exists.");
       }
       const newConfig = feoConfigValidator.safeParse(
         deepMerge(config.data, {
-          configs: {
+          applications: {
             [vars.name]: {
               targets: {},
             },
@@ -41,7 +42,7 @@ const addApplicationMutationOptions = (configPath: string) => {
       return newConfig.data;
     },
     onSuccess: async (data, _vars, _onMutateResult, context) => {
-      await context.client.setQueryData([{ path: configPath }], filetype.stringify(data));
+      await context.client.setQueryData([{ path: configPath }], data);
     },
   });
 };

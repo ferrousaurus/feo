@@ -7,19 +7,18 @@ import { Suspense, useReducer, useState } from "react";
 import configQueryOptions from "#/data/configQueryOptions";
 import type { FeoSource } from "#/data/feoConfig";
 import feoConfigValidator from "#/data/feoConfig";
-import filetypes, { supportedExtensionSchema } from "#/lib/config/filetypes";
 import sha from "#/lib/crypto/hash";
 import resolveAbsolutePath from "#/lib/fs/resolveAbsolutePath";
 import readFile from "#/lib/io/readFile";
 import writeFile from "#/lib/io/writeFile";
 import keys from "#/lib/object/keys";
+import { sourceId } from "#/lib/source/identity";
 import ApplicationsPanel from "#/panels/ApplicationsPanel";
 import Legend from "#/panels/LegendPanel";
 import PreviewPanel from "#/panels/PreviewPanel";
 import SourcesPanel from "#/panels/SourcesPanel";
 import TargetsPanel from "#/panels/TargetsPanel";
 
-import { deepMerge } from "@std/collections";
 import Panel from "./Panel";
 
 export const panels = ["apps", "targets", "sources", "preview"] as const;
@@ -84,9 +83,9 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
   const [{ panel, application, target, source }, dispatch] = useReducer(
     (p: ShellState, c: Partial<ShellState> | ((state: ShellState) => Partial<ShellState>)) => {
       if (typeof c === "function") {
-        return deepMerge(p, c(p));
+        return { ...p, ...c(p) };
       }
-      return deepMerge(p, c);
+      return { ...p, ...c };
     },
     {
       panel: "apps",
@@ -125,18 +124,16 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
   };
 
   const handleNextApplication = () => {
-    const text = queryClient.getQueryData(configQueryOptions(configPath).queryKey);
-    if (text === undefined) {
+    const data = queryClient.getQueryData(configQueryOptions(configPath).queryKey);
+    if (data === undefined) {
       return;
     }
-    const ext = supportedExtensionSchema.parse(npath.parse(configPath).ext);
-    const data = filetypes[ext].parse(text);
     const config = feoConfigValidator.parse(data);
-    const apps = keys(config.configs);
+    const apps = keys(config.applications);
     dispatch((s) => {
       if (s.application === undefined) {
         const firstApp = apps[0];
-        const targets = firstApp === undefined ? undefined : config.configs[firstApp]?.targets;
+        const targets = firstApp === undefined ? undefined : config.applications[firstApp]?.targets;
         const firstTarget = targets === undefined ? undefined : keys(targets)[0];
         return {
           application: firstApp,
@@ -152,7 +149,7 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
       if (next === undefined) {
         return { application: s.application };
       }
-      const targets = config.configs[next]?.targets;
+      const targets = config.applications[next]?.targets;
       if (targets === undefined) {
         return { application: next, target: undefined, source: undefined };
       }
@@ -166,18 +163,16 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
   };
 
   const handlePreviousApplication = () => {
-    const text = queryClient.getQueryData(configQueryOptions(configPath).queryKey);
-    if (text === undefined) {
+    const data = queryClient.getQueryData(configQueryOptions(configPath).queryKey);
+    if (data === undefined) {
       return;
     }
-    const ext = supportedExtensionSchema.parse(npath.parse(configPath).ext);
-    const data = filetypes[ext].parse(text);
     const config = feoConfigValidator.parse(data);
-    const apps = keys(config.configs);
+    const apps = keys(config.applications);
     dispatch((s) => {
       if (s.application === undefined) {
         const firstApp = apps[0];
-        const targets = firstApp === undefined ? undefined : config.configs[firstApp]?.targets;
+        const targets = firstApp === undefined ? undefined : config.applications[firstApp]?.targets;
         const firstTarget = targets === undefined ? undefined : keys(targets)[0];
         return {
           application: firstApp,
@@ -193,7 +188,7 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
       if (prev === undefined) {
         return { application: undefined, target: undefined, source: undefined };
       }
-      const targets = config.configs[prev]?.targets;
+      const targets = config.applications[prev]?.targets;
       if (targets === undefined) {
         return { application: prev, target: undefined, source: undefined };
       }
@@ -207,18 +202,16 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
   };
 
   const handleNextTarget = () => {
-    const text = queryClient.getQueryData(configQueryOptions(configPath).queryKey);
-    if (text === undefined) {
+    const data = queryClient.getQueryData(configQueryOptions(configPath).queryKey);
+    if (data === undefined) {
       return;
     }
-    const ext = supportedExtensionSchema.parse(npath.parse(configPath).ext);
-    const data = filetypes[ext].parse(text);
     const config = feoConfigValidator.parse(data);
     dispatch((s) => {
       if (s.application === undefined) {
         return { target: s.target };
       }
-      const appConfig = config.configs[s.application];
+      const appConfig = config.applications[s.application];
       if (appConfig === undefined) {
         return { target: s.target };
       }
@@ -246,18 +239,16 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
   };
 
   const handlePreviousTarget = () => {
-    const text = queryClient.getQueryData(configQueryOptions(configPath).queryKey);
-    if (text === undefined) {
+    const data = queryClient.getQueryData(configQueryOptions(configPath).queryKey);
+    if (data === undefined) {
       return;
     }
-    const ext = supportedExtensionSchema.parse(npath.parse(configPath).ext);
-    const data = filetypes[ext].parse(text);
     const config = feoConfigValidator.parse(data);
     dispatch((s) => {
       if (s.application === undefined) {
         return { target: s.target };
       }
-      const appConfig = config.configs[s.application];
+      const appConfig = config.applications[s.application];
       if (appConfig === undefined) {
         return { target: s.target };
       }
@@ -285,18 +276,16 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
   };
 
   const handleNextSource = () => {
-    const text = queryClient.getQueryData(configQueryOptions(configPath).queryKey);
-    if (text === undefined) {
+    const data = queryClient.getQueryData(configQueryOptions(configPath).queryKey);
+    if (data === undefined) {
       return;
     }
-    const ext = supportedExtensionSchema.parse(npath.parse(configPath).ext);
-    const data = filetypes[ext].parse(text);
     const config = feoConfigValidator.parse(data);
     dispatch((s) => {
       if (s.application === undefined || s.target === undefined) {
         return { source: s.source };
       }
-      const sources = config.configs[s.application]?.targets[s.target]?.sources;
+      const sources = config.applications[s.application]?.targets[s.target]?.sources;
       if (sources === undefined) {
         return { source: s.source };
       }
@@ -306,7 +295,7 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
         }
         return { source: firstSource };
       }
-      const i = sources.findIndex((src) => src.path === s.source?.path);
+      const i = sources.findIndex((src) => s.source !== undefined && sourceId(src) === sourceId(s.source));
       if (i === -1) {
         return { source: s.source };
       }
@@ -319,25 +308,23 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
   };
 
   const handlePreviousSource = () => {
-    const text = queryClient.getQueryData(configQueryOptions(configPath).queryKey);
-    if (text === undefined) {
+    const data = queryClient.getQueryData(configQueryOptions(configPath).queryKey);
+    if (data === undefined) {
       return;
     }
-    const ext = supportedExtensionSchema.parse(npath.parse(configPath).ext);
-    const data = filetypes[ext].parse(text);
     const config = feoConfigValidator.parse(data);
     dispatch((s) => {
       if (s.application === undefined || s.target === undefined) {
         return { source: s.source };
       }
-      const sources = config.configs[s.application]?.targets[s.target]?.sources;
+      const sources = config.applications[s.application]?.targets[s.target]?.sources;
       if (sources === undefined) {
         return { source: s.source };
       }
       if (s.source === undefined) {
         return { source: sources[sources.length - 1] };
       }
-      const i = sources.findIndex((src) => src.path === s.source?.path);
+      const i = sources.findIndex((src) => s.source !== undefined && sourceId(src) === sourceId(s.source));
       if (i === -1) {
         return { source: s.source };
       }

@@ -2,13 +2,13 @@ import { useMutation, useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
 import Keybinds from "#/components/Keybinds";
-
 import ActiveSource from "#/components/sources/ActiveSource";
 import configQueryOptions from "#/data/configQueryOptions";
 import deleteSourceMutationOptions from "#/data/deleteSourceMutationOptions";
 import type { FeoSource as SourceData } from "#/data/feoConfig";
 import sourceContentQueryOptions from "#/data/sourceContentQueryOptions";
 import useTitle from "#/hooks/useTitle";
+import { sourceId, sourceLabel } from "#/lib/source/identity";
 
 export type SourceProps = {
   configPath: string;
@@ -36,7 +36,7 @@ export default function Source({
   const { data: config } = useSuspenseQuery(configQueryOptions(configPath));
   const theme = config.settings.theme;
 
-  const title = useTitle(source.path, 0.35, {
+  const title = useTitle(sourceLabel(source), 0.35, {
     buffer: 8,
     stringify: (title: string) => `┤${title}├`,
   });
@@ -63,7 +63,7 @@ export default function Source({
     const handleConfirm = () => {
       setDeleting((d) => {
         if (d) {
-          void mutateAsync({ app: application, target, source: source.path });
+          void mutateAsync({ app: application, target, source: sourceId(source) });
         }
         return false;
       });

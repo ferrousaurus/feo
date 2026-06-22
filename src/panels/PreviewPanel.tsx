@@ -33,7 +33,7 @@ export default function PreviewPanel({
   const sources =
     application === undefined || target === undefined
       ? []
-      : (config.configs[application]?.targets[target]?.sources ?? []);
+      : (config.applications[application]?.targets[target]?.sources ?? []);
 
   const { isPending, isError, error, data } = useQuery(
     queryOptions({
@@ -54,11 +54,11 @@ export default function PreviewPanel({
     return <text>{error?.message}</text>;
   }
 
-  if (target === undefined) {
+  if (application === undefined || target === undefined) {
     return <text>{target} is not defined</text>;
   }
 
-  const { ext } = path.parse(target);
+  const { ext } = path.parse(config.applications[application]?.targets[target]?.path ?? "");
 
   const validatedExt = supportedExtensionSchema.safeParse(ext);
 

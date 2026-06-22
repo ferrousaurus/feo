@@ -1,10 +1,29 @@
 import { z } from "zod/mini";
 
-export const sourceValidator = z.object({
+const inlineSourceValidator = z.object({
+  data: z.record(z.string(), z.json()),
+});
+
+const localSourceValidator = z.object({
   path: z.string(),
 });
 
+const remoteSourceValidator = z.object({
+  url: z.url(),
+});
+
+export const sourceValidator = z.union([inlineSourceValidator, localSourceValidator, remoteSourceValidator]);
+
 export type FeoSource = z.infer<typeof sourceValidator>;
+
+export const targetValidator = z.object({
+  path: z.string(),
+  sources: z.array(sourceValidator),
+});
+
+export const applicationValidator = z.object({
+  targets: z.record(z.string(), targetValidator),
+});
 
 const keymapValidator = z.pipe(
   z.union([z.array(z.string()), z.string()]),
@@ -20,7 +39,6 @@ const defaultConfig = {
       down: ["j", "down"],
       move: ["m"],
       new: ["n"],
-      refresh: ["r"],
       scrollDown: ["]"],
       scrollUp: "[",
       up: ["k", "up"],
@@ -48,7 +66,6 @@ const feoConfigValidator = z.object({
           down: z.prefault(keymapValidator, defaultConfig.settings.keymap.down),
           move: z.prefault(keymapValidator, defaultConfig.settings.keymap.move),
           new: z.prefault(keymapValidator, defaultConfig.settings.keymap.new),
-          refresh: z.prefault(keymapValidator, defaultConfig.settings.keymap.refresh),
           scrollDown: z.prefault(keymapValidator, defaultConfig.settings.keymap.scrollDown),
           scrollUp: z.prefault(keymapValidator, defaultConfig.settings.keymap.scrollUp),
           up: z.prefault(keymapValidator, defaultConfig.settings.keymap.up),
@@ -73,17 +90,7 @@ const feoConfigValidator = z.object({
       theme: defaultConfig.settings.theme,
     },
   ),
-  configs: z.record(
-    z.string(),
-    z.object({
-      targets: z.record(
-        z.string(),
-        z.object({
-          sources: z.array(sourceValidator),
-        }),
-      ),
-    }),
-  ),
+  applications: z.record(z.string(), applicationValidator),
 });
 
 export type FeoConfig = z.infer<typeof feoConfigValidator>;
