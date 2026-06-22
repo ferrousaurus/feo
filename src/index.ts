@@ -11,6 +11,7 @@ import VERSION from "#/lib/version";
 import tui from "#/tui";
 import { deepMerge } from "@std/collections";
 import npath from "node:path";
+import { isDeepStrictEqual } from "node:util";
 import sha from "./lib/crypto/hash";
 import resolveAbsolutePath from "./lib/fs/resolveAbsolutePath";
 import writeFile from "./lib/io/writeFile";
@@ -61,14 +62,24 @@ await new Command()
           .map((r) => r.value);
         const resolved = sources.reduce((p, c) => deepMerge(c, p), {} as Serializable);
         const contents = filetypes[validatedExt].stringify(resolved);
-        const currentFileContents = await readFile(resolveAbsolutePath(target)).then((r) => r.text());
+        const currentFile = await readFile(resolveAbsolutePath(target));
 
-        if (currentFileContents !== null) {
-          await writeFile(
-            resolveAbsolutePath(`${dir}/${name}.${sha(currentFileContents)}.feo-bkup${validatedExt}`),
-            currentFileContents,
-          );
+        if (currentFile.ok) {
+          const currentFileContents = await currentFile.text();
+
+          const currentFileData =
+            currentFileContents === null
+              ? null
+              : filetypes[supportedExtensionSchema.parse(npath.parse(target).ext)].parse(currentFileContents);
+
+          if (!isDeepStrictEqual(currentFileData, resolved)) {
+            await writeFile(
+              resolveAbsolutePath(`${dir}/${name}.${sha(currentFileContents)}.feo-bkup${validatedExt}`),
+              currentFileContents,
+            );
+          }
         }
+
         await writeFile(resolveAbsolutePath(`${dir}/${name}${validatedExt}`), contents);
       }
     }

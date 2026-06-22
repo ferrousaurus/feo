@@ -78,9 +78,13 @@ export default async function readFile(input: string | URL) {
     }
     switch (protocol) {
       case "file:":
-        const file = await readLocalFile(absolutePath);
-        const text = file.toString();
-        return { text: async () => text };
+        try {
+          const file = await readLocalFile(absolutePath);
+          const text = file.toString();
+          return { ok: true, text: async () => text, status: 200 } as const;
+        } catch {
+          return { ok: false, text: async () => await Promise.reject(), status: 404 } as const;
+        }
       case "http:":
       case "https:":
         return await readHttpFile(absolutePath);
