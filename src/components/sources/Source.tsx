@@ -5,7 +5,7 @@ import Keybinds from "#/components/Keybinds";
 import ActiveSource from "#/components/sources/ActiveSource";
 import configQueryOptions from "#/data/configQueryOptions";
 import deleteSourceMutationOptions from "#/data/deleteSourceMutationOptions";
-import type { FeoSource as SourceData } from "#/data/feoConfig";
+import type { FeoSource } from "#/data/feoConfig";
 import sourceContentQueryOptions from "#/data/sourceContentQueryOptions";
 import useTitle from "#/hooks/useTitle";
 import { sourceId, sourceLabel } from "#/lib/source/identity";
@@ -14,7 +14,7 @@ export type SourceProps = {
   configPath: string;
   application: string;
   target: string;
-  source: SourceData;
+  source: FeoSource;
   active: boolean;
   enableKeybinds: boolean;
   moving: boolean;

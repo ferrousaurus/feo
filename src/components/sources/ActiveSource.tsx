@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useRef } from "react";
 
 import Keybinds from "#/components/Keybinds";
-import type { FeoSource as SourceData } from "#/data/feoConfig";
+import type { FeoSource } from "#/data/feoConfig";
 import sourceContentQueryOptions from "#/data/sourceContentQueryOptions";
 import filetypes, { supportedExtensionSchema } from "#/lib/config/filetypes";
 import syntaxStyle from "#/lib/syntaxStyle";
@@ -13,7 +13,7 @@ import syntaxStyle from "#/lib/syntaxStyle";
 export type ActiveSourceProps = {
   enableKeybinds: boolean;
   configPath: string;
-  source: SourceData;
+  source: FeoSource;
 };
 
 export default function ActiveSource({ enableKeybinds, configPath, source }: Readonly<ActiveSourceProps>) {
@@ -32,7 +32,7 @@ export default function ActiveSource({ enableKeybinds, configPath, source }: Rea
     );
   }
 
-  const { ext } = path.parse("path" in source ? source.path : "url" in source ? source.url : ".json");
+  const { ext } = path.parse("path" in source ? source.path : "url" in source ? source.url : "data.json");
   const validatedExt = supportedExtensionSchema.safeParse(ext);
   const format = validatedExt.success ? validatedExt.data : null;
 
