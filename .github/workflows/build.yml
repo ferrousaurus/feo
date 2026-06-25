@@ -2,10 +2,7 @@ name: build
 
 on:
   push:
-    branches: [main]
     tags: ["v*"]
-  pull_request:
-  workflow_dispatch:
 
 permissions:
   contents: read
@@ -56,6 +53,14 @@ jobs:
 
       - name: Test
         run: bun run test
+
+      - name: Set version
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          VERSION="${TAG#v}"
+          sed -i.bak "s/\"0\.0\.0-dev\"/\"$VERSION\"/" src/lib/version.ts
+          rm -f src/lib/version.ts.bak
 
       - name: Build
         run: bun build --compile --target=${{ matrix.target }} --outfile=dist/${{ matrix.artifact }} src/index.ts

@@ -30,13 +30,6 @@ const unparsableCases = [
   { input: "no equals" },
 ] as const;
 
-const stringifyCases = [
-  { input: {}, expected: "" },
-  { input: { a: 1 }, expected: "a = 1\n" },
-  { input: { a: 1, b: 2 }, expected: "a = 1\nb = 2\n" },
-  { input: { section: { key: "value" } }, expected: '\n[section]\nkey = "value"\n' },
-] as const;
-
 describe("parse", () => {
   for (const { input, expected } of successCases) {
     test(`parse('${input.replace(/\n/g, "\\n")}') returns the expected object`, () => {

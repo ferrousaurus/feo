@@ -46,13 +46,6 @@ const unparsableCases = [
   { input: "undefined" },
 ] as const;
 
-const stringifyCases = [
-  { input: {}, expected: "{}" },
-  { input: { a: 1 }, expected: '{\n  "a": 1\n}' },
-  { input: { a: 1, b: "two" }, expected: '{\n  "a": 1,\n  "b": "two"\n}' },
-  { input: { a: { b: [1, 2] } }, expected: '{\n  "a": {\n    "b": [\n      1,\n      2\n    ]\n  }\n}' },
-] as const;
-
 describe("parse", () => {
   for (const { input, expected } of successCases) {
     test(`parse('${input}') returns the expected object`, () => {
