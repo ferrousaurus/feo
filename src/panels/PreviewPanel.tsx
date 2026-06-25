@@ -5,7 +5,6 @@ import { queryOptions, useQuery, useSuspenseQuery } from "@tanstack/react-query"
 import { useRef } from "react";
 
 import Keybinds from "#/components/Keybinds";
-
 import configQueryOptions from "#/data/configQueryOptions";
 import filetypes, { supportedExtensionSchema } from "#/lib/config/filetypes";
 import getMergedConfig from "#/lib/getMergedConfig";

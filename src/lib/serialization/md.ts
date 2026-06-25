@@ -1,5 +1,6 @@
 import * as YAML from "@std/yaml";
 import { z, type JSONType } from "zod/mini";
+
 import type { Serializable } from "./util";
 
 export const parse = (str: string): { content: string; frontmatter?: JSONType } => {

@@ -1,4 +1,5 @@
 import * as JSONC from "@std/jsonc";
+
 import { serializableValidator } from "./util";
 import type { Serializable } from "./util";
 

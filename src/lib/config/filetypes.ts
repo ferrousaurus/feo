@@ -1,9 +1,11 @@
+import { z } from "zod/mini";
+
 import keys from "#/lib/object/keys";
 import json from "#/lib/serialization/json";
 import md from "#/lib/serialization/md";
 import toml from "#/lib/serialization/toml";
 import yaml from "#/lib/serialization/yaml";
-import { z } from "zod/mini";
+
 import type { Serializable } from "../serialization/util";
 
 export type Filetype = {

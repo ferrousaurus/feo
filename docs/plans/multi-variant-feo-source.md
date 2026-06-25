@@ -12,18 +12,18 @@ Everything in the codebase still assumes `{ path: string }`. This plan makes the
 
 ## Decisions (resolved by interview)
 
-| # | Decision | Choice |
-|---|----------|--------|
-| 1 | Identity model | **Derived** (no `id` field added to schema) |
-| 2 | ID format | **Discriminated prefix**: `path:…`, `url:…`, `data:<sha>` |
-| 3 | Inline-data hash | **Sort keys** before `JSON.stringify` for order-independence |
-| 4 | Display label | `sourceLabel`: unprefixed for path/url, prefixed for data |
-| 5 | Source creation | `new URL()` + protocol check inside `addSource` mutation; no inline from TUI |
-| 6 | Loading | Extract shared `loadSourceContent`; all three call sites delegate |
-| 7 | Type safety | **Tighten** `data: z.json()` → `z.record(z.string(), z.json())` in schema |
-| 8 | Dead code | **Delete** `src/commands/write.ts` |
-| 9 | Tests | Unit-test `sourceId`/`sourceLabel`/`loadSourceContent` |
-| 10 | Docs | Create `CONTEXT.md` + `docs/adr/0001-source-identity.md` |
+| #   | Decision         | Choice                                                                       |
+| --- | ---------------- | ---------------------------------------------------------------------------- |
+| 1   | Identity model   | **Derived** (no `id` field added to schema)                                  |
+| 2   | ID format        | **Discriminated prefix**: `path:…`, `url:…`, `data:<sha>`                    |
+| 3   | Inline-data hash | **Sort keys** before `JSON.stringify` for order-independence                 |
+| 4   | Display label    | `sourceLabel`: unprefixed for path/url, prefixed for data                    |
+| 5   | Source creation  | `new URL()` + protocol check inside `addSource` mutation; no inline from TUI |
+| 6   | Loading          | Extract shared `loadSourceContent`; all three call sites delegate            |
+| 7   | Type safety      | **Tighten** `data: z.json()` → `z.record(z.string(), z.json())` in schema    |
+| 8   | Dead code        | **Delete** `src/commands/write.ts`                                           |
+| 9   | Tests            | Unit-test `sourceId`/`sourceLabel`/`loadSourceContent`                       |
+| 10  | Docs             | Create `CONTEXT.md` + `docs/adr/0001-source-identity.md`                     |
 
 ### Rationale for non-obvious decisions
 
@@ -169,13 +169,13 @@ import type { FeoSource } from "#/data/feoConfig";
 
 In each of these three files, replace `s.path === vars.source` (or `!==` for delete) with `sourceId(s) === vars.source`. Add `import { sourceId } from "#/lib/source/identity"` to each.
 
-| File | Lines | Current | Replacement |
-|------|-------|---------|-------------|
-| `src/data/deleteSourceMutationOptions.ts` | 31 | `(s) => s.path !== vars.source` | `(s) => sourceId(s) !== vars.source` |
-| `src/data/moveSourceUpMutationOptions.ts` | 23 | `sources.some((s) => s.path === vars.source)` | `sources.some((s) => sourceId(s) === vars.source)` |
-| `src/data/moveSourceUpMutationOptions.ts` | 26 | `sources.findIndex((s) => s.path === vars.source)` | `sources.findIndex((s) => sourceId(s) === vars.source)` |
-| `src/data/moveSourceDownMutationOptions.ts` | 23 | same as moveSourceUp:23 | same |
-| `src/data/moveSourceDownMutationOptions.ts` | 26 | same as moveSourceUp:26 | same |
+| File                                        | Lines | Current                                            | Replacement                                             |
+| ------------------------------------------- | ----- | -------------------------------------------------- | ------------------------------------------------------- |
+| `src/data/deleteSourceMutationOptions.ts`   | 31    | `(s) => s.path !== vars.source`                    | `(s) => sourceId(s) !== vars.source`                    |
+| `src/data/moveSourceUpMutationOptions.ts`   | 23    | `sources.some((s) => s.path === vars.source)`      | `sources.some((s) => sourceId(s) === vars.source)`      |
+| `src/data/moveSourceUpMutationOptions.ts`   | 26    | `sources.findIndex((s) => s.path === vars.source)` | `sources.findIndex((s) => sourceId(s) === vars.source)` |
+| `src/data/moveSourceDownMutationOptions.ts` | 23    | same as moveSourceUp:23                            | same                                                    |
+| `src/data/moveSourceDownMutationOptions.ts` | 26    | same as moveSourceUp:26                            | same                                                    |
 
 The mutation var type stays `source: string` — the string is now a `sourceId` instead of a `.path`. Callers in Phase 6 will pass `sourceId(source)` rather than `source.path`.
 
@@ -198,22 +198,16 @@ Remove `import readConfigFile from "./config/readConfigFile"`. Add `import loadS
 
 ```ts
 // before
-const sources = (
-  await Promise.allSettled(
-    sourcePaths.map(async ({ path }) => {
-      const { ext: sourceExt } = npath.parse(path);
-      const validatedSourceExt = supportedExtensionSchema.parse(sourceExt);
-      const text = await readFile(path).then((r) => r.text());
-      return filetypes[validatedSourceExt].parse(text);
-    }),
-  )
-)
+const sources = await Promise.allSettled(
+  sourcePaths.map(async ({ path }) => {
+    const { ext: sourceExt } = npath.parse(path);
+    const validatedSourceExt = supportedExtensionSchema.parse(sourceExt);
+    const text = await readFile(path).then((r) => r.text());
+    return filetypes[validatedSourceExt].parse(text);
+  }),
+);
 // after
-const sources = (
-  await Promise.allSettled(
-    sourcePaths.map(async (s) => loadSourceContent(s)),
-  )
-)
+const sources = await Promise.allSettled(sourcePaths.map(async (s) => loadSourceContent(s)));
 ```
 
 Add `import loadSourceContent from "#/lib/source/loadSourceContent"` at the top. The `npath`, `readFile`, `filetypes`, `supportedExtensionSchema` imports may now be unused — check and remove if so. (The `index.ts` file still uses `npath.parse` and `filetypes`/`supportedExtensionSchema` for the config file itself on line 37 and 77, so keep those imports as needed for the remaining usage.)
@@ -222,13 +216,13 @@ Add `import loadSourceContent from "#/lib/source/loadSourceContent"` at the top.
 
 **`src/panels/SourcesPanel.tsx`** — add `import { sourceId } from "#/lib/source/identity"` at top. Changes:
 
-| Line | Current | Replacement |
-|------|---------|-------------|
-| 50 | `key={s.path}` | `key={sourceId(s)}` |
-| 55 | `active={source?.path === s.path}` | `active={source !== undefined && sourceId(source) === sourceId(s)}` |
-| 56 | `enableKeybinds={active && source?.path === s.path && !creating}` | `enableKeybinds={active && source !== undefined && sourceId(source) === sourceId(s) && !creating}` |
-| 57 | `moving={moving === s.path}` | `moving={moving === sourceId(s)}` |
-| 82 | `setMoving((m) => (m === undefined ? source?.path : undefined));` | `setMoving((m) => (m === undefined ? (source !== undefined ? sourceId(source) : undefined) : undefined));` |
+| Line | Current                                                           | Replacement                                                                                                |
+| ---- | ----------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| 50   | `key={s.path}`                                                    | `key={sourceId(s)}`                                                                                        |
+| 55   | `active={source?.path === s.path}`                                | `active={source !== undefined && sourceId(source) === sourceId(s)}`                                        |
+| 56   | `enableKeybinds={active && source?.path === s.path && !creating}` | `enableKeybinds={active && source !== undefined && sourceId(source) === sourceId(s) && !creating}`         |
+| 57   | `moving={moving === s.path}`                                      | `moving={moving === sourceId(s)}`                                                                          |
+| 82   | `setMoving((m) => (m === undefined ? source?.path : undefined));` | `setMoving((m) => (m === undefined ? (source !== undefined ? sourceId(source) : undefined) : undefined));` |
 
 Line 38 `useState<string \| undefined>(undefined)` stays — the string is now a `sourceId`. Type is unchanged.
 
@@ -240,17 +234,17 @@ import { sourceId, sourceLabel } from "#/lib/source/identity";
 
 Changes:
 
-| Line | Current | Replacement |
-|------|---------|-------------|
-| 39 | `const title = useTitle(source.path, 0.35, {` | `const title = useTitle(sourceLabel(source), 0.35, {` |
-| 66 | `void mutateAsync({ app: application, target, source: source.path });` | `void mutateAsync({ app: application, target, source: sourceId(source) });` |
+| Line | Current                                                                | Replacement                                                                 |
+| ---- | ---------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| 39   | `const title = useTitle(source.path, 0.35, {`                          | `const title = useTitle(sourceLabel(source), 0.35, {`                       |
+| 66   | `void mutateAsync({ app: application, target, source: source.path });` | `void mutateAsync({ app: application, target, source: sourceId(source) });` |
 
 **`src/components/Shell.tsx`** — add `import { sourceId } from "#/lib/source/identity"`. Changes:
 
-| Line | Current | Replacement |
-|------|---------|-------------|
-| 309 | `const i = sources.findIndex((src) => src.path === s.source?.path);` | `const i = sources.findIndex((src) => s.source !== undefined && sourceId(src) === sourceId(s.source));` |
-| 340 | `const i = sources.findIndex((src) => src.path === s.source?.path);` | same |
+| Line | Current                                                              | Replacement                                                                                             |
+| ---- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| 309  | `const i = sources.findIndex((src) => src.path === s.source?.path);` | `const i = sources.findIndex((src) => s.source !== undefined && sourceId(src) === sourceId(s.source));` |
+| 340  | `const i = sources.findIndex((src) => src.path === s.source?.path);` | same                                                                                                    |
 
 **No change**: `src/components/sources/ActiveSource.tsx:36` — already discriminates correctly with `"path" in source ? source.path : "url" in source ? source.url : ".json"`. This is for syntax-highlighting ext, not identity/display.
 
@@ -299,6 +293,7 @@ Sources have three variants (local path, remote URL, inline data) with no shared
 ## File summary
 
 **New (6)**:
+
 - `src/lib/source/identity.ts`
 - `src/lib/source/loadSourceContent.ts`
 - `src/lib/source/identity.test.ts`
@@ -307,6 +302,7 @@ Sources have three variants (local path, remote URL, inline data) with no shared
 - `docs/adr/0001-source-identity.md`
 
 **Edited (10)**:
+
 - `src/data/feoConfig.ts` (Phase 1)
 - `src/data/addSourceMutationOptions.ts` (Phase 3)
 - `src/data/deleteSourceMutationOptions.ts` (Phase 4)
@@ -322,6 +318,7 @@ Sources have three variants (local path, remote URL, inline data) with no shared
 (That's 11 edits, not 10 — table above has 11 rows.)
 
 **Deleted (1)**:
+
 - `src/commands/write.ts`
 
 ## Verification

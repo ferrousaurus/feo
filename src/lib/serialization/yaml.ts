@@ -1,4 +1,5 @@
 import * as YAML from "@std/yaml";
+
 import { serializableValidator } from "./util";
 import type { Serializable } from "./util";
 
