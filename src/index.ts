@@ -14,7 +14,6 @@ import type { Serializable } from "#/lib/serialization/util";
 import loadSourceContent from "#/lib/source/loadSourceContent";
 import VERSION from "#/lib/version";
 import tui from "#/tui";
-
 import sha from "./lib/crypto/hash";
 import resolveAbsolutePath from "./lib/fs/resolveAbsolutePath";
 import writeFile from "./lib/io/writeFile";
