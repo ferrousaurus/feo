@@ -8,15 +8,13 @@
   ],
   "type": "module",
   "scripts": {
-    "dev": "tsx --experimental-ffi --watch src/index.ts",
+    "dev": "bun run --watch src/index.ts",
     "test": "vitest run",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check",
-    "check": "tsgo --noEmit",
-    "build": "rolldown -c",
-    "start": "node --experimental-ffi dist/bundle.js"
+    "build": "bun build --compile --outfile=dist/feo src/index.ts"
   },
   "dependencies": {
     "@cliffy/command": "npm:@jsr/cliffy__command@^1.2.1",
@@ -30,21 +28,20 @@
     "@std/ini": "npm:@jsr/std__ini@^0.225.2",
     "@tanstack/react-query": "^5.101.0",
     "react": "^19.2.7",
-    "tsx": "^4.22.4",
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@types/node": "^25.9.3",
+    "@types/bun": "^1.3.14",
     "@types/react": "^19.2.17",
-    "@typescript/native-preview": "7.0.0-dev.20260616.1",
     "oxfmt": "^0.55.0",
     "oxlint": "^1.70.0",
-    "rolldown": "^1.1.1",
     "vitest": "^4.1.9"
   },
-  "engines": {
-    "node": "^26.3.0",
-    "pnpm": "^11.7.0"
+  "peerDependencies": {
+    "typescript": "^5"
   },
-  "packageManager": "pnpm@11.7.0"
+  "engines": {
+    "bun": "^1.3.14"
+  },
+  "packageManager": "bun@1.3.14"
 }
