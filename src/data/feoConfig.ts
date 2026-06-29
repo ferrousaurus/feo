@@ -1,16 +1,40 @@
+import path from "node:path";
+
 import { z } from "zod/mini";
+
+import { SUPPORTED_EXTENSIONS } from "#/lib/config/filetypes";
 
 const inlineSourceValidator = z.object({
   data: z.record(z.string(), z.json()),
 });
 
-const localSourceValidator = z.object({
-  path: z.string(),
-});
+const localSourceValidator = z.pipe(
+  z.object({
+    path: z.string(),
+    mediaType: z.optional(z.enum(SUPPORTED_EXTENSIONS)),
+    templatingLanguage: z.optional(z.enum(["liquid"])),
+    vars: z.optional(z.record(z.string(), z.json())),
+  }),
+  z.transform(({ mediaType, vars, ...rest }) => ({
+    mediaType: mediaType === undefined ? z.enum(SUPPORTED_EXTENSIONS).parse(path.parse(rest.path).ext) : mediaType,
+    vars: vars === undefined ? {} : vars,
+    ...rest,
+  })),
+);
 
-const remoteSourceValidator = z.object({
-  url: z.url(),
-});
+const remoteSourceValidator = z.pipe(
+  z.object({
+    url: z.url(),
+    mediaType: z.optional(z.enum(SUPPORTED_EXTENSIONS)),
+    templatingLanguage: z.optional(z.enum(["liquid"])),
+    vars: z.optional(z.record(z.string(), z.json())),
+  }),
+  z.transform(({ mediaType, vars, ...rest }) => ({
+    mediaType: mediaType === undefined ? z.enum(SUPPORTED_EXTENSIONS).parse(path.parse(rest.url).ext) : mediaType,
+    vars: vars === undefined ? {} : vars,
+    ...rest,
+  })),
+);
 
 export const sourceValidator = z.union([inlineSourceValidator, localSourceValidator, remoteSourceValidator]);
 

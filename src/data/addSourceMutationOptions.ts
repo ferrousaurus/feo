@@ -4,7 +4,7 @@ import { deepMerge } from "@std/collections";
 import { mutationOptions } from "@tanstack/react-query";
 
 import type { FeoSource } from "#/data/feoConfig";
-import feoConfigValidator from "#/data/feoConfig";
+import feoConfigValidator, { sourceValidator } from "#/data/feoConfig";
 import filetypes, { supportedExtensionSchema } from "#/lib/config/filetypes";
 import resolveAbsolutePath from "#/lib/fs/resolveAbsolutePath";
 import writeFile from "#/lib/io/writeFile";
@@ -26,9 +26,11 @@ const addSourceMutationOptions = (configPath: string) => {
       let source: FeoSource;
       try {
         const { protocol } = new URL(vars.source);
-        source = protocol === "http:" || protocol === "https:" ? { url: vars.source } : { path: vars.source };
+        source = sourceValidator.parse(
+          protocol === "http:" || protocol === "https:" ? { url: vars.source } : { path: vars.source },
+        );
       } catch {
-        source = { path: vars.source };
+        source = sourceValidator.parse({ path: vars.source });
       }
       const newConfig = feoConfigValidator.safeParse(
         deepMerge(config.data, {
