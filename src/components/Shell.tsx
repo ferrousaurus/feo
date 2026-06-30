@@ -1,3 +1,4 @@
+import fs from "node:fs/promises";
 import npath from "node:path";
 
 import { useKeyboard, useRenderer } from "@opentui/react";
@@ -353,7 +354,11 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
         .then(async (f) => (f.ok ? await f.text() : undefined))
         .then(async (currentFileContents) => {
           if (currentFileContents !== undefined) {
-            await writeFile(`${dir}/${name}.${sha(currentFileContents)}.feo-bkup${ext}`, currentFileContents);
+            const backupPath = resolveAbsolutePath(
+              `~/.local/share/feo/${application}/${target}/${name}.${sha(currentFileContents)}${ext}`,
+            );
+            await fs.mkdir(npath.dirname(backupPath), { recursive: true });
+            await writeFile(backupPath, currentFileContents);
           }
           await writeFile(`${dir}/${name}${ext}`, w.contents);
         });
