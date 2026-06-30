@@ -17,6 +17,15 @@ const syntaxStyle = SyntaxStyle.fromStyles({
   "punctuation.bracket": {},
   "punctuation.special": { fg: RGBA.fromIndex(5) },
   operator: {},
+  markup: { fg: RGBA.fromIndex(6) },
+  "markup.heading": { bold: true },
+  "markup.strong": { bold: true },
+  "markup.italic": { italic: true },
+  "markup.raw": { fg: RGBA.fromIndex(3) },
+  "markup.link": { fg: RGBA.fromIndex(5), underline: true },
+  "markup.link.url": { fg: RGBA.fromIndex(14), underline: true },
+  keyword: { fg: RGBA.fromIndex(5) },
+  "character.special": { fg: RGBA.fromIndex(5) },
 });
 
 export default syntaxStyle;

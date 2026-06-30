@@ -80,24 +80,27 @@ export const applicationValidator = z
     ...rest,
     template: appTemplate,
     targets: Object.fromEntries(
-      entries(targets).map(([name, { sources, template: targetTemplate, ...rest }]) => [
-        name,
-        {
-          ...rest,
-          template: targetTemplate,
-          sources: sources.map((s) =>
-            "template" in s
-              ? {
-                  ...s,
-                  template: {
-                    ...s.template,
-                    vars: { ...appTemplate.vars, ...targetTemplate.vars, ...s.template?.vars },
-                  },
-                }
-              : s,
-          ),
-        },
-      ]),
+      entries(targets).map(
+        ([name, { sources, template: targetTemplate, ...rest }]) =>
+          [
+            name,
+            {
+              ...rest,
+              template: targetTemplate,
+              sources: sources.map((s) =>
+                "template" in s
+                  ? {
+                      ...s,
+                      template: {
+                        ...s.template,
+                        vars: { ...appTemplate.vars, ...targetTemplate.vars, ...s.template?.vars },
+                      },
+                    }
+                  : s,
+              ),
+            },
+          ] as const,
+      ),
     ),
   }));
 

@@ -27,6 +27,9 @@ const filetypes = {
   ".md": {
     mediaType: "text/markdown",
   },
+  ".mdx": {
+    mediaType: "text/markdown",
+  },
 } as const;
 
 export const SUPPORTED_EXTENSIONS = keys(filetypes);

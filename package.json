@@ -15,6 +15,7 @@
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check",
     "check": "tsc -b",
+    "parsers": "bun run scripts/fetch-parsers.ts",
     "build": "bun build --compile --outfile=dist/feo src/index.ts"
   },
   "dependencies": {

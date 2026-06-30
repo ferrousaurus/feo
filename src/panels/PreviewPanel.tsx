@@ -14,6 +14,7 @@ import syntaxStyle from "#/lib/syntaxStyle";
 export type PreviewPanelProps = {
   application?: string;
   active: boolean;
+  mutating?: boolean;
   configPath: string;
   onCancelWrite?: () => void;
   onWrite?: (opts: { path: string; contents: string }) => void;
@@ -25,6 +26,7 @@ export default function PreviewPanel({
   configPath,
   target,
   active,
+  mutating = false,
   onWrite,
   onCancelWrite,
 }: Readonly<PreviewPanelProps>) {
@@ -89,8 +91,15 @@ export default function PreviewPanel({
           onScrollDown={() => {
             ref.current?.scrollBy(1);
           }}
+          onConfirm={
+            mutating && target !== undefined && target !== ""
+              ? () => {
+                  onWrite?.({ path: targetPath, contents: stringify(data) });
+                }
+              : undefined
+          }
           onWrite={
-            target !== undefined && target !== ""
+            !mutating && target !== undefined && target !== ""
               ? () => {
                   onWrite?.({ path: targetPath, contents: stringify(data) });
                 }

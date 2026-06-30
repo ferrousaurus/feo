@@ -5,17 +5,26 @@ import configQueryOptions from "#/data/configQueryOptions";
 import useTitle from "#/hooks/useTitle";
 
 export type PanelProps = BoxProps & {
-  active: boolean;
+  active?: boolean;
   configPath: string;
+  submitting?: boolean;
 };
 
 const stringifyTitle = (title: string) => `┤${title}├`;
 
-export default function Panel({ active, configPath, title, ...props }: Readonly<PanelProps>) {
+export default function Panel({
+  active = false,
+  configPath,
+  submitting = false,
+  title,
+  ...props
+}: Readonly<PanelProps>) {
   const { data: config } = useSuspenseQuery(configQueryOptions(configPath));
   const theme = config.settings.theme;
 
   const truncatedTitle = useTitle(title, 0.3, { stringify: stringifyTitle });
 
-  return <box title={truncatedTitle} borderColor={active ? theme.active : theme.inactive} {...props} />;
+  const borderColor = active ? (submitting ? theme.warning : theme.active) : theme.inactive;
+
+  return <box title={truncatedTitle} borderColor={borderColor} {...props} />;
 }

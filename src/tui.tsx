@@ -9,6 +9,12 @@ import feoConfigValidator from "#/data/feoConfig";
 import readConfigFile from "#/lib/config/readConfigFile";
 import resolveAbsolutePath from "#/lib/fs/resolveAbsolutePath";
 import keys from "#/lib/object/keys";
+import jsonHighlights from "#/parsers/json/highlights.scm" with { type: "file" };
+import jsonWasm from "#/parsers/json/tree-sitter-json.wasm" with { type: "file" };
+import tomlHighlights from "#/parsers/toml/highlights.scm" with { type: "file" };
+import tomlWasm from "#/parsers/toml/tree-sitter-toml.wasm" with { type: "file" };
+import yamlHighlights from "#/parsers/yaml/highlights.scm" with { type: "file" };
+import yamlWasm from "#/parsers/yaml/tree-sitter-yaml.wasm" with { type: "file" };
 
 import sourceContentQueryOptions from "./data/sourceContentQueryOptions";
 import values from "./lib/object/values";
@@ -27,29 +33,18 @@ const tui = async ({ configPath }: Readonly<TuiProps>) => {
   addDefaultParsers([
     {
       filetype: "json",
-      aliases: ["jsonc"],
-      wasm: "https://github.com/tree-sitter/tree-sitter-json/releases/download/v0.24.8/tree-sitter-json.wasm",
-      queries: {
-        highlights: ["https://raw.githubusercontent.com/tree-sitter/tree-sitter-json/master/queries/highlights.scm"],
-      },
+      wasm: jsonWasm,
+      queries: { highlights: [jsonHighlights] },
     },
     {
       filetype: "yaml",
-      wasm: "https://github.com/tree-sitter-grammars/tree-sitter-yaml/releases/download/v0.7.2/tree-sitter-yaml.wasm",
-      queries: {
-        highlights: [
-          "https://raw.githubusercontent.com/tree-sitter-grammars/tree-sitter-yaml/master/queries/highlights.scm",
-        ],
-      },
+      wasm: yamlWasm,
+      queries: { highlights: [yamlHighlights] },
     },
     {
       filetype: "toml",
-      wasm: "https://github.com/tree-sitter-grammars/tree-sitter-toml/releases/download/v0.7.0/tree-sitter-toml.wasm",
-      queries: {
-        highlights: [
-          "https://raw.githubusercontent.com/tree-sitter-grammars/tree-sitter-toml/master/queries/highlights.scm",
-        ],
-      },
+      wasm: tomlWasm,
+      queries: { highlights: [tomlHighlights] },
     },
   ]);
 
@@ -69,7 +64,8 @@ const tui = async ({ configPath }: Readonly<TuiProps>) => {
   const application = keys(config.data.applications)[0];
   const appConfig = application !== undefined ? config.data.applications[application] : undefined;
   const targets = appConfig !== undefined ? keys(appConfig.targets) : undefined;
-  const target = targets !== undefined ? targets[0] : undefined;
+  const firstTarget = targets !== undefined ? targets[0] : undefined;
+  const target = firstTarget !== undefined && typeof firstTarget === "string" ? firstTarget : undefined;
   const sources = application !== undefined && target !== undefined ? appConfig?.targets[target]?.sources : undefined;
   const source = sources !== undefined ? sources[0] : undefined;
 

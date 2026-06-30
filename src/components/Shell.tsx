@@ -95,7 +95,7 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
     },
   );
 
-  const [_writing, setWriting] = useState<{ path: string; contents: string } | undefined>(undefined);
+  const [writing, setWriting] = useState<{ path: string; contents: string } | undefined>(undefined);
 
   const [creating, setCreating] = useState<"application" | "target" | "source" | undefined>(undefined);
 
@@ -350,9 +350,9 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
       const path = resolveAbsolutePath(opts.path);
       const { dir, ext, name } = npath.parse(path);
       void readFile(path)
-        .then((f) => f.text())
+        .then(async (f) => (f.ok ? await f.text() : undefined))
         .then(async (currentFileContents) => {
-          if (currentFileContents !== null) {
+          if (currentFileContents !== undefined) {
             await writeFile(`${dir}/${name}.${sha(currentFileContents)}.feo-bkup${ext}`, currentFileContents);
           }
           await writeFile(`${dir}/${name}${ext}`, w.contents);
@@ -447,11 +447,13 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
             active={panel === "preview"}
             borderStyle="single"
             configPath={configPath}
+            submitting={writing !== undefined}
           >
             <Suspense>
               <PreviewPanel
                 configPath={configPath}
                 active={panel === "preview"}
+                mutating={writing !== undefined}
                 application={application}
                 target={target}
                 onWrite={handleWrite}

@@ -1,3 +1,4 @@
+import fs from "node:fs";
 import npath from "node:path";
 import { isDeepStrictEqual } from "node:util";
 
@@ -15,7 +16,6 @@ import type { Serializable } from "#/lib/serialization/util";
 import loadSourceContent from "#/lib/source/loadSourceContent";
 import VERSION from "#/lib/version";
 import tui from "#/tui";
-import fs from "node:fs";
 
 import sha from "./lib/crypto/hash";
 import resolveAbsolutePath from "./lib/fs/resolveAbsolutePath";
