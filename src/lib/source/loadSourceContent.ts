@@ -12,9 +12,9 @@ async function applyTemplate(source: FeoSource, text: string) {
   if ("data" in source) {
     return text;
   }
-  switch (source.templatingLanguage) {
+  switch (source.template?.language) {
     case "liquid": {
-      return liquid(text, source.vars);
+      return liquid(text, source.template.vars ?? {});
     }
     default: {
       return text;

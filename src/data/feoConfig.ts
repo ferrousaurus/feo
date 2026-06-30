@@ -5,6 +5,11 @@ import { z } from "zod/mini";
 import filetypes, { supportedExtensionSchema } from "#/lib/config/filetypes";
 import { supportedMediaTypeSchema } from "#/lib/config/mediaTypes";
 
+const templateValidator = z.object({
+  language: z.optional(z.enum(["liquid"])),
+  vars: z.optional(z.record(z.string(), z.json())),
+});
+
 const inlineSourceValidator = z.object({
   data: z.record(z.string(), z.json()),
 });
@@ -13,15 +18,13 @@ const localSourceValidator = z.pipe(
   z.object({
     path: z.string(),
     mediaType: z.optional(supportedMediaTypeSchema),
-    templatingLanguage: z.optional(z.enum(["liquid"])),
-    vars: z.optional(z.record(z.string(), z.json())),
+    template: z.optional(templateValidator),
   }),
-  z.transform(({ mediaType, vars, ...rest }) => {
+  z.transform(({ mediaType, ...rest }) => {
     const parsedExt = supportedExtensionSchema.safeParse(path.parse(rest.path).ext);
     const resolvedMediaType = mediaType ?? (parsedExt.success ? filetypes[parsedExt.data].mediaType : undefined);
     return {
       ...(resolvedMediaType === undefined ? {} : { mediaType: resolvedMediaType }),
-      vars: vars ?? {},
       ...rest,
     };
   }),
@@ -31,15 +34,13 @@ const remoteSourceValidator = z.pipe(
   z.object({
     url: z.url(),
     mediaType: z.optional(supportedMediaTypeSchema),
-    templatingLanguage: z.optional(z.enum(["liquid"])),
-    vars: z.optional(z.record(z.string(), z.json())),
+    template: z.optional(templateValidator),
   }),
-  z.transform(({ mediaType, vars, ...rest }) => {
+  z.transform(({ mediaType, ...rest }) => {
     const parsedExt = supportedExtensionSchema.safeParse(path.parse(rest.url).ext);
     const resolvedMediaType = mediaType ?? (parsedExt.success ? filetypes[parsedExt.data].mediaType : undefined);
     return {
       ...(resolvedMediaType === undefined ? {} : { mediaType: resolvedMediaType }),
-      vars: vars ?? {},
       ...rest,
     };
   }),
