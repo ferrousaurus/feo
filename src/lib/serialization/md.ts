@@ -1,5 +1,6 @@
+import { z } from "zod";
+
 import mediaTypes from "#/lib/config/mediaTypes";
-import { z } from "zod/mini";
 
 import type { Serializable } from "./util";
 

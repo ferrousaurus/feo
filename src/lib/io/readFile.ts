@@ -1,6 +1,6 @@
 import fs from "node:fs/promises";
 
-import { z } from "zod/mini";
+import { z } from "zod";
 
 import getProtocol from "#/lib/fs/getProtocol";
 import resolveAbsolutePath from "#/lib/fs/resolveAbsolutePath";

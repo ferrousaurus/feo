@@ -1,4 +1,4 @@
-import { z } from "zod/mini";
+import { z } from "zod";
 
 export const serializableValidator = z.record(z.string(), z.json());
 

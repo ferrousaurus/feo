@@ -1,5 +1,5 @@
 import type { CodeProps } from "@opentui/react";
-import { z } from "zod/mini";
+import { z } from "zod";
 
 import json from "#/lib/serialization/json";
 import md from "#/lib/serialization/md";

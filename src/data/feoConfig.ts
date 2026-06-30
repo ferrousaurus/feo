@@ -1,68 +1,107 @@
 import path from "node:path";
 
-import { z } from "zod/mini";
+import { z } from "zod";
 
 import filetypes, { supportedExtensionSchema } from "#/lib/config/filetypes";
 import { supportedMediaTypeSchema } from "#/lib/config/mediaTypes";
+import entries from "#/lib/object/entries";
 
 const templateValidator = z.object({
-  language: z.optional(z.enum(["liquid"])),
-  vars: z.optional(z.record(z.string(), z.json())),
+  language: z.enum(["liquid"]).optional(),
+  vars: z.record(z.string(), z.json()).optional(),
 });
 
 const inlineSourceValidator = z.object({
   data: z.record(z.string(), z.json()),
 });
 
-const localSourceValidator = z.pipe(
-  z.object({
+const localSourceValidator = z
+  .object({
     path: z.string(),
-    mediaType: z.optional(supportedMediaTypeSchema),
-    template: z.optional(templateValidator),
-  }),
-  z.transform(({ mediaType, ...rest }) => {
+    mediaType: supportedMediaTypeSchema.optional(),
+    template: templateValidator.optional(),
+  })
+  .transform(({ mediaType, ...rest }) => {
     const parsedExt = supportedExtensionSchema.safeParse(path.parse(rest.path).ext);
     const resolvedMediaType = mediaType ?? (parsedExt.success ? filetypes[parsedExt.data].mediaType : undefined);
     return {
       ...(resolvedMediaType === undefined ? {} : { mediaType: resolvedMediaType }),
       ...rest,
     };
-  }),
-);
+  });
 
-const remoteSourceValidator = z.pipe(
-  z.object({
+const remoteSourceValidator = z
+  .object({
     url: z.url(),
-    mediaType: z.optional(supportedMediaTypeSchema),
-    template: z.optional(templateValidator),
-  }),
-  z.transform(({ mediaType, ...rest }) => {
+    mediaType: supportedMediaTypeSchema.optional(),
+    template: templateValidator.optional(),
+  })
+  .transform(({ mediaType, ...rest }) => {
     const parsedExt = supportedExtensionSchema.safeParse(path.parse(rest.url).ext);
     const resolvedMediaType = mediaType ?? (parsedExt.success ? filetypes[parsedExt.data].mediaType : undefined);
     return {
       ...(resolvedMediaType === undefined ? {} : { mediaType: resolvedMediaType }),
       ...rest,
     };
-  }),
-);
+  });
 
 export const sourceValidator = z.union([inlineSourceValidator, localSourceValidator, remoteSourceValidator]);
 
 export type FeoSource = z.infer<typeof sourceValidator>;
 
-export const targetValidator = z.object({
-  path: z.string(),
-  sources: z.array(sourceValidator),
-});
+export const targetValidator = z
+  .object({
+    path: z.string(),
+    sources: z.array(sourceValidator),
+    template: z
+      .object({
+        vars: z.record(z.string(), z.json()),
+      })
+      .prefault({ vars: {} }),
+  })
+  .transform(({ sources, template, ...rest }) => ({
+    ...rest,
+    template,
+    sources: sources.map((s) =>
+      "template" in s ? { ...s, template: { ...s.template, vars: { ...template.vars, ...s.template?.vars } } } : s,
+    ),
+  }));
 
-export const applicationValidator = z.object({
-  targets: z.record(z.string(), targetValidator),
-});
+export const applicationValidator = z
+  .object({
+    targets: z.record(z.string(), targetValidator),
+    template: z
+      .object({
+        vars: z.record(z.string(), z.json()),
+      })
+      .prefault({ vars: {} }),
+  })
+  .transform(({ targets, template: appTemplate, ...rest }) => ({
+    ...rest,
+    template: appTemplate,
+    targets: Object.fromEntries(
+      entries(targets).map(([name, { sources, template: targetTemplate, ...rest }]) => [
+        name,
+        {
+          ...rest,
+          template: targetTemplate,
+          sources: sources.map((s) =>
+            "template" in s
+              ? {
+                  ...s,
+                  template: {
+                    ...s.template,
+                    vars: { ...appTemplate.vars, ...targetTemplate.vars, ...s.template?.vars },
+                  },
+                }
+              : s,
+          ),
+        },
+      ]),
+    ),
+  }));
 
-const keymapValidator = z.pipe(
-  z.union([z.array(z.string()), z.string()]),
-  z.transform((p) => (typeof p === "string" ? [p] : p)),
-);
+const keymapValidator = z.union([z.array(z.string()), z.string()]).transform((p) => (typeof p === "string" ? [p] : p));
 
 const defaultConfig = {
   settings: {
@@ -92,8 +131,8 @@ const defaultConfig = {
 const feoConfigValidator = z.object({
   settings: z.prefault(
     z.object({
-      keymap: z.prefault(
-        z.object({
+      keymap: z
+        .object({
           cancel: z.prefault(keymapValidator, defaultConfig.settings.keymap.cancel),
           confirm: z.prefault(keymapValidator, defaultConfig.settings.keymap.confirm),
           delete: z.prefault(keymapValidator, defaultConfig.settings.keymap.delete),
@@ -104,20 +143,19 @@ const feoConfigValidator = z.object({
           scrollUp: z.prefault(keymapValidator, defaultConfig.settings.keymap.scrollUp),
           up: z.prefault(keymapValidator, defaultConfig.settings.keymap.up),
           write: z.prefault(keymapValidator, defaultConfig.settings.keymap.write),
-        }),
-        defaultConfig.settings.keymap,
-      ),
-      theme: z.prefault(
-        z.object({
-          inactive: z.prefault(z.string(), defaultConfig.settings.theme.inactive),
-          active: z.prefault(z.string(), defaultConfig.settings.theme.active),
-          success: z.prefault(z.string(), defaultConfig.settings.theme.success),
-          info: z.prefault(z.string(), defaultConfig.settings.theme.info),
-          warning: z.prefault(z.string(), defaultConfig.settings.theme.warning),
-          error: z.prefault(z.string(), defaultConfig.settings.theme.error),
-        }),
-        defaultConfig.settings.theme,
-      ),
+        })
+        .prefault(defaultConfig.settings.keymap),
+
+      theme: z
+        .object({
+          inactive: z.string().prefault(defaultConfig.settings.theme.inactive),
+          active: z.string().prefault(defaultConfig.settings.theme.active),
+          success: z.string().prefault(defaultConfig.settings.theme.success),
+          info: z.string().prefault(defaultConfig.settings.theme.info),
+          warning: z.string().prefault(defaultConfig.settings.theme.warning),
+          error: z.string().prefault(defaultConfig.settings.theme.error),
+        })
+        .prefault(defaultConfig.settings.theme),
     }),
     {
       keymap: defaultConfig.settings.keymap,

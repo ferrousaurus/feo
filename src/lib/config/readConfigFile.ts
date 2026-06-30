@@ -1,4 +1,4 @@
-import { z } from "zod/mini";
+import { z } from "zod";
 
 import filetypes from "#/lib/config/filetypes";
 import mediaTypes from "#/lib/config/mediaTypes";

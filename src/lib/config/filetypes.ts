@@ -1,4 +1,4 @@
-import { z } from "zod/mini";
+import { z } from "zod";
 
 import keys from "#/lib/object/keys";
 

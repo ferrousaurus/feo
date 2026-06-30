@@ -1,6 +1,6 @@
 # feo
 
-Configuration file manager with a terminal UI. Domain language in [CONTEXT.md](CONTEXT.md); decisions in [docs/adr/](docs/adr/).
+Configuration file manager with a terminal UI. Architectural decisions in [docs/adr/](docs/adr/).
 
 ## Toolchain
 
@@ -21,8 +21,9 @@ CI runs in this order (`.github/workflows/ci.yml`): `lint` → `fmt:check` → `
 ## Architecture
 
 - CLI: `src/index.ts` (Cliffy). Default action launches the TUI; the only subcommand is `write [--all] [applications...]`.
-- TUI: `src/tui.tsx` mounts an OpenTUI renderer + React root inside TanStack Query (`src/data/*`). Four panels (`src/panels/*`) are composed in `src/components/Shell.tsx` — Applications / Targets / Sources / Preview.
-- Config schema (zod/mini): `src/data/feoConfig.ts`. Source identity is derived, not stored — see `src/lib/source/identity.ts` and `docs/adr/0001-source-identity.md`.
+- TUI: `src/tui.tsx` mounts an OpenTUI renderer + React root inside TanStack Query (`src/data/*`). Four panels (`src/panels/*`) are composed in `src/components/Shell.tsx` — Applications / Targets / Sources / Preview, plus a `LegendPanel` footer.
+- Tree-sitter parsers (`.json`/`.yaml`/`.toml`) are downloaded from GitHub at TUI startup in `src/tui.tsx` (`addDefaultParsers`). Offline/airgapped runs of the TUI will fail to syntax-highlight — a network fetch is required.
+- Config schema (zod): `src/data/feoConfig.ts`. Source identity is derived, not stored — see `src/lib/source/identity.ts` and `docs/adr/0001-source-identity.md`.
 - Per-filetype parse/stringify: `src/lib/config/filetypes.ts` (`.jsonc`, `.json`, `.yaml`, `.yml`, `.toml`, `.md`, `.mdx`). Default config: `~/.config/feo/config.jsonc`; override with `feo -c <path>`.
 - `write` deep-merges sources per target and writes the target file; existing files are backed up as `{name}.{sha(content)}.feo-bkup{ext}` before overwrite.
 
@@ -30,7 +31,7 @@ CI runs in this order (`.github/workflows/ci.yml`): `lint` → `fmt:check` → `
 
 - **Path alias**: `#/*` → `./src/*` (mirrored in `tsconfig.json` and `vitest.config.ts`). NOT `@/*`.
 - **JSX runtime**: `@opentui/react` (`tsconfig.json` `jsxImportSource`). Terminal UI.
-- **Zod**: import from `zod/mini`, not `zod`.
+- **Zod**: import from `zod`, not `zod/mini`.
 - **JSR packages**: `@jsr/*` requires the registry in `.npmrc` (`@jsr:registry=https://npm.jsr.io`).
 - **Module system**: ESM with `verbatimModuleSyntax: true` — use `import type` for type-only imports.
 - **tsconfig**: `strict`, `noUncheckedIndexedAccess`, `noImplicitOverride` enabled. `noUnused*` and `noPropertyAccessFromIndexSignature` disabled.
