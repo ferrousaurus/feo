@@ -7,6 +7,7 @@ import { useRef } from "react";
 import Keybinds from "#/components/Keybinds";
 import configQueryOptions from "#/data/configQueryOptions";
 import filetypes, { supportedExtensionSchema } from "#/lib/config/filetypes";
+import mediaTypes from "#/lib/config/mediaTypes";
 import getMergedConfig from "#/lib/getMergedConfig";
 import syntaxStyle from "#/lib/syntaxStyle";
 
@@ -63,7 +64,7 @@ export default function PreviewPanel({
   const validatedExt = supportedExtensionSchema.safeParse(ext);
 
   const stringify = validatedExt.success
-    ? (filetypes[validatedExt.data].stringify ?? ((obj) => obj.toString()))
+    ? (mediaTypes[filetypes[validatedExt.data].mediaType].stringify ?? ((obj) => obj.toString()))
     : (obj: Record<string, unknown>) => obj.toString();
 
   return (
@@ -73,7 +74,7 @@ export default function PreviewPanel({
           <code
             wrapMode="none"
             content={stringify(data)}
-            filetype={validatedExt.success ? filetypes[validatedExt.data].filetype : undefined}
+            filetype={validatedExt.success ? mediaTypes[filetypes[validatedExt.data].mediaType].filetype : undefined}
             syntaxStyle={syntaxStyle}
           />
         </line-number>

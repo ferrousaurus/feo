@@ -8,6 +8,7 @@ import Keybinds from "#/components/Keybinds";
 import type { FeoSource } from "#/data/feoConfig";
 import sourceContentQueryOptions from "#/data/sourceContentQueryOptions";
 import filetypes, { supportedExtensionSchema } from "#/lib/config/filetypes";
+import mediaTypes from "#/lib/config/mediaTypes";
 import syntaxStyle from "#/lib/syntaxStyle";
 
 export type ActiveSourceProps = {
@@ -34,7 +35,8 @@ export default function ActiveSource({ enableKeybinds, configPath, source }: Rea
 
   const { ext } = path.parse("path" in source ? source.path : "url" in source ? source.url : "data.json");
   const validatedExt = supportedExtensionSchema.safeParse(ext);
-  const format = validatedExt.success ? validatedExt.data : null;
+  const mediaType =
+    "mediaType" in source ? source.mediaType : validatedExt.success ? filetypes[validatedExt.data].mediaType : null;
 
   return (
     <>
@@ -42,8 +44,8 @@ export default function ActiveSource({ enableKeybinds, configPath, source }: Rea
         <line-number>
           <code
             wrapMode="none"
-            content={data === undefined ? "" : filetypes[format ?? ".json"].stringify(data)}
-            filetype={format === null ? "txt" : filetypes[format].filetype}
+            content={data === undefined ? "" : mediaTypes[mediaType ?? "application/json"].stringify(data)}
+            filetype={mediaType === null || mediaType === undefined ? "txt" : mediaTypes[mediaType].filetype}
             syntaxStyle={syntaxStyle}
           />
         </line-number>

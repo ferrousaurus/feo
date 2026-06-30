@@ -2,7 +2,8 @@ import path from "node:path";
 
 import { z } from "zod/mini";
 
-import { SUPPORTED_EXTENSIONS } from "#/lib/config/filetypes";
+import filetypes, { supportedExtensionSchema } from "#/lib/config/filetypes";
+import { supportedMediaTypeSchema } from "#/lib/config/mediaTypes";
 
 const inlineSourceValidator = z.object({
   data: z.record(z.string(), z.json()),
@@ -11,29 +12,37 @@ const inlineSourceValidator = z.object({
 const localSourceValidator = z.pipe(
   z.object({
     path: z.string(),
-    mediaType: z.optional(z.enum(SUPPORTED_EXTENSIONS)),
+    mediaType: z.optional(supportedMediaTypeSchema),
     templatingLanguage: z.optional(z.enum(["liquid"])),
     vars: z.optional(z.record(z.string(), z.json())),
   }),
-  z.transform(({ mediaType, vars, ...rest }) => ({
-    mediaType: mediaType === undefined ? z.enum(SUPPORTED_EXTENSIONS).parse(path.parse(rest.path).ext) : mediaType,
-    vars: vars === undefined ? {} : vars,
-    ...rest,
-  })),
+  z.transform(({ mediaType, vars, ...rest }) => {
+    const parsedExt = supportedExtensionSchema.safeParse(path.parse(rest.path).ext);
+    const resolvedMediaType = mediaType ?? (parsedExt.success ? filetypes[parsedExt.data].mediaType : undefined);
+    return {
+      ...(resolvedMediaType === undefined ? {} : { mediaType: resolvedMediaType }),
+      vars: vars ?? {},
+      ...rest,
+    };
+  }),
 );
 
 const remoteSourceValidator = z.pipe(
   z.object({
     url: z.url(),
-    mediaType: z.optional(z.enum(SUPPORTED_EXTENSIONS)),
+    mediaType: z.optional(supportedMediaTypeSchema),
     templatingLanguage: z.optional(z.enum(["liquid"])),
     vars: z.optional(z.record(z.string(), z.json())),
   }),
-  z.transform(({ mediaType, vars, ...rest }) => ({
-    mediaType: mediaType === undefined ? z.enum(SUPPORTED_EXTENSIONS).parse(path.parse(rest.url).ext) : mediaType,
-    vars: vars === undefined ? {} : vars,
-    ...rest,
-  })),
+  z.transform(({ mediaType, vars, ...rest }) => {
+    const parsedExt = supportedExtensionSchema.safeParse(path.parse(rest.url).ext);
+    const resolvedMediaType = mediaType ?? (parsedExt.success ? filetypes[parsedExt.data].mediaType : undefined);
+    return {
+      ...(resolvedMediaType === undefined ? {} : { mediaType: resolvedMediaType }),
+      vars: vars ?? {},
+      ...rest,
+    };
+  }),
 );
 
 export const sourceValidator = z.union([inlineSourceValidator, localSourceValidator, remoteSourceValidator]);

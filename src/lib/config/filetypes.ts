@@ -1,55 +1,32 @@
 import { z } from "zod/mini";
 
 import keys from "#/lib/object/keys";
-import json from "#/lib/serialization/json";
-import md from "#/lib/serialization/md";
-import toml from "#/lib/serialization/toml";
-import yaml from "#/lib/serialization/yaml";
 
-import type { Serializable } from "../serialization/util";
+import mediaTypes from "./mediaTypes";
 
 export type Filetype = {
-  filetype: string;
-  parse: (str: string) => Serializable;
-  stringify: (obj: Serializable) => string;
+  mediaType: keyof typeof mediaTypes;
 };
 
 const filetypes = {
   ".jsonc": {
-    filetype: "json",
-    parse: json.parse,
-    stringify: json.stringify,
-  } satisfies Filetype,
+    mediaType: "application/json",
+  },
   ".json": {
-    filetype: "json",
-    parse: json.parse,
-    stringify: json.stringify,
-  } satisfies Filetype,
+    mediaType: "application/json",
+  },
   ".yaml": {
-    filetype: "yaml",
-    parse: yaml.parse,
-    stringify: yaml.stringify,
-  } satisfies Filetype,
+    mediaType: "application/yaml",
+  },
   ".yml": {
-    filetype: "yaml",
-    parse: yaml.parse,
-    stringify: yaml.stringify,
-  } satisfies Filetype,
+    mediaType: "application/yaml",
+  },
   ".toml": {
-    filetype: "toml",
-    parse: toml.parse,
-    stringify: toml.stringify,
-  } satisfies Filetype,
+    mediaType: "application/toml",
+  },
   ".md": {
-    filetype: "md",
-    parse: md.parse,
-    stringify: md.stringify,
-  } satisfies Filetype,
-  ".mdx": {
-    filetype: "md",
-    parse: md.parse,
-    stringify: md.stringify,
-  } satisfies Filetype,
+    mediaType: "text/markdown",
+  },
 } as const;
 
 export const SUPPORTED_EXTENSIONS = keys(filetypes);

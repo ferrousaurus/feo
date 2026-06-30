@@ -7,6 +7,7 @@ import { deepMerge } from "@std/collections";
 import configOption from "#/commands/options/config";
 import feoConfigValidator from "#/data/feoConfig";
 import filetypes, { supportedExtensionSchema } from "#/lib/config/filetypes";
+import mediaTypes from "#/lib/config/mediaTypes";
 import readFile from "#/lib/io/readFile";
 import entries from "#/lib/object/entries";
 import values from "#/lib/object/values";
@@ -38,7 +39,7 @@ await new Command()
     const configPath = options.config as string;
     const configStr = await readFile(configPath).then((f) => f.text());
     const configExt = supportedExtensionSchema.parse(npath.parse(configPath).ext);
-    const data = filetypes[configExt].parse(configStr);
+    const data = mediaTypes[filetypes[configExt].mediaType].parse(configStr);
     const config = feoConfigValidator.parse(data);
     const applications =
       all === true
@@ -55,7 +56,7 @@ await new Command()
           .filter((r) => r.status === "fulfilled")
           .map((r) => r.value);
         const resolved = sources.reduce((p, c) => deepMerge(c, p), {} as Serializable);
-        const contents = filetypes[validatedExt].stringify(resolved);
+        const contents = mediaTypes[filetypes[validatedExt].mediaType].stringify(resolved);
         const currentFile = await readFile(resolveAbsolutePath(targetPath));
 
         if (currentFile.ok) {
@@ -64,7 +65,9 @@ await new Command()
           const currentFileData =
             currentFileContents === null
               ? null
-              : filetypes[supportedExtensionSchema.parse(npath.parse(targetPath).ext)].parse(currentFileContents);
+              : mediaTypes[filetypes[supportedExtensionSchema.parse(npath.parse(targetPath).ext)].mediaType].parse(
+                  currentFileContents,
+                );
 
           if (!isDeepStrictEqual(currentFileData, resolved)) {
             await writeFile(

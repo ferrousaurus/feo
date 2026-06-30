@@ -5,12 +5,13 @@ import { mutationOptions } from "@tanstack/react-query";
 
 import feoConfigValidator, { type FeoConfig } from "#/data/feoConfig";
 import filetypes, { supportedExtensionSchema } from "#/lib/config/filetypes";
+import mediaTypes from "#/lib/config/mediaTypes";
 import resolveAbsolutePath from "#/lib/fs/resolveAbsolutePath";
 import writeFile from "#/lib/io/writeFile";
 import type { DeepPartial } from "#/lib/object/DeepPartial";
 
 const patchConfigMutationOptions = (configPath: string) => {
-  const filetype = filetypes[supportedExtensionSchema.parse(npath.parse(configPath).ext)];
+  const mediaType = mediaTypes[filetypes[supportedExtensionSchema.parse(npath.parse(configPath).ext)].mediaType];
 
   return mutationOptions({
     mutationKey: ["patchConfig", configPath],
@@ -27,7 +28,7 @@ const patchConfigMutationOptions = (configPath: string) => {
       if (!newConfig.success) {
         throw new Error("There was an error applying the change.");
       }
-      await writeFile(resolveAbsolutePath(configPath), filetype.stringify(newConfig.data));
+      await writeFile(resolveAbsolutePath(configPath), mediaType.stringify(newConfig.data));
 
       return newConfig.data;
     },

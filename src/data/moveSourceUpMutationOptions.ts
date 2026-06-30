@@ -6,6 +6,7 @@ import { mutationOptions } from "@tanstack/react-query";
 import type { FeoConfig } from "#/data/feoConfig";
 import feoConfigValidator from "#/data/feoConfig";
 import filetypes, { supportedExtensionSchema } from "#/lib/config/filetypes";
+import mediaTypes from "#/lib/config/mediaTypes";
 import resolveAbsolutePath from "#/lib/fs/resolveAbsolutePath";
 import writeFile from "#/lib/io/writeFile";
 import { sourceId } from "#/lib/source/identity";
@@ -31,7 +32,7 @@ function moveSourceUp(config: FeoConfig, vars: { app: string; target: string; so
 }
 
 const moveSourceUpMutationOptions = (configPath: string) => {
-  const filetype = filetypes[supportedExtensionSchema.parse(npath.parse(configPath).ext)];
+  const mediaType = mediaTypes[filetypes[supportedExtensionSchema.parse(npath.parse(configPath).ext)].mediaType];
 
   return mutationOptions({
     mutationKey: ["moveSourceUp", configPath],
@@ -66,7 +67,7 @@ const moveSourceUpMutationOptions = (configPath: string) => {
         if (!newConfig.success) {
           throw new Error("There was an error applying the change.");
         }
-        await writeFile(resolveAbsolutePath(configPath), filetype.stringify(newConfig.data));
+        await writeFile(resolveAbsolutePath(configPath), mediaType.stringify(newConfig.data));
         return newConfig.data;
       } catch (_e) {
         return config.data;

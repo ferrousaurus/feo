@@ -5,12 +5,13 @@ import { mutationOptions } from "@tanstack/react-query";
 
 import feoConfigValidator from "#/data/feoConfig";
 import filetypes, { supportedExtensionSchema } from "#/lib/config/filetypes";
+import mediaTypes from "#/lib/config/mediaTypes";
 import resolveAbsolutePath from "#/lib/fs/resolveAbsolutePath";
 import writeFile from "#/lib/io/writeFile";
 import keys from "#/lib/object/keys";
 
 const addApplicationMutationOptions = (configPath: string) => {
-  const filetype = filetypes[supportedExtensionSchema.parse(npath.parse(configPath).ext)];
+  const mediaType = mediaTypes[filetypes[supportedExtensionSchema.parse(npath.parse(configPath).ext)].mediaType];
 
   return mutationOptions({
     mutationKey: ["addApplication", configPath],
@@ -38,7 +39,7 @@ const addApplicationMutationOptions = (configPath: string) => {
       if (!newConfig.success) {
         throw new Error("There was an error applying the change.");
       }
-      await writeFile(resolveAbsolutePath(configPath), filetype.stringify(newConfig.data));
+      await writeFile(resolveAbsolutePath(configPath), mediaType.stringify(newConfig.data));
       return newConfig.data;
     },
     onSuccess: async (data, _vars, _onMutateResult, context) => {

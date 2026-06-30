@@ -1,6 +1,7 @@
 import { z } from "zod/mini";
 
 import filetypes from "#/lib/config/filetypes";
+import mediaTypes from "#/lib/config/mediaTypes";
 import readFile from "#/lib/io/readFile";
 import keys from "#/lib/object/keys";
 
@@ -23,5 +24,5 @@ export default async function readConfigFile(path: string) {
     throw new UnsupportedExtentionError(ext);
   }
 
-  return filetypes[supportedExt.data]?.parse(contents);
+  return mediaTypes[filetypes[supportedExt.data]?.mediaType]?.parse(contents);
 }
