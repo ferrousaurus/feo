@@ -27,16 +27,14 @@ await new Command()
   .description("A configuration file manager")
   .globalOption(configOption.flags, configOption.desc, configOption.opts)
   .action(async (options) => {
-    if (options.config !== undefined) {
-      await tui({ configPath: options.config });
-    } else {
-      const configDir = npath.join(process.env.HOME ?? "", ".config", "feo");
-      const configPath =
-        ["jsonc", "json", "yaml", "yml", "toml"]
-          .map((ext) => npath.join(configDir, `config.${ext}`))
-          .find((p) => fs.existsSync(p)) ?? "";
-      await tui({ configPath });
-    }
+    const configDir = npath.join(process.env.HOME ?? "", ".config", "feo");
+    const configPath =
+      options.config !== undefined
+        ? options.config
+        : (["jsonc", "json", "yaml", "yml", "toml"]
+            .map((ext) => npath.join(configDir, `config.${ext}`))
+            .find((p) => fs.existsSync(p)) ?? "");
+    await tui({ configPath });
   })
   .command("write", "Write configurations")
   .option("-a, --all", "Write all targets")
@@ -46,7 +44,13 @@ await new Command()
       console.error("You cannot specify applications when using the --all option");
       throw new Error("You cannot specify applications when using the --all option");
     }
-    const configPath = options.config as string;
+    const configDir = npath.join(process.env.HOME ?? "", ".config", "feo");
+    const configPath =
+      options.config !== undefined
+        ? options.config
+        : (["jsonc", "json", "yaml", "yml", "toml"]
+            .map((ext) => npath.join(configDir, `config.${ext}`))
+            .find((p) => fs.existsSync(p)) ?? "");
     const configStr = await readFile(configPath).then((f) => f.text());
     const configExt = supportedExtensionSchema.parse(npath.parse(configPath).ext);
     const data = mediaTypes[filetypes[configExt].mediaType].parse(configStr);
