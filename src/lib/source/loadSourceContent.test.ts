@@ -14,14 +14,14 @@ describe("loadSourceContent", () => {
   });
 
   it("reads and parses a local path source by extension", async () => {
-    vi.mocked(readFile).mockResolvedValue({ ok: true, text: async () => '{"a":1}', status: 200 } as never);
+    vi.mocked(readFile).mockResolvedValue({ ok: true, text: async () => '{"a":1}', status: 200 });
     const result = await loadSourceContent(sourceValidator.parse({ path: "config.json" }));
     expect(result).toEqual({ a: 1 });
     expect(readFile).toHaveBeenCalledWith("config.json");
   });
 
   it("reads and parses a remote url source by extension", async () => {
-    vi.mocked(readFile).mockResolvedValue({ ok: true, text: async () => '{"b":2}', status: 200 } as never);
+    vi.mocked(readFile).mockResolvedValue({ ok: true, text: async () => '{"b":2}', status: 200 });
     const result = await loadSourceContent(sourceValidator.parse({ url: "https://example.com/config.json" }));
     expect(result).toEqual({ b: 2 });
     expect(readFile).toHaveBeenCalledWith("https://example.com/config.json");

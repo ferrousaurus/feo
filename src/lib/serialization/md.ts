@@ -1,26 +1,38 @@
-import * as YAML from "@std/yaml";
-import { z, type JSONType } from "zod/mini";
+import mediaTypes from "#/lib/config/mediaTypes";
+import { z } from "zod/mini";
 
 import type { Serializable } from "./util";
 
-export const parse = (str: string): { content: string; frontmatter?: JSONType } => {
-  const match = str.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
-  if (match === null) {
-    return { content: str };
-  }
-  const [, frontmatter, content] = match;
+const handleMatch = (matched: Exclude<RegExpMatchArray, null>, parse: (frontmatter: string) => z.JSONType) => {
+  const [, frontmatter, content] = matched;
   if (frontmatter === undefined) {
     return { content: content ?? "" };
   }
-  return { content: content ?? "", frontmatter: z.json().parse(YAML.parse(frontmatter)) };
+  return { content: content ?? "", frontmatter: z.json().parse(parse(frontmatter)) };
 };
 
-export const stringify = (obj: Serializable) => {
+export const parse = (str: string): { frontmatter?: z.JSONType; content: string } => {
+  const yamlMatch = str.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
+  if (yamlMatch !== null) {
+    return handleMatch(yamlMatch, mediaTypes["application/yaml"].parse);
+  }
+  const tomlMatch = str.match(/^\+\+\+\n([\s\S]*?)\n\+\+\+\n([\s\S]*)$/);
+  if (tomlMatch !== null) {
+    return handleMatch(tomlMatch, mediaTypes["application/toml"].parse);
+  }
+  const jsonMatch = str.match(/^;;;\n([\s\S]*?)\n;;;\n([\s\S]*)$/);
+  if (jsonMatch !== null) {
+    return handleMatch(jsonMatch, mediaTypes["application/json"].parse);
+  }
+  return { content: str };
+};
+
+export const stringify = (obj: Serializable): string => {
   const { content, frontmatter } = obj;
   if (frontmatter === undefined) {
     return `${content}`;
   }
-  return `---\n${YAML.stringify(frontmatter)}---\n${content}`;
+  return `---\n${mediaTypes["application/yaml"].stringify(z.record(z.string(), z.json()).parse(frontmatter))}---\n${content}`;
 };
 
 export default { parse, stringify };

@@ -32,9 +32,9 @@ const mediaTypes = {
     stringify: toml.stringify,
   } satisfies MediaType,
   "text/markdown": {
-    filetype: "md",
-    parse: md.parse,
-    stringify: md.stringify,
+    filetype: "markdown",
+    parse: (str) => md.parse(str),
+    stringify: (obj) => md.stringify(obj),
   } satisfies MediaType,
 } as const;
 
