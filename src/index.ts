@@ -15,6 +15,7 @@ import type { Serializable } from "#/lib/serialization/util";
 import loadSourceContent from "#/lib/source/loadSourceContent";
 import VERSION from "#/lib/version";
 import tui from "#/tui";
+import fs from "node:fs";
 
 import sha from "./lib/crypto/hash";
 import resolveAbsolutePath from "./lib/fs/resolveAbsolutePath";
@@ -26,7 +27,16 @@ await new Command()
   .description("A configuration file manager")
   .globalOption(configOption.flags, configOption.desc, configOption.opts)
   .action(async (options) => {
-    await tui({ configPath: options.config });
+    if (options.config !== undefined) {
+      await tui({ configPath: options.config });
+    } else {
+      const configDir = npath.join(process.env.HOME ?? "", ".config", "feo");
+      const configPath =
+        ["jsonc", "json", "yaml", "yml", "toml"]
+          .map((ext) => npath.join(configDir, `config.${ext}`))
+          .find((p) => fs.existsSync(p)) ?? "";
+      await tui({ configPath });
+    }
   })
   .command("write", "Write configurations")
   .option("-a, --all", "Write all targets")
