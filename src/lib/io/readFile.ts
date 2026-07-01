@@ -1,8 +1,6 @@
 import fs from "node:fs/promises";
 
-import { z } from "zod";
 
-import getProtocol from "#/lib/fs/getProtocol";
 import resolveAbsolutePath from "#/lib/fs/resolveAbsolutePath";
 
 export class NotFoundError extends Error {
@@ -53,7 +51,7 @@ async function readLocalFile(path: string | URL) {
   }
 }
 
-async function readHttpFile(input: string | URL) {
+export async function readHttpFile(input: string | URL) {
   const response = await fetch(input);
   if (response.status === 404) {
     throw new NotFoundError(input);
@@ -67,29 +65,14 @@ async function readHttpFile(input: string | URL) {
   return response;
 }
 
-export default async function readFile(input: string | URL) {
-  if (typeof input === "string") {
-    const absolutePath = resolveAbsolutePath(input);
+export default async function readFile(input: string) {
+  const absolutePath = resolveAbsolutePath(input);
 
-    const protocol = getProtocol(absolutePath);
-    const validatedProtocol = z.enum(["file:", "http:", "https:"]).safeParse(protocol);
-    if (!validatedProtocol.success) {
-      throw new UnsupportedProtocolError(protocol);
-    }
-    switch (protocol) {
-      case "file:":
-        try {
-          const file = await readLocalFile(absolutePath);
-          const text = file.toString();
-          return { ok: true, text: async () => text, status: 200 } as const;
-        } catch {
-          return { ok: false, text: async () => await Promise.reject(), status: 404 } as const;
-        }
-      case "http:":
-      case "https:":
-        return await readHttpFile(absolutePath);
-    }
+  try {
+    const file = await readLocalFile(absolutePath);
+    const text = file.toString();
+    return { ok: true, text: async () => text, status: 200 } as const;
+  } catch {
+    return { ok: false, text: async () => await Promise.reject(), status: 404 } as const;
   }
-
-  return await readHttpFile(input);
 }

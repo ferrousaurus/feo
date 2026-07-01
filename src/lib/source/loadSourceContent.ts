@@ -2,8 +2,8 @@ import npath from "node:path";
 
 import type { FeoSource } from "#/data/feoConfig";
 import filetypes, { supportedExtensionSchema } from "#/lib/config/filetypes";
-import mediaTypes from "#/lib/config/mediaTypes";
-import readFile from "#/lib/io/readFile";
+import mediaTypes, { supportedMediaTypeSchema } from "#/lib/config/mediaTypes";
+import readFile, { readHttpFile } from "#/lib/io/readFile";
 import type { Serializable } from "#/lib/serialization/util";
 
 import liquid from "../templating/liquid";
@@ -30,10 +30,12 @@ export default async function loadSourceContent(source: FeoSource): Promise<Seri
     return mediaTypes[filetypes[ext].mediaType].parse(templated);
   }
   if ("url" in source) {
-    const text = await readFile(source.url).then((f) => f.text());
-    const ext = supportedExtensionSchema.parse(npath.parse(source.url).ext);
+    const response = await readHttpFile(source.url)
+    const text = await response.text();
+    const contentType = supportedMediaTypeSchema.safeParse(response.headers.get("Content-Type")?.split(";")[0]);
+    const mediaType = source.mediaType !== undefined ? mediaTypes[source.mediaType] : (contentType.success ? mediaTypes[contentType.data] :  mediaTypes[filetypes[supportedExtensionSchema.parse(npath.parse(source.url).ext)].mediaType]);
     const templated = await applyTemplate(source, text);
-    return mediaTypes[filetypes[ext].mediaType].parse(templated);
+    return mediaType.parse(templated);
   }
   return source.data;
 }
