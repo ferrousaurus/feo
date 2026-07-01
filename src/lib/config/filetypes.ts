@@ -30,6 +30,9 @@ const filetypes = {
   ".mdx": {
     mediaType: "text/markdown",
   },
+  ".txt": {
+    mediaType: "text/plain"
+  }
 } as const;
 
 export const SUPPORTED_EXTENSIONS = keys(filetypes);

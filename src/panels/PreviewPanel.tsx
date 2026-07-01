@@ -1,12 +1,9 @@
-import path from "node:path";
-
 import { ScrollBoxRenderable } from "@opentui/core";
 import { queryOptions, useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { useRef } from "react";
 
 import Keybinds from "#/components/Keybinds";
 import configQueryOptions from "#/data/configQueryOptions";
-import filetypes, { supportedExtensionSchema } from "#/lib/config/filetypes";
 import mediaTypes from "#/lib/config/mediaTypes";
 import getMergedConfig from "#/lib/getMergedConfig";
 import syntaxStyle from "#/lib/syntaxStyle";
@@ -61,12 +58,11 @@ export default function PreviewPanel({
   }
 
   const targetPath = config.applications[application]?.targets[target]?.path ?? "";
-  const { ext } = path.parse(targetPath);
 
-  const validatedExt = supportedExtensionSchema.safeParse(ext);
+  const mediaType = config.applications[application]?.targets[target]?.mediaType
 
-  const stringify = validatedExt.success
-    ? (mediaTypes[filetypes[validatedExt.data].mediaType].stringify ?? ((obj) => obj.toString()))
+  const stringify = mediaType !== undefined
+    ? (mediaTypes[mediaType].stringify)
     : (obj: Record<string, unknown>) => obj.toString();
 
   return (
@@ -76,7 +72,7 @@ export default function PreviewPanel({
           <code
             wrapMode="none"
             content={stringify(data)}
-            filetype={validatedExt.success ? mediaTypes[filetypes[validatedExt.data].mediaType].filetype : undefined}
+            filetype={mediaType !== undefined ? mediaTypes[mediaType].filetype : undefined}
             syntaxStyle={syntaxStyle}
           />
         </line-number>

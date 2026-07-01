@@ -4,6 +4,7 @@ import { z } from "zod";
 import json from "#/lib/serialization/json";
 import md from "#/lib/serialization/md";
 import toml from "#/lib/serialization/toml";
+import txt from "#/lib/serialization/txt";
 import yaml from "#/lib/serialization/yaml";
 
 import keys from "../object/keys";
@@ -33,8 +34,13 @@ const mediaTypes = {
   } satisfies MediaType,
   "text/markdown": {
     filetype: "markdown",
-    parse: (str) => md.parse(str),
-    stringify: (obj) => md.stringify(obj),
+    parse: md.parse,
+    stringify: md.stringify,
+  } satisfies MediaType,
+  "text/plain": {
+    filetype: "text",
+    parse: txt.parse,
+    stringify: txt.stringify,
   } satisfies MediaType,
 } as const;
 

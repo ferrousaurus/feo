@@ -53,15 +53,18 @@ export const targetValidator = z
   .object({
     path: z.string(),
     sources: z.array(sourceValidator),
+    mediaType: supportedMediaTypeSchema.optional(),
     template: z
       .object({
         vars: z.record(z.string(), z.json()),
       })
       .prefault({ vars: {} }),
   })
-  .transform(({ sources, template, ...rest }) => ({
+  .transform(({ sources, template, mediaType, path: p, ...rest }) => ({
     ...rest,
+    path: p,
     template,
+    mediaType: mediaType ?? filetypes[supportedExtensionSchema.parse(path.parse(p).ext)].mediaType,
     sources: sources.map((s) =>
       "template" in s ? { ...s, template: { ...s.template, vars: { ...template.vars, ...s.template?.vars } } } : s,
     ),
