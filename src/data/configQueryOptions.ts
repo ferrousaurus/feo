@@ -6,7 +6,7 @@ import sourceContentQueryOptions from "./sourceContentQueryOptions";
 
 const configQueryOptions = (path: string) =>
   queryOptions({
-    ...sourceContentQueryOptions(sourceValidator.parse({ path })),
+    ...sourceContentQueryOptions(sourceValidator.parse({ path }), path),
     select: (data) => feoConfigValidator.parse(data),
   });
 

@@ -11,7 +11,7 @@ Configuration file manager with a terminal UI. Architectural decisions in [docs/
 ## Commands (`bun run <name>`)
 
 - `dev` — `bun run --watch src/index.ts` (bun's native watch, not tsx)
-- `test` — `vitest run` (colocated `*.test.ts`; single file: `bunx vitest run <path>`, watch: `bunx vitest`)
+- `test` — `bun test` (colocated `*.test.ts`; single file: `bun test <path>`, watch: `bun test --watch`)
 - `check` — `tsc -b` (the project uses `tsc`, not `tsgo`)
 - `lint` / `lint:fix` — `oxlint` / `oxlint --fix`
 - `fmt` / `fmt:check` — `oxfmt` / `oxfmt --check`
@@ -30,7 +30,7 @@ CI runs in this order (`.github/workflows/ci.yml`): `lint` → `fmt:check` → `
 
 ## Conventions
 
-- **Path alias**: `#/*` → `./src/*` (mirrored in `tsconfig.json` and `vitest.config.ts`). NOT `@/*`.
+- **Path alias**: `#/*` → `./src/*` (mirrored in `tsconfig.json`). NOT `@/*`.
 - **JSX runtime**: `@opentui/react` (`tsconfig.json` `jsxImportSource`). Terminal UI.
 - **Zod**: import from `zod`, not `zod/mini`.
 - **JSR packages**: `@jsr/*` requires the registry in `.npmrc` (`@jsr:registry=https://npm.jsr.io`).

@@ -1,7 +1,6 @@
 import fs from "node:fs/promises";
 
-
-import resolveAbsolutePath from "#/lib/fs/resolveAbsolutePath";
+import resolvePath from "#/lib/fs/resolvePath";
 
 export class NotFoundError extends Error {
   constructor(filename: string | URL) {
@@ -66,13 +65,13 @@ export async function readHttpFile(input: string | URL) {
 }
 
 export default async function readFile(input: string) {
-  const absolutePath = resolveAbsolutePath(input);
+  const absolutePath = resolvePath(input);
 
   try {
     const file = await readLocalFile(absolutePath);
     const text = file.toString();
     return { ok: true, text: async () => text, status: 200 } as const;
-  } catch {
-    return { ok: false, text: async () => await Promise.reject(), status: 404 } as const;
+  } catch (e) {
+    return { ok: false, text: async () => await Promise.reject(e), status: 404 } as const;
   }
 }

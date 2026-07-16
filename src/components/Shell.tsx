@@ -2,14 +2,13 @@ import fs from "node:fs/promises";
 import npath from "node:path";
 
 import { useKeyboard, useRenderer } from "@opentui/react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { Suspense, useReducer, useState } from "react";
 
 import configQueryOptions from "#/data/configQueryOptions";
 import type { FeoSource } from "#/data/feoConfig";
-import feoConfigValidator from "#/data/feoConfig";
 import sha from "#/lib/crypto/hash";
-import resolveAbsolutePath from "#/lib/fs/resolveAbsolutePath";
+import resolvePath from "#/lib/fs/resolvePath";
 import readFile from "#/lib/io/readFile";
 import writeFile from "#/lib/io/writeFile";
 import keys from "#/lib/object/keys";
@@ -81,6 +80,8 @@ export type ShellProps = {
 export default function Shell({ configPath, initialApplication, initialTarget, initialSource }: Readonly<ShellProps>) {
   const queryClient = useQueryClient();
 
+  const { data: config } = useSuspenseQuery(configQueryOptions(configPath));
+
   const [{ panel, application, target, source }, dispatch] = useReducer(
     (p: ShellState, c: Partial<ShellState> | ((state: ShellState) => Partial<ShellState>)) => {
       if (typeof c === "function") {
@@ -125,11 +126,6 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
   };
 
   const handleNextApplication = () => {
-    const data = queryClient.getQueryData(configQueryOptions(configPath).queryKey);
-    if (data === undefined) {
-      return;
-    }
-    const config = feoConfigValidator.parse(data);
     const apps = keys(config.applications);
     dispatch((s) => {
       if (s.application === undefined) {
@@ -164,11 +160,6 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
   };
 
   const handlePreviousApplication = () => {
-    const data = queryClient.getQueryData(configQueryOptions(configPath).queryKey);
-    if (data === undefined) {
-      return;
-    }
-    const config = feoConfigValidator.parse(data);
     const apps = keys(config.applications);
     dispatch((s) => {
       if (s.application === undefined) {
@@ -203,11 +194,6 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
   };
 
   const handleNextTarget = () => {
-    const data = queryClient.getQueryData(configQueryOptions(configPath).queryKey);
-    if (data === undefined) {
-      return;
-    }
-    const config = feoConfigValidator.parse(data);
     dispatch((s) => {
       if (s.application === undefined) {
         return { target: s.target };
@@ -240,11 +226,6 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
   };
 
   const handlePreviousTarget = () => {
-    const data = queryClient.getQueryData(configQueryOptions(configPath).queryKey);
-    if (data === undefined) {
-      return;
-    }
-    const config = feoConfigValidator.parse(data);
     dispatch((s) => {
       if (s.application === undefined) {
         return { target: s.target };
@@ -277,11 +258,6 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
   };
 
   const handleNextSource = () => {
-    const data = queryClient.getQueryData(configQueryOptions(configPath).queryKey);
-    if (data === undefined) {
-      return;
-    }
-    const config = feoConfigValidator.parse(data);
     dispatch((s) => {
       if (s.application === undefined || s.target === undefined) {
         return { source: s.source };
@@ -309,11 +285,6 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
   };
 
   const handlePreviousSource = () => {
-    const data = queryClient.getQueryData(configQueryOptions(configPath).queryKey);
-    if (data === undefined) {
-      return;
-    }
-    const config = feoConfigValidator.parse(data);
     dispatch((s) => {
       if (s.application === undefined || s.target === undefined) {
         return { source: s.source };
@@ -348,13 +319,13 @@ export default function Shell({ configPath, initialApplication, initialTarget, i
       if (w.contents !== opts.contents) {
         return w; // TODO: Error messaging
       }
-      const path = resolveAbsolutePath(opts.path);
+      const path = resolvePath(opts.path);
       const { dir, ext, name } = npath.parse(path);
       void readFile(path)
         .then(async (f) => (f.ok ? await f.text() : undefined))
         .then(async (currentFileContents) => {
           if (currentFileContents !== undefined) {
-            const backupPath = resolveAbsolutePath(
+            const backupPath = resolvePath(
               `~/.local/share/feo/${application}/${target}/${name}.${sha(currentFileContents)}${ext}`,
             );
             await fs.mkdir(npath.dirname(backupPath), { recursive: true });

@@ -5,7 +5,7 @@ import { mutationOptions } from "@tanstack/react-query";
 import feoConfigValidator from "#/data/feoConfig";
 import filetypes, { supportedExtensionSchema } from "#/lib/config/filetypes";
 import mediaTypes from "#/lib/config/mediaTypes";
-import resolveAbsolutePath from "#/lib/fs/resolveAbsolutePath";
+import resolvePath from "#/lib/fs/resolvePath";
 import writeFile from "#/lib/io/writeFile";
 
 const deleteTargetMutationOptions = (configPath: string) => {
@@ -23,7 +23,7 @@ const deleteTargetMutationOptions = (configPath: string) => {
         throw config.error;
       }
       delete config.data.applications[vars.app]?.targets[vars.target];
-      await writeFile(resolveAbsolutePath(configPath), mediaType.stringify(config.data));
+      await writeFile(resolvePath(configPath), mediaType.stringify(config.data));
 
       return config.data;
     },

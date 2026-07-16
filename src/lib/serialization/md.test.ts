@@ -1,4 +1,4 @@
-import { describe, expect, test } from "vitest";
+import { describe, expect, test } from "bun:test";
 import { $ZodError } from "zod/v4/core";
 
 import md from "./md";

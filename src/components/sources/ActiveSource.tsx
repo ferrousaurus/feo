@@ -18,7 +18,7 @@ export type ActiveSourceProps = {
 };
 
 export default function ActiveSource({ enableKeybinds, configPath, source }: Readonly<ActiveSourceProps>) {
-  const { isPending, isError, error, data } = useQuery(sourceContentQueryOptions(source));
+  const { isPending, isError, error, data } = useQuery(sourceContentQueryOptions(source, configPath));
   const ref = useRef<ScrollBoxRenderable>(null);
 
   if (isPending) {

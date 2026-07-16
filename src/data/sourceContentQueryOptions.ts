@@ -4,10 +4,10 @@ import loadSourceContent from "#/lib/source/loadSourceContent";
 
 import type { FeoSource } from "./feoConfig";
 
-const sourceContentQueryOptions = (source: FeoSource) =>
+const sourceContentQueryOptions = (source: FeoSource, configPath: string) =>
   queryOptions({
-    queryKey: [source],
-    queryFn: () => loadSourceContent(source),
+    queryKey: [{ configPath, source }],
+    queryFn: () => loadSourceContent(source, configPath),
   });
 
 export default sourceContentQueryOptions;

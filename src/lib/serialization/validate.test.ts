@@ -1,6 +1,6 @@
 import { isDeepStrictEqual } from "node:util";
 
-import { describe, expect, test } from "vitest";
+import { describe, expect, test } from "bun:test";
 
 import { serializableValidator } from "./util";
 

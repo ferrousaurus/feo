@@ -1,9 +1,10 @@
-import path from "node:path";
+import npath from "node:path";
 
 import { z } from "zod";
 
 import filetypes, { supportedExtensionSchema } from "#/lib/config/filetypes";
 import { supportedMediaTypeSchema } from "#/lib/config/mediaTypes";
+import resolvePath from "#/lib/fs/resolvePath";
 import entries from "#/lib/object/entries";
 
 const templateValidator = z.object({
@@ -21,10 +22,11 @@ const localSourceValidator = z
     mediaType: supportedMediaTypeSchema.optional(),
     template: templateValidator.optional(),
   })
-  .transform(({ mediaType, ...rest }) => {
-    const parsedExt = supportedExtensionSchema.safeParse(path.parse(rest.path).ext);
+  .transform(({ mediaType, path, ...rest }) => {
+    const parsedExt = supportedExtensionSchema.safeParse(npath.parse(path).ext);
     const resolvedMediaType = mediaType ?? (parsedExt.success ? filetypes[parsedExt.data].mediaType : undefined);
     return {
+      path: resolvePath(path),
       ...(resolvedMediaType === undefined ? {} : { mediaType: resolvedMediaType }),
       ...rest,
     };
@@ -37,7 +39,7 @@ const remoteSourceValidator = z
     template: templateValidator.optional(),
   })
   .transform(({ mediaType, ...rest }) => {
-    const parsedExt = supportedExtensionSchema.safeParse(path.parse(rest.url).ext);
+    const parsedExt = supportedExtensionSchema.safeParse(npath.parse(rest.url).ext);
     const resolvedMediaType = mediaType ?? (parsedExt.success ? filetypes[parsedExt.data].mediaType : undefined);
     return {
       ...(resolvedMediaType === undefined ? {} : { mediaType: resolvedMediaType }),
@@ -60,11 +62,11 @@ export const targetValidator = z
       })
       .prefault({ vars: {} }),
   })
-  .transform(({ sources, template, mediaType, path: p, ...rest }) => ({
+  .transform(({ sources, template, mediaType, path, ...rest }) => ({
     ...rest,
-    path: p,
+    path: resolvePath(path),
     template,
-    mediaType: mediaType ?? filetypes[supportedExtensionSchema.parse(path.parse(p).ext)].mediaType,
+    mediaType: mediaType ?? filetypes[supportedExtensionSchema.parse(npath.parse(path).ext)].mediaType,
     sources: sources.map((s) =>
       "template" in s ? { ...s, template: { ...s.template, vars: { ...template.vars, ...s.template?.vars } } } : s,
     ),
@@ -110,6 +112,7 @@ export const applicationValidator = z
 const keymapValidator = z.union([z.array(z.string()), z.string()]).transform((p) => (typeof p === "string" ? [p] : p));
 
 const defaultConfig = {
+  applications: {},
   settings: {
     keymap: {
       cancel: ["escape"],
@@ -134,42 +137,39 @@ const defaultConfig = {
   },
 };
 
-const feoConfigValidator = z.object({
-  settings: z.prefault(
-    z.object({
-      keymap: z
-        .object({
-          cancel: z.prefault(keymapValidator, defaultConfig.settings.keymap.cancel),
-          confirm: z.prefault(keymapValidator, defaultConfig.settings.keymap.confirm),
-          delete: z.prefault(keymapValidator, defaultConfig.settings.keymap.delete),
-          down: z.prefault(keymapValidator, defaultConfig.settings.keymap.down),
-          move: z.prefault(keymapValidator, defaultConfig.settings.keymap.move),
-          new: z.prefault(keymapValidator, defaultConfig.settings.keymap.new),
-          scrollDown: z.prefault(keymapValidator, defaultConfig.settings.keymap.scrollDown),
-          scrollUp: z.prefault(keymapValidator, defaultConfig.settings.keymap.scrollUp),
-          up: z.prefault(keymapValidator, defaultConfig.settings.keymap.up),
-          write: z.prefault(keymapValidator, defaultConfig.settings.keymap.write),
-        })
-        .prefault(defaultConfig.settings.keymap),
-
-      theme: z
-        .object({
-          inactive: z.string().prefault(defaultConfig.settings.theme.inactive),
-          active: z.string().prefault(defaultConfig.settings.theme.active),
-          success: z.string().prefault(defaultConfig.settings.theme.success),
-          info: z.string().prefault(defaultConfig.settings.theme.info),
-          warning: z.string().prefault(defaultConfig.settings.theme.warning),
-          error: z.string().prefault(defaultConfig.settings.theme.error),
-        })
-        .prefault(defaultConfig.settings.theme),
-    }),
-    {
-      keymap: defaultConfig.settings.keymap,
-      theme: defaultConfig.settings.theme,
-    },
-  ),
-  applications: z.record(z.string(), applicationValidator),
-});
+const feoConfigValidator = z
+  .object({
+    settings: z
+      .object({
+        keymap: z
+          .object({
+            cancel: z.prefault(keymapValidator, defaultConfig.settings.keymap.cancel),
+            confirm: z.prefault(keymapValidator, defaultConfig.settings.keymap.confirm),
+            delete: z.prefault(keymapValidator, defaultConfig.settings.keymap.delete),
+            down: z.prefault(keymapValidator, defaultConfig.settings.keymap.down),
+            move: z.prefault(keymapValidator, defaultConfig.settings.keymap.move),
+            new: z.prefault(keymapValidator, defaultConfig.settings.keymap.new),
+            scrollDown: z.prefault(keymapValidator, defaultConfig.settings.keymap.scrollDown),
+            scrollUp: z.prefault(keymapValidator, defaultConfig.settings.keymap.scrollUp),
+            up: z.prefault(keymapValidator, defaultConfig.settings.keymap.up),
+            write: z.prefault(keymapValidator, defaultConfig.settings.keymap.write),
+          })
+          .prefault(defaultConfig.settings.keymap),
+        theme: z
+          .object({
+            inactive: z.string().prefault(defaultConfig.settings.theme.inactive),
+            active: z.string().prefault(defaultConfig.settings.theme.active),
+            success: z.string().prefault(defaultConfig.settings.theme.success),
+            info: z.string().prefault(defaultConfig.settings.theme.info),
+            warning: z.string().prefault(defaultConfig.settings.theme.warning),
+            error: z.string().prefault(defaultConfig.settings.theme.error),
+          })
+          .prefault(defaultConfig.settings.theme),
+      })
+      .prefault(defaultConfig.settings),
+    applications: z.record(z.string(), applicationValidator).prefault(defaultConfig.applications),
+  })
+  .prefault(defaultConfig);
 
 export type FeoConfig = z.infer<typeof feoConfigValidator>;
 

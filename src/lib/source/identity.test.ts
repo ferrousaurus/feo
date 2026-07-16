@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "bun:test";
 
 import { sourceValidator } from "#/data/feoConfig";
 import { sourceId, sourceLabel } from "#/lib/source/identity";

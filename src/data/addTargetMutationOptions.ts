@@ -6,7 +6,7 @@ import { mutationOptions } from "@tanstack/react-query";
 import feoConfigValidator from "#/data/feoConfig";
 import filetypes, { supportedExtensionSchema } from "#/lib/config/filetypes";
 import mediaTypes from "#/lib/config/mediaTypes";
-import resolveAbsolutePath from "#/lib/fs/resolveAbsolutePath";
+import resolvePath from "#/lib/fs/resolvePath";
 import writeFile from "#/lib/io/writeFile";
 
 const addTargetMutationOptions = (configPath: string) => {
@@ -37,7 +37,7 @@ const addTargetMutationOptions = (configPath: string) => {
       if (!newConfig.success) {
         throw new Error("There was an error applying the change.");
       }
-      await writeFile(resolveAbsolutePath(configPath), mediaType.stringify(newConfig.data));
+      await writeFile(resolvePath(configPath), mediaType.stringify(newConfig.data));
       return newConfig.data;
     },
     onSuccess: async (data, _vars, _onMutateResult, context) => {

@@ -38,7 +38,7 @@ export default function PreviewPanel({
     queryOptions({
       queryKey: ["COMBINED", { configs: sources }],
       queryFn: async () => {
-        return await getMergedConfig({ sources });
+        return await getMergedConfig({ configPath, sources });
       },
     }),
   );
@@ -59,11 +59,10 @@ export default function PreviewPanel({
 
   const targetPath = config.applications[application]?.targets[target]?.path ?? "";
 
-  const mediaType = config.applications[application]?.targets[target]?.mediaType
+  const mediaType = config.applications[application]?.targets[target]?.mediaType;
 
-  const stringify = mediaType !== undefined
-    ? (mediaTypes[mediaType].stringify)
-    : (obj: Record<string, unknown>) => obj.toString();
+  const stringify =
+    mediaType !== undefined ? mediaTypes[mediaType].stringify : (obj: Record<string, unknown>) => obj.toString();
 
   return (
     <>

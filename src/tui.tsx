@@ -7,7 +7,7 @@ import Shell from "#/components/Shell";
 import configQueryOptions from "#/data/configQueryOptions";
 import feoConfigValidator from "#/data/feoConfig";
 import readConfigFile from "#/lib/config/readConfigFile";
-import resolveAbsolutePath from "#/lib/fs/resolveAbsolutePath";
+import resolvePath from "#/lib/fs/resolvePath";
 import keys from "#/lib/object/keys";
 import jsonHighlights from "#/parsers/json/highlights.scm" with { type: "file" };
 import jsonWasm from "#/parsers/json/tree-sitter-json.wasm" with { type: "file" };
@@ -22,7 +22,7 @@ import values from "./lib/object/values";
 export type TuiProps = { configPath: string };
 
 const tui = async ({ configPath }: Readonly<TuiProps>) => {
-  const config = feoConfigValidator.safeParse(await readConfigFile(resolveAbsolutePath(configPath)));
+  const config = feoConfigValidator.safeParse(await readConfigFile(resolvePath(configPath)));
 
   if (!config.success) {
     console.error(`${configPath} could not be opened as a configuration file.`);
@@ -57,7 +57,7 @@ const tui = async ({ configPath }: Readonly<TuiProps>) => {
       .flatMap((c) => values(c.targets))
       .flatMap((t) => t.sources)
       .map((s) => {
-        queryClient.prefetchQuery(sourceContentQueryOptions(s));
+        queryClient.prefetchQuery(sourceContentQueryOptions(s, configPath));
       }),
   );
 

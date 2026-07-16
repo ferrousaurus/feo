@@ -32,7 +32,7 @@ export default function Source({
   const [deleting, setDeleting] = useState(false);
   const { mutateAsync } = useMutation(deleteSourceMutationOptions(configPath));
 
-  const { isError } = useQuery(sourceContentQueryOptions(source));
+  const { isError } = useQuery(sourceContentQueryOptions(source, configPath));
   const { data: config } = useSuspenseQuery(configQueryOptions(configPath));
   const theme = config.settings.theme;
 

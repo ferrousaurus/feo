@@ -4,11 +4,12 @@ import type { FeoSource } from "#/data/feoConfig";
 import loadSourceContent from "#/lib/source/loadSourceContent";
 
 export type GetMergedConfigProps = {
+  configPath: string;
   sources: FeoSource[];
 };
 
-export default async function getMergedConfig({ sources }: Readonly<GetMergedConfigProps>) {
-  const objs = await Promise.allSettled(sources.map(async (s) => loadSourceContent(s)));
+export default async function getMergedConfig({ configPath, sources }: Readonly<GetMergedConfigProps>) {
+  const objs = await Promise.allSettled(sources.map(async (s) => loadSourceContent(s, configPath)));
 
   const errors = objs.filter((o) => o.status === "rejected").map((o) => o.reason);
 

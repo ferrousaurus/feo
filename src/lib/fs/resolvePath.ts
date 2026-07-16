@@ -1,4 +1,4 @@
-export default function resolveAbsolutePath(path: string): string {
+export default function resolvePath(path: string) {
   const expanded = path.startsWith("~") ? "${HOME}" + path.slice(1) : path;
 
   return expanded

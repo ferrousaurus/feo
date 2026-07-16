@@ -18,7 +18,7 @@ import VERSION from "#/lib/version";
 import tui from "#/tui";
 
 import sha from "./lib/crypto/hash";
-import resolveAbsolutePath from "./lib/fs/resolveAbsolutePath";
+import resolvePath from "./lib/fs/resolvePath";
 import writeFile from "./lib/io/writeFile";
 
 await new Command()
@@ -66,12 +66,12 @@ await new Command()
       for (const [, { path: targetPath, sources: sourcePaths }] of entries(application.targets)) {
         const { dir, ext, name } = npath.parse(targetPath);
         const validatedExt = supportedExtensionSchema.parse(ext);
-        const sources = (await Promise.allSettled(sourcePaths.map(async (s) => loadSourceContent(s))))
+        const sources = (await Promise.allSettled(sourcePaths.map(async (s) => loadSourceContent(s, configPath))))
           .filter((r) => r.status === "fulfilled")
           .map((r) => r.value);
         const resolved = sources.reduce((p, c) => deepMerge(c, p), {} as Serializable);
         const contents = mediaTypes[filetypes[validatedExt].mediaType].stringify(resolved);
-        const currentFile = await readFile(resolveAbsolutePath(targetPath));
+        const currentFile = await readFile(resolvePath(targetPath));
 
         if (currentFile.ok) {
           const currentFileContents = await currentFile.text();
@@ -85,13 +85,13 @@ await new Command()
 
           if (!isDeepStrictEqual(currentFileData, resolved)) {
             await writeFile(
-              resolveAbsolutePath(`${dir}/${name}.${sha(currentFileContents)}.feo-bkup${validatedExt}`),
+              resolvePath(`${dir}/${name}.${sha(currentFileContents)}.feo-bkup${validatedExt}`),
               currentFileContents,
             );
           }
         }
 
-        await writeFile(resolveAbsolutePath(`${dir}/${name}${validatedExt}`), contents);
+        await writeFile(resolvePath(`${dir}/${name}${validatedExt}`), contents);
       }
     }
   })
