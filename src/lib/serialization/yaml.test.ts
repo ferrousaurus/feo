@@ -4,6 +4,7 @@ import { $ZodError } from "zod/v4/core";
 import yaml from "./yaml";
 
 const successCases = [
+  { input: "", expected: {} },
   { input: "a: 1", expected: { a: 1 } },
   { input: "a: 1\nb: 2", expected: { a: 1, b: 2 } },
   { input: "a:\n  b: 2", expected: { a: { b: 2 } } },
