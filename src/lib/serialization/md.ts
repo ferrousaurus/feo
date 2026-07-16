@@ -32,7 +32,8 @@ export const parse = (str: string): { frontmatter?: z.JSONType; content: string 
 
 export const stringify = (obj: Serializable): string => {
   const { content, frontmatter } = obj;
-  if (frontmatter === undefined) {
+  const frontmatterAsRecord = z.record(z.string(), z.unknown()).safeParse(frontmatter);
+  if (!frontmatterAsRecord.success || Object.keys(frontmatterAsRecord.data).length === 0) {
     return `${content}`;
   }
   return `---\n${yaml.stringify(z.record(z.string(), z.json()).parse(frontmatter))}---\n${content}`;
