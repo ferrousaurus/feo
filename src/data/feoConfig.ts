@@ -12,15 +12,32 @@ const templateValidator = z.object({
   vars: z.record(z.string(), z.json()).optional(),
 });
 
-const inlineSourceValidator = z.object({
+const baseSourceValidator = z.object({
+  merge: z
+    .object({
+      arrays: z.enum(["merge", "replace"]).default("merge"),
+      sets: z.enum(["merge", "replace"]).default("merge"),
+      maps: z.enum(["merge", "replace"]).default("merge"),
+    })
+    .default({
+      arrays: "merge",
+      sets: "merge",
+      maps: "merge",
+    }),
+});
+
+const inlineSourceValidator = baseSourceValidator.extend({
   data: z.record(z.string(), z.json()),
 });
 
-const localSourceValidator = z
-  .object({
+const fileBaseSourceValidator = baseSourceValidator.extend({
+  mediaType: supportedMediaTypeSchema.optional(),
+  template: templateValidator.optional(),
+});
+
+const localSourceValidator = fileBaseSourceValidator
+  .extend({
     path: z.string(),
-    mediaType: supportedMediaTypeSchema.optional(),
-    template: templateValidator.optional(),
   })
   .transform(({ mediaType, path, ...rest }) => {
     const parsedExt = supportedExtensionSchema.safeParse(npath.parse(path).ext);
@@ -32,11 +49,9 @@ const localSourceValidator = z
     };
   });
 
-const remoteSourceValidator = z
-  .object({
+const remoteSourceValidator = fileBaseSourceValidator
+  .extend({
     url: z.url(),
-    mediaType: supportedMediaTypeSchema.optional(),
-    template: templateValidator.optional(),
   })
   .transform(({ mediaType, ...rest }) => {
     const parsedExt = supportedExtensionSchema.safeParse(npath.parse(rest.url).ext);

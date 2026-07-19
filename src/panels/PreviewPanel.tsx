@@ -37,9 +37,7 @@ export default function PreviewPanel({
   const { isPending, isError, error, data } = useQuery(
     queryOptions({
       queryKey: ["COMBINED", { configs: sources }],
-      queryFn: async () => {
-        return await getMergedConfig({ configPath, sources });
-      },
+      queryFn: async () => await getMergedConfig({ configPath, sources }),
     }),
   );
 

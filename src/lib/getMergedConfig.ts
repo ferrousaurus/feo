@@ -9,7 +9,9 @@ export type GetMergedConfigProps = {
 };
 
 export default async function getMergedConfig({ configPath, sources }: Readonly<GetMergedConfigProps>) {
-  const objs = await Promise.allSettled(sources.map(async (s) => loadSourceContent(s, configPath)));
+  const objs = await Promise.allSettled(
+    sources.map(async (source) => ({ content: await loadSourceContent(source, configPath), source })),
+  );
 
   const errors = objs.filter((o) => o.status === "rejected").map((o) => o.reason);
 
@@ -23,5 +25,5 @@ export default async function getMergedConfig({ configPath, sources }: Readonly<
 
   const successes = objs.filter((o) => o.status === "fulfilled").map((o) => o.value);
 
-  return successes.reduce((p, c) => deepMerge(c, p), {});
+  return successes.reduce((p, c) => deepMerge(c.content, p, c.source.merge), {});
 }
